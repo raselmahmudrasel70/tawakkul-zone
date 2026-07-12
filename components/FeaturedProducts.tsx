@@ -39,40 +39,47 @@ export default function FeaturedProducts() {
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {products.map((product) => (
-            <Link
+            <div
               key={product.id}
-              href={`/product/${product.id}`}
-              className="block rounded-2xl bg-white p-6 shadow-lg transition duration-300 hover:-translate-y-2 hover:shadow-2xl"
+              className="rounded-2xl bg-white p-6 shadow-lg transition duration-300 hover:-translate-y-2 hover:shadow-2xl"
             >
-              <div className="relative mb-4 h-56 overflow-hidden rounded-xl">
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  fill
-                  className="object-cover transition duration-300 hover:scale-110"
-                />
+              {/* Product Image */}
+              <Link href={`/product/${product.id}`}>
+                <div className="relative mb-4 h-56 overflow-hidden rounded-xl">
+                  <Image
+                    src={product.image}
+                    alt={product.name}
+                    fill
+                    className="object-cover transition duration-300 hover:scale-110"
+                  />
 
-                <span className="absolute left-3 top-3 rounded-full bg-green-600 px-3 py-1 text-xs font-bold text-white">
-                  NEW
-                </span>
+                  <span className="absolute left-3 top-3 rounded-full bg-green-600 px-3 py-1 text-xs font-bold text-white">
+                    NEW
+                  </span>
 
-                <div className="absolute right-3 top-3 rounded-full bg-white/90 p-2 shadow-lg">
-                  <Heart className="h-5 w-5 text-gray-700" />
+                  <div className="absolute right-3 top-3 rounded-full bg-white/90 p-2 shadow-lg">
+                    <Heart className="h-5 w-5 text-gray-700" />
+                  </div>
                 </div>
-              </div>
+              </Link>
 
-              <h3 className="mt-4 text-lg font-semibold text-gray-700">
-                {product.name}
-              </h3>
+              {/* Product Name */}
+              <Link href={`/product/${product.id}`}>
+                <h3 className="mt-4 text-lg font-semibold text-gray-700 hover:text-green-700">
+                  {product.name}
+                </h3>
+              </Link>
 
+              {/* Price */}
               <p className="mt-2 text-xl font-bold text-green-700">
                 {product.price}
               </p>
 
-              <div className="mt-5 w-full rounded-xl bg-green-700 py-2 text-center font-semibold text-white hover:bg-green-800">
+              {/* Add to Cart */}
+              <button className="mt-5 w-full rounded-xl bg-green-700 py-2 font-semibold text-white transition hover:bg-green-800">
                 Add to Cart
-              </div>
-            </Link>
+              </button>
+            </div>
           ))}
         </div>
       </div>
