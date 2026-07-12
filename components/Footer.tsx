@@ -37,12 +37,12 @@ export default function Footer() {
           <div className="space-y-3 text-sm">
             <div className="flex items-center gap-2">
               <Phone size={16} />
-              017XXXXXXXX
+              01637133488
             </div>
 
             <div className="flex items-center gap-2">
               <Mail size={16} />
-              support@tawakkulzone.com
+              info.tawakkulzone@gmail.com
             </div>
           </div>
         </div>
