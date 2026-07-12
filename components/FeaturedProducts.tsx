@@ -12,7 +12,7 @@ export default function FeaturedProducts() {
 
 
   return (
-    <section className="bg-gray-50 py-16">
+    <section className="bg-gray-50 py-10">
       <div className="mx-auto max-w-7xl px-6">
         <h2 className="mb-10 text-center text-4xl font-bold text-red-900">
           ⭐ Featured Products

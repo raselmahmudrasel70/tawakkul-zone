@@ -20,15 +20,32 @@ export default function Footer() {
         </div>
 
         {/* Quick Links */}
-        <div>
-          <h3 className="mb-4 font-semibold">Quick Links</h3>
+<div>
+  <h3 className="mb-4 font-semibold">Quick Links</h3>
 
-          <div className="space-y-2">
-            <Link href="/">Home</Link><br />
-            <Link href="/cart">Cart</Link><br />
-            <Link href="/">Products</Link>
-          </div>
-        </div>
+  <div className="flex flex-wrap gap-5">
+    <Link
+      href="/"
+      className="text-yellow-300 transition hover:text-white"
+    >
+      Home
+    </Link>
+
+    <Link
+      href="/cart"
+      className="text-yellow-300 transition hover:text-white"
+    >
+      Cart
+    </Link>
+
+    <Link
+      href="/"
+      className="text-yellow-300 transition hover:text-white"
+    >
+      Products
+    </Link>
+  </div>
+</div>
 
         {/* Contact */}
         <div>
