@@ -1,26 +1,31 @@
+import Image from "next/image";
 export default function FeaturedProducts() {
   const products = [
-    {
-      id: 1,
-      name: "Premium Panjabi",
-      price: "৳ 2,450",
-    },
-    {
-      id: 2,
-      name: "Arabic Jubba",
-      price: "৳ 3,200",
-    },
-    {
-      id: 3,
-      name: "Prayer Cap",
-      price: "৳ 350",
-    },
-    {
-      id: 4,
-      name: "Premium Shirt",
-      price: "৳ 1,650",
-    },
-  ];
+  {
+    id: 1,
+    name: "Three Piece Collection",
+    price: "৳ 767",
+    image: "/products/product1.jpg"
+  },
+  {
+    id: 2,
+    name: "Three Piece Collection",
+    price: "৳ 789",
+    image: "/products/product2.jpg",
+  },
+  {
+    id: 3,
+    name: "Three Piece Collection",
+    price: "৳ 799",
+    image: "/products/product3.jpg",
+  },
+  {
+    id: 4,
+    name: "Three Piece Collection",
+    price: "৳ 749",
+    image: "/products/product4.jpg",
+  },
+];
 
   return (
     <section className="bg-gray-50 py-16">
@@ -35,7 +40,14 @@ export default function FeaturedProducts() {
               key={product.id}
               className="rounded-2xl bg-white p-5 shadow-md transition hover:-translate-y-1 hover:shadow-xl"
             >
-              <div className="mb-4 h-56 rounded-xl bg-gray-200"></div>
+              <div className="relative mb-4 h-56 overflow-hidden rounded-xl">
+  <Image
+    src={product.image}
+    alt={product.name}
+    fill
+    className="object-cover"
+  />
+</div>
 
               <h3 className="text-lg font-semibold">{product.name}</h3>
 
