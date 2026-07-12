@@ -6,10 +6,19 @@ import Image from "next/image";
 import { Heart } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 
-export default function FeaturedProducts() {
-  const { addToCart } = useCart();
+export default function FeaturedProducts({
+  selectedCategory,
+}: {
+  selectedCategory: string;
+}) {
+const { addToCart } = useCart();
 
-
+const filteredProducts =
+  selectedCategory === "All"
+    ? products
+    : products.filter(
+        (product) => product.category === selectedCategory
+      );
 
   return (
     <section className="bg-gray-50 py-10">
@@ -19,7 +28,7 @@ export default function FeaturedProducts() {
         </h2>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {products.map((product) => (
+          {filteredProducts.map((product) => (
             <div
               key={product.id}
               className="rounded-2xl bg-white p-6 shadow-lg transition duration-300 hover:-translate-y-2 hover:shadow-2xl"
@@ -70,7 +79,7 @@ export default function FeaturedProducts() {
 </div>
 
               <p className="mt-2 text-2xl font-bold text-green-700">
-                {product.price}
+                ৳ {product.price}
               </p>
 <div className="mt-2 text-sm">
   {product.freeDelivery ? (
