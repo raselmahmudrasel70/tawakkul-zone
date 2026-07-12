@@ -1,5 +1,5 @@
 "use client";
-
+import SearchBar from "./SearchBar";
 import Link from "next/link";
 import { Search, Heart, ShoppingCart, User } from "lucide-react";
 import { useCart } from "@/context/CartContext";
@@ -24,14 +24,7 @@ export default function Header() {
         </div>
 
         {/* Search */}
-        <div className="hidden md:flex items-center bg-white rounded-full px-4 py-2 w-96">
-          <Search size={18} className="text-gray-500" />
-
-          <input
-            className="ml-2 w-full outline-none text-black"
-            placeholder="Search Products..."
-          />
-        </div>
+        <SearchBar />
 
         {/* Icons */}
         <div className="flex items-center gap-5">
