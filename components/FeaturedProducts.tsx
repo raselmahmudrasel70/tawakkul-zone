@@ -1,8 +1,13 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { Heart } from "lucide-react";
+import { useCart } from "@/context/CartContext";
 
 export default function FeaturedProducts() {
+  const { addToCart } = useCart();
+
   const products = [
     {
       id: 1,
@@ -43,7 +48,6 @@ export default function FeaturedProducts() {
               key={product.id}
               className="rounded-2xl bg-white p-6 shadow-lg transition duration-300 hover:-translate-y-2 hover:shadow-2xl"
             >
-              {/* Product Image */}
               <Link href={`/product/${product.id}`}>
                 <div className="relative mb-4 h-56 overflow-hidden rounded-xl">
                   <Image
@@ -63,20 +67,20 @@ export default function FeaturedProducts() {
                 </div>
               </Link>
 
-              {/* Product Name */}
               <Link href={`/product/${product.id}`}>
                 <h3 className="mt-4 text-lg font-semibold text-gray-700 hover:text-green-700">
                   {product.name}
                 </h3>
               </Link>
 
-              {/* Price */}
               <p className="mt-2 text-xl font-bold text-green-700">
                 {product.price}
               </p>
 
-              {/* Add to Cart */}
-              <button className="mt-5 w-full rounded-xl bg-green-700 py-2 font-semibold text-white transition hover:bg-green-800">
+              <button
+                onClick={() => addToCart(product)}
+                className="mt-5 w-full rounded-xl bg-green-700 py-2 font-semibold text-white transition hover:bg-green-800"
+              >
                 Add to Cart
               </button>
             </div>
