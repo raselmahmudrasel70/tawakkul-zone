@@ -33,9 +33,11 @@ export default function FeaturedProducts() {
                     className="object-cover transition duration-300 hover:scale-110"
                   />
 
-                  <span className="absolute left-3 top-3 rounded-full bg-green-600 px-3 py-1 text-xs font-bold text-white">
-                    NEW
-                  </span>
+                  {product.newArrival && (
+  <span className="absolute left-3 top-3 rounded-full bg-green-600 px-3 py-1 text-xs font-bold text-white">
+    NEW
+  </span>
+)}
 
                   <div className="absolute right-3 top-3 rounded-full bg-white/90 p-2 shadow-lg">
                     <Heart className="h-5 w-5 text-gray-700" />
@@ -48,11 +50,39 @@ export default function FeaturedProducts() {
                   {product.name}
                 </h3>
               </Link>
+<div className="mt-2 flex items-center gap-2">
+  <span className="text-yellow-500">★★★★★</span>
 
-              <p className="mt-2 text-xl font-bold text-green-700">
+  <span className="text-sm text-gray-500">
+    {product.rating}
+  </span>
+</div>
+<div className="mt-1">
+  {product.stock ? (
+    <span className="text-sm text-green-600">
+      ✔ In Stock
+    </span>
+  ) : (
+    <span className="text-sm text-red-600">
+      ✖ Out of Stock
+    </span>
+  )}
+</div>
+
+              <p className="mt-2 text-2xl font-bold text-green-700">
                 {product.price}
               </p>
-
+<div className="mt-2 text-sm">
+  {product.freeDelivery ? (
+    <span className="font-medium text-green-600">
+      🚚 Free Delivery
+    </span>
+  ) : (
+    <span className="text-gray-500">
+      🚚 Delivery Available
+    </span>
+  )}
+</div>
               <button
                 onClick={() => addToCart(product)}
                 className="mt-5 w-full rounded-xl bg-green-700 py-2 font-semibold text-white transition hover:bg-green-800"

@@ -8,6 +8,10 @@ type Product = {
   name: string;
   price: number;
   image: string;
+  category: string;
+  rating: number;
+  stock: boolean;
+  description: string;
 };
 
 export default function ProductDetails({
@@ -38,22 +42,34 @@ export default function ProductDetails({
           </h1>
 
           <div className="mt-3 flex items-center gap-2">
-            ⭐⭐⭐⭐⭐
-            <span className="text-gray-500">(4.9)</span>
-          </div>
+  <span className="text-yellow-500 text-xl">★★★★★</span>
+
+  <span className="font-medium text-gray-600">
+    {product.rating} / 5
+  </span>
+</div>
 
           <p className="mt-4 text-3xl font-bold text-green-700">
             ৳ {product.price}
           </p>
 
-          <p className="mt-4 font-semibold text-green-600">
-            ✔ In Stock
-          </p>
+          <p
+  className={`mt-4 font-semibold ${
+    product.stock ? "text-green-600" : "text-red-600"
+  }`}
+>
+  {product.stock ? "✔ In Stock" : "✖ Out of Stock"}
+</p>
+<div className="mt-3">
+  <span className="font-semibold">Category:</span>{" "}
+  <span className="rounded-full bg-green-100 px-3 py-1 text-sm text-green-700">
+    {product.category}
+  </span>
+</div>
 
           <p className="mt-6 leading-7 text-gray-600">
-            Premium quality Islamic fashion from Tawakkul Zone.
-            Comfortable fabric, elegant design and perfect for daily wear.
-          </p>
+  {product.description}
+</p>
 
           <div className="mt-8 flex gap-4">
             <button

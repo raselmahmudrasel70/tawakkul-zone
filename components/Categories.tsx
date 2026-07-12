@@ -1,12 +1,14 @@
 export default function Categories() {
+  "use client";
   const categories = [
-    "থ্রী পিস",
-    "শাড়ী",
-    "বোরকা",
-    "হিজাব",
-    "গজ কাপড়",
-    "বাচ্চাদের জন্য",
-  ];
+  "All",
+  "Three Piece",
+  "Saree",
+  "Abaya",
+  "Hijab",
+  "Fabric",
+  "Kids",
+];
 
   return (
     <section className="bg-white py-16">
@@ -15,16 +17,16 @@ export default function Categories() {
           🛍️ Shop by Category
         </h2>
 
-        <div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-6">
-          {categories.map((category) => (
-            <button
-              key={category}
-              className="rounded-2xl border border-green-200 bg-green-50 p-6 text-center font-semibold text-green-800 transition hover:bg-green-700 hover:text-white"
-            >
-              {category}
-            </button>
-          ))}
-        </div>
+        <div className="flex flex-wrap justify-center gap-4">
+  {categories.map((category) => (
+    <button
+      key={category}
+      className="rounded-full border border-green-200 bg-green-50 px-6 py-3 text-sm font-semibold text-green-800 transition-all duration-300 hover:-translate-y-1 hover:bg-green-700 hover:text-white hover:shadow-lg"
+    >
+      {category}
+    </button>
+  ))}
+</div>
       </div>
     </section>
   );
