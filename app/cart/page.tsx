@@ -114,5 +114,3 @@ export default function CartPage() {
     </main>
   );
 }
-
-<main className="min-h-screen bg-slate-50"></main>
