@@ -1,21 +1,15 @@
-import { notFound } from "next/navigation";
-import { products } from "@/data/products";
-import ProductDetails from "@/components/ProductDetails";
+export default function AddProductPage() {
+  return (
+    <main className="mx-auto max-w-5xl px-6 py-10">
+      <h1 className="mb-8 text-4xl font-bold text-green-800">
+        ➕ Add Product
+      </h1>
 
-export default async function ProductPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
+      <div className="rounded-2xl border bg-white p-8 shadow-lg">
 
-  const product = products.find(
-    (item) => item.id === Number(id)
+        {/* আমরা এখানে Form বানাব */}
+
+      </div>
+    </main>
   );
-
-  if (!product) {
-    notFound();
-  }
-
-  return <ProductDetails product={product} />;
 }

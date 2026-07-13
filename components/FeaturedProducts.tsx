@@ -1,5 +1,5 @@
 "use client";
-
+import { useWishlist } from "@/context/WishlistContext";
 import { products } from "@/data/products";
 import Link from "next/link";
 import Image from "next/image";
@@ -12,14 +12,15 @@ export default function FeaturedProducts({
   selectedCategory: string;
 }) {
 const { addToCart } = useCart();
-
+const { wishlist, addToWishlist, removeFromWishlist } = useWishlist();
 const filteredProducts =
   selectedCategory === "All"
     ? products
     : products.filter(
         (product) => product.category === selectedCategory
       );
-
+const isWishlisted = (id: number) =>
+  wishlist.some((item) => item.id === id);
   return (
     <section className="bg-gray-50 py-10">
       <div className="mx-auto max-w-7xl px-6">
@@ -30,29 +31,46 @@ const filteredProducts =
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {filteredProducts.map((product) => (
             <div
-              key={product.id}
-              className="rounded-2xl bg-white p-6 shadow-lg transition duration-300 hover:-translate-y-2 hover:shadow-2xl"
-            >
-              <Link href={`/product/${product.id}`}>
-                <div className="relative mb-4 h-56 overflow-hidden rounded-xl">
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    fill
-                    className="object-cover transition duration-300 hover:scale-110"
-                  />
+  key={product.id}
+  className="rounded-2xl bg-white p-6 shadow-lg transition duration-300 hover:-translate-y-2 hover:shadow-2xl"
+>
+  <div className="relative mb-4 h-56 overflow-hidden rounded-xl">
 
-                  {product.newArrival && (
-  <span className="absolute left-3 top-3 rounded-full bg-green-600 px-3 py-1 text-xs font-bold text-white">
-    NEW
-  </span>
-)}
+    <Link href={`/product/${product.id}`}>
+      <Image
+        src={product.image}
+        alt={product.name}
+        fill
+        className="object-cover transition duration-300 hover:scale-110"
+      />
+    </Link>
 
-                  <div className="absolute right-3 top-3 rounded-full bg-white/90 p-2 shadow-lg">
-                    <Heart className="h-5 w-5 text-gray-700" />
-                  </div>
-                </div>
-              </Link>
+    {product.newArrival && (
+      <span className="absolute left-3 top-3 rounded-full bg-green-600 px-3 py-1 text-xs font-bold text-white">
+        NEW
+      </span>
+    )}
+
+    <button
+  onClick={() => {
+    if (isWishlisted(product.id)) {
+      removeFromWishlist(product.id);
+    } else {
+      addToWishlist(product);
+    }
+  }}
+  className="absolute right-3 top-3 rounded-full bg-white/90 p-2 shadow-lg transition hover:bg-red-100"
+>
+  <Heart
+    className={`h-5 w-5 transition ${
+      isWishlisted(product.id)
+        ? "fill-red-500 text-red-500"
+        : "text-gray-700"
+    }`}
+  />
+</button>
+
+  </div>
 
               <Link href={`/product/${product.id}`}>
                 <h3 className="mt-4 text-lg font-semibold text-gray-700 hover:text-green-700">
