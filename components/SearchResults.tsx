@@ -35,7 +35,7 @@ export default function SearchResults({
           >
             <div className="relative h-16 w-16 overflow-hidden rounded-lg">
               <Image
-                src={product.image}
+                src={product.images || "/products/product1.jpg"}
                 alt={product.name}
                 fill
                 className="object-cover"

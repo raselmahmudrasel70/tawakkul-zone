@@ -53,7 +53,7 @@ export default async function ProductsPage() {
               <div className="flex items-center gap-5">
                 <div className="relative h-24 w-24 overflow-hidden rounded-xl border bg-gray-100">
                   <Image
-                    src={product.image || "/products/product1.jpg"}
+                    src={product.images || "/products/product1.jpg"}
                     alt={product.name}
                     fill
                     className="object-cover"
@@ -68,6 +68,10 @@ export default async function ProductsPage() {
                   <p className="text-gray-500">
                     {product.category}
                   </p>
+                   
+                   <p className="mt-2 text-lg font-bold text-green-700">
+                    {product.discount}
+                    </p>
 
                   <p className="mt-2 text-lg font-bold text-green-700">
                     ৳ {product.price}

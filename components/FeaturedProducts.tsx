@@ -1,11 +1,11 @@
 "use client";
+import { supabase } from "@/lib/supabase";
 import { useWishlist } from "@/context/WishlistContext";
-import { products } from "@/data/products";
 import Link from "next/link";
 import Image from "next/image";
 import { Heart } from "lucide-react";
 import { useCart } from "@/context/CartContext";
-
+import { useEffect, useState } from "react";
 export default function FeaturedProducts({
   selectedCategory,
 }: {
@@ -13,12 +13,32 @@ export default function FeaturedProducts({
 }) {
 const { addToCart } = useCart();
 const { wishlist, addToWishlist, removeFromWishlist } = useWishlist();
+const [products, setProducts] = useState<any[]>([]);
 const filteredProducts =
   selectedCategory === "All"
     ? products
     : products.filter(
         (product) => product.category === selectedCategory
       );
+      useEffect(() => {
+  async function loadProducts() {
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .order("id", { ascending: false });
+
+    if (error) {
+      console.log(error);
+      return;
+    }
+
+    if (data) {
+      setProducts(data);
+    }
+  }
+
+  loadProducts();
+}, []);
 const isWishlisted = (id: number) =>
   wishlist.some((item) => item.id === id);
   return (
@@ -29,8 +49,13 @@ const isWishlisted = (id: number) =>
         </h2>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {filteredProducts.map((product) => (
+          {filteredProducts.map((product) => {
+  const discountedPrice =
+    product.price - (product.price * (product.discount ?? 0)) / 100;
+
+  return (
             <div
+            
   key={product.id}
   className="rounded-2xl bg-white p-6 shadow-lg transition duration-300 hover:-translate-y-2 hover:shadow-2xl"
 >
@@ -38,7 +63,7 @@ const isWishlisted = (id: number) =>
 
     <Link href={`/product/${product.id}`}>
       <Image
-        src={product.image}
+        src={product.images || "/products/product1.jpg"}
         alt={product.name}
         fill
         className="object-cover transition duration-300 hover:scale-110"
@@ -96,9 +121,29 @@ const isWishlisted = (id: number) =>
   )}
 </div>
 
-              <p className="mt-2 text-2xl font-bold text-green-700">
-                ৳ {product.price}
-              </p>
+              <div className="mt-3">
+  {product.discount > 0 ? (
+    <>
+      <div className="flex items-center gap-2">
+        <span className="text-sm font-semibold text-red-500 line-through">
+          ৳ {product.price}
+        </span>
+
+        <span className="rounded-full bg-red-600 px-2 py-0.5 text-xs font-bold text-white">
+          -{product.discount}%
+        </span>
+      </div>
+
+      <p className="mt-1 text-2xl font-extrabold text-green-700">
+        ৳ {discountedPrice.toFixed(0)}
+      </p>
+    </>
+  ) : (
+    <p className="mt-1 text-2xl font-extrabold text-green-700">
+      ৳ {product.price}
+    </p>
+  )}
+</div>
 <div className="mt-2 text-sm">
   {product.freeDelivery ? (
     <span className="font-medium text-green-600">
@@ -117,7 +162,8 @@ const isWishlisted = (id: number) =>
                 Add to Cart
               </button>
             </div>
-          ))}
+                    );
+        })}
         </div>
       </div>
     </section>

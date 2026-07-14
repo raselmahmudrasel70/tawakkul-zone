@@ -19,7 +19,6 @@ export const metadata: Metadata = {
   title: "Tawakkul Zone",
   description: "Premium Islamic Fashion & Clothing",
 };
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -33,9 +32,9 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <CartProvider>
   <WishlistProvider>
-    <Header />
-
-    <main className="flex-1">
+    <Header/>
+     Tawakkul Zone
+     <main className="flex-1">
       {children}
     </main>
   </WishlistProvider>

@@ -12,56 +12,90 @@ const [price, setPrice] = useState("");
 const [discount, setDiscount] = useState("0");
 const [description, setDescription] = useState("");
 const [stock, setStock] = useState(true);
-
-const [featured, setFeatured] = useState(false);
-const [newArrival, setNewArrival] = useState(false);
-const [freeDelivery, setFreeDelivery] = useState(false);
+const [slug, setSlug] = useState("");
+const [rating, setRating] = useState("5");
+const [sku, setSku] = useState("");
+const [isActive, setIsActive] = useState(true);
+const [featured, setFeatured] = useState(true);
+const [newArrival, setNewArrival] = useState(true);
+const [freeDelivery, setFreeDelivery] = useState(true);
 const [cashOnDelivery, setCashOnDelivery] = useState(true);
 
-const [image, setImage] = useState("");
+const [image, setImage] = useState<File | null>(null);
 const [loading, setLoading] = useState(false);
 async function handleSubmit(e: React.FormEvent) {
   e.preventDefault();
 
   setLoading(true);
 
-  const { error } = await supabase
-    .from("products")
-    .insert({
-      name,
-      category,
-      brand,
-      image,
-      price: Number(price),
-      discount: Number(discount),
-      description,
-      stock,
-      featured,
-      new_arrival: newArrival,
-      free_delivery: freeDelivery,
-      cash_on_delivery: cashOnDelivery,
-    });
+  let imageUrl = "";
 
-  setLoading(false);
+  // Upload image
+  if (image) {
+    const fileName = `${Date.now()}-${image.name}`;
 
-  if (error) {
-    alert(error.message);
-    return;
+    const { error: uploadError } = await supabase.storage
+      .from("products")
+      .upload(fileName, image);
+
+    if (uploadError) {
+      alert(uploadError.message);
+      setLoading(false);
+      return;
+    }
+
+    const { data } = supabase.storage
+      .from("products")
+      .getPublicUrl(fileName);
+
+    imageUrl = data.publicUrl;
   }
 
-  alert("✅ Product Added Successfully");
+  // Insert product
+ const { error } = await supabase
+  .from("products")
+  .insert({
+    name,
+    slug,
+    category,
+    brand,
+    sku,
 
-  router.push("/admin/products");
+    images: imageUrl,
+
+    price: Number(price),
+    discount: Number(discount),
+    description,
+
+    rating: Number(rating),
+
+    stock,
+    featured,
+    new_arrival: newArrival,
+    free_delivery: freeDelivery,
+    cash_on_delivery: cashOnDelivery,
+    is_active: isActive,
+  });
+
+setLoading(false);
+
+if (error) {
+  alert(error.message);
+  return;
+}
+
+alert("✅ Product Added Successfully");
+router.push("/admin/products");
 }
   return (
-    <main className="mx-auto max-w-6xl px-6 py-10 bg-yellow-200">
+    <main className="mx-auto max-w-6xl px-6 py-10">
       <h1 className="mb-8 text-4xl font-bold text-green-800">
         ➕ Add Product
       </h1>
 
       <form
   onSubmit={handleSubmit}
-  className="space-y-8 rounded-2xl border bg-white p-8 shadow-lg"
+  className="space-y-8 rounded-2xl border bg-blue-100 p-8 shadow-lg"
 >
 
         {/* Basic Information */}
@@ -84,7 +118,19 @@ async function handleSubmit(e: React.FormEvent) {
   className="w-full rounded-xl border p-3 outline-none text-black focus:border-green-700"
 />
             </div>
+<div>
+  <label className="mb-2 block font-semibold text-yellow-700">
+    Slug
+  </label>
 
+  <input
+    type="text"
+    value={slug}
+    onChange={(e) => setSlug(e.target.value)}
+    placeholder="premium-three-piece"
+    className="w-full rounded-xl border p-3 outline-none focus:border-green-700"
+  />
+</div>
             <div>
               <label className="mb-2 block font-semibold text-yellow-700">
                 Category
@@ -116,16 +162,34 @@ async function handleSubmit(e: React.FormEvent) {
   className="w-full rounded-xl border p-3 text-blue-700"
 />
             </div>
+<div>
+  <label className="mb-2 block font-semibold text-yellow-700">
+    SKU
+  </label>
 
+  <input
+    type="text"
+    value={sku}
+    onChange={(e) => setSku(e.target.value)}
+    placeholder="TZ-TP-001"
+    className="w-full rounded-xl border p-3 text-black"
+  />
+</div>
             <div>
               <label className="mb-2 block font-semibold text-yellow-700">
                 Product Image
               </label>
 
               <input
-                type="file"
-                className="w-full rounded-xl border p-2 text-black"
-              />
+  type="file"
+  accept="image/*"
+  onChange={(e) => {
+    if (e.target.files?.[0]) {
+      setImage(e.target.files[0]);
+    }
+  }}
+  className="w-full rounded-xl border p-2 text-black"
+/>
             </div>
 
           </div>
@@ -167,7 +231,21 @@ async function handleSubmit(e: React.FormEvent) {
 
           </div>
         </div>
+<div>
+  <label className="mb-2 block font-semibold text-yellow-700">
+    Rating
+  </label>
 
+  <input
+    type="number"
+    min="1"
+    max="5"
+    step="0.1"
+    value={rating}
+    onChange={(e) => setRating(e.target.value)}
+    className="w-full rounded-xl border p-3 text-black"
+  />
+</div>
         {/* Product */}
         <div>
           <h2 className="mb-5 text-2xl font-bold text-green-700">
@@ -177,20 +255,24 @@ async function handleSubmit(e: React.FormEvent) {
           <div className="grid gap-5 md:grid-cols-2">
 
             <div>
-              <label className="mb-2 block font-semibold">
+              <label className="mb-2 block font-semibold text-yellow-700">
                 Stock
               </label>
 
-              <select className="w-full rounded-xl border p-3 text-black">
-                <option>🟢 In Stock</option>
-                <option>🔴 Out of Stock</option>
-              </select>
+              <select
+  value={stock ? "true" : "false"}
+  onChange={(e) => setStock(e.target.value === "true")}
+  className="w-full rounded-xl border p-3 text-black"
+>
+  <option value="true">🟢 In Stock</option>
+  <option value="false">🔴 Out of Stock</option>
+</select>
             </div>
 
           </div>
 
           <div className="mt-5">
-            <label className="mb-2 block font-semibold text-black">
+            <label className="mb-2 block font-semibold text-yellow-700">
               Description
             </label>
 
@@ -198,7 +280,7 @@ async function handleSubmit(e: React.FormEvent) {
   rows={5}
   value={description}
   onChange={(e) => setDescription(e.target.value)}
-  className="w-full rounded-xl border p-3"
+  className="w-full rounded-xl border p-3 outline-none text-black focus:border-green-700"
 />
           </div>
         </div>
@@ -212,22 +294,38 @@ async function handleSubmit(e: React.FormEvent) {
           <div className="grid gap-4 md:grid-cols-2">
 
             <label className="flex items-center gap-3 text-yellow-700">
-              <input type="checkbox" />
+              <input
+  type="checkbox"
+  checked={featured}
+  onChange={(e) => setFeatured(e.target.checked)}
+/>
               Featured Product
             </label>
 
             <label className="flex items-center gap-3 text-yellow-700">
-              <input type="checkbox" />
+              <input
+  type="checkbox"
+  checked={newArrival}
+  onChange={(e) => setNewArrival(e.target.checked)}
+/>
               New Arrival
             </label>
 
             <label className="flex items-center gap-3 text-yellow-700">
-              <input type="checkbox" />
+              <input
+  type="checkbox"
+  checked={freeDelivery}
+  onChange={(e) => setFreeDelivery(e.target.checked)}
+/>
               Free Delivery
             </label>
 
             <label className="flex items-center gap-3 text-yellow-700">
-              <input type="checkbox" />
+              <input
+  type="checkbox"
+  checked={cashOnDelivery}
+  onChange={(e) => setCashOnDelivery(e.target.checked)}
+/>
               Cash on Delivery
             </label>
 

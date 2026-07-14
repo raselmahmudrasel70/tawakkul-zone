@@ -42,7 +42,7 @@ export default function WishlistPage() {
             {wishlist.map((item) => (
               <ProductRow
   key={item.id}
-  image={item.image}
+  images={item.images}
   name={item.name}
   price={item.price}
 >

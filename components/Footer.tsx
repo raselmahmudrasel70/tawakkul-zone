@@ -25,7 +25,7 @@ export default function Footer() {
 
   <div className="flex flex-wrap gap-5">
     <Link
-      href="/"
+      href="https://tawakkulzone.shop"
       className="text-yellow-300 transition hover:text-white"
     >
       Home

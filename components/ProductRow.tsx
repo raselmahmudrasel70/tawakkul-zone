@@ -3,14 +3,14 @@
 import Image from "next/image";
 
 type ProductRowProps = {
-  image: string;
+  images: string;
   name: string;
   price: number;
   children: React.ReactNode;
 };
 
 export default function ProductRow({
-  image,
+  images,
   name,
   price,
   children,
@@ -19,11 +19,11 @@ export default function ProductRow({
     <div className="flex items-center gap-5 rounded-2xl border bg-black p-4 shadow">
       <div className="relative h-28 w-28 overflow-hidden rounded-xl">
         <Image
-          src={image}
-          alt={name}
-          fill
-          className="object-cover"
-        />
+  src={images || "/products/product1.jpg"}
+  alt={name}
+  fill
+  className="object-cover"
+/>
       </div>
 
       <div className="flex-1">

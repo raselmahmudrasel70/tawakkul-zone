@@ -36,7 +36,7 @@ export default function CartPage() {
             {cart.map((item) => (
               <ProductRow
   key={item.id}
-  image={item.image}
+  images={item.images}
   name={item.name}
   price={item.price}
 >
