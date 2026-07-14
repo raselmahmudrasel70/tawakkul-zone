@@ -70,11 +70,11 @@ const isWishlisted = (id: number) =>
       />
     </Link>
 
-    {product.newArrival && (
-      <span className="absolute left-3 top-3 rounded-full bg-green-600 px-3 py-1 text-xs font-bold text-white">
-        NEW
-      </span>
-    )}
+    {product.discount > 0 && (
+  <span className="absolute left-3 top-3 rounded-full bg-white px-3 py-1 text-xs font-bold text-red-600 shadow-lg">
+    -{product.discount}%
+  </span>
+)}
 
     <button
   onClick={() => {
@@ -84,10 +84,10 @@ const isWishlisted = (id: number) =>
       addToWishlist(product);
     }
   }}
-  className="absolute right-3 top-3 rounded-full bg-white/90 p-2 shadow-lg transition hover:bg-red-100"
+  className="absolute right-3 top-3 rounded-full border border-white bg-pink-200 p-2.5 backdrop-blur-md shadow-xl transition-all duration-300 hover:scale-110 hover:bg-red-400"
 >
   <Heart
-    className={`h-5 w-5 transition ${
+    className={`h-5 w-5 transition-all duration-300 ${
       isWishlisted(product.id)
         ? "fill-red-500 text-red-500"
         : "text-gray-700"

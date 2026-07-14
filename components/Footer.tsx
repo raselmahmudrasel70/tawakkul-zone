@@ -79,7 +79,7 @@ export default function Footer() {
     </a>
 
     <a
-      href="https://instagram.com"
+      href="https://tawakkulzone.shop"
       target="_blank"
       rel="noopener noreferrer"
       className="transition hover:text-pink-500"
@@ -90,14 +90,14 @@ export default function Footer() {
     href="https://t.me/tawakkulzonebd"
       target="_blank"
       rel="noopener noreferrer"
-      className="transition hover:text-pink-500"
+      className="transition hover:text-blue-500"
     >
       <FaTelegram />
     </a>
 
 
     <a
-      href="https://youtube.com"
+      href="https://tawakkulzone.shop"
       target="_blank"
       rel="noopener noreferrer"
       className="transition hover:text-red-500"
