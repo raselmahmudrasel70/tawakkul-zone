@@ -11,7 +11,7 @@ export default function Hero() {
         className="object-cover"
       />
 
-      <div className="absolute inset-0 bg-black/70" />
+      <div className="absolute inset-0 bg-black/65" />
 
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="text-center text-white px-6">

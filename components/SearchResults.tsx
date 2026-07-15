@@ -2,22 +2,43 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { products } from "@/data/products";
+import { supabase } from "@/lib/supabase";
+import { useEffect, useState } from "react";
 
 type Props = {
   search: string;
 };
-
+type Product = {
+  id: number;
+  name: string;
+  price: number;
+  images: string;
+};
 export default function SearchResults({
   search,
 }: Props) {
-  if (!search.trim()) return null;
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
 
-  const filteredProducts = products.filter((product) =>
-    product.name
-      .toLowerCase()
-      .includes(search.toLowerCase())
-  );
+useEffect(() => {
+  async function searchProducts() {
+    if (!search.trim()) {
+      setFilteredProducts([]);
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("products")
+      .select("id, name, price, images")
+      .ilike("name", `%${search}%`);
+
+    if (!error && data) {
+      setFilteredProducts(data as Product[]);
+    }
+  }
+
+  searchProducts();
+}, [search]);
+  if (!search.trim()) return null;
 
   return (
     <div className="absolute left-0 top-full mt-3 w-full rounded-2xl bg-white shadow-2xl">
