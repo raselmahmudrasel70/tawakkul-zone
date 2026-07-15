@@ -55,7 +55,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
     alert("Account created successfully!");
 
-    router.push("/login");
+    router.push("/pagol-naki");
   }
 
   setLoading(false);

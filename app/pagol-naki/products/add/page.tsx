@@ -85,7 +85,7 @@ if (error) {
 }
 
 alert("✅ Product Added Successfully");
-router.push("/admin/products");
+router.push("/pagol-naki/products");
 }
   return (
     <main className="mx-auto max-w-6xl px-6 py-10">

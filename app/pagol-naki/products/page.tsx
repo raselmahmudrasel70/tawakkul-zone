@@ -17,7 +17,7 @@ export default async function ProductsPage() {
         </h1>
 
         <Link
-          href="/admin/products/add"
+          href="/pagol-naki/products/add"
           className="rounded-xl bg-green-700 px-6 py-3 font-semibold text-white transition hover:bg-green-800"
         >
           ➕ Add Product
@@ -69,9 +69,9 @@ export default async function ProductsPage() {
                     {product.category}
                   </p>
                    
-                   <p className="mt-2 text-lg font-bold text-green-700">
-                    {product.discount}
-                    </p>
+                   <p className="text-red-600 font-semibold">
+  Discount: {product.discount}%
+</p>
 
                   <p className="mt-2 text-lg font-bold text-green-700">
                     ৳ {product.price}
@@ -92,9 +92,12 @@ export default async function ProductsPage() {
                 )}
 
                 <div className="mt-4 flex justify-end gap-2">
-                  <button className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
-                    ✏️ Edit
-                  </button>
+                  <Link
+  href={`/pagol-naki/products/edit/${product.id}`}
+  className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+>
+  ✏️ Edit
+</Link>
 
                   <DeleteButton id={product.id} />
                 </div>
