@@ -41,7 +41,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     return;
   }
 
-  if (data.user) {
+  /*if (data.user) {
     const { error: profileError } = await supabase
       .from("profiles")
       .insert({
@@ -56,8 +56,11 @@ const handleSubmit = async (e: React.FormEvent) => {
     alert("Account created successfully!");
 
     router.push("/pagol-naki");
-  }
-
+  }*/
+if (data.user) {
+  alert("Account created successfully!");
+  router.push("/pagol-naki");
+}
   setLoading(false);
 };
     return (

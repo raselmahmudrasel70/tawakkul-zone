@@ -32,7 +32,7 @@ export default function LoginPage() {
         onSubmit={login}
         className="w-full max-w-md rounded-xl border p-6 space-y-4"
       >
-        <h1 className="text-3xl font-bold">Admin Login</h1>
+        <h1 className="text-3xl font-bold text-center">Login</h1>
 
         <input
           className="w-full border p-3 rounded"
