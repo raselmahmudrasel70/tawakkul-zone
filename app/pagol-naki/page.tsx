@@ -62,7 +62,12 @@ router.replace("/pagol-naki/login");
         >
           📦 Manage Products
         </Link>
-
+<Link
+  href="/pagol-naki/orders"
+  className="rounded-3xl bg-blue-700 p-10 text-center text-4xl font-bold text-white hover:bg-blue-800"
+>
+  📦 Orders
+</Link>
         <div className="rounded-2xl bg-gray-500 p-8 text-center text-xl font-bold text-white">
           📊 Dashboard
         </div>

@@ -4,16 +4,26 @@ import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Swal from "sweetalert2";
 export default function CheckoutPage() {
-    const { cart } = useCart();
+    const { cart, clearCart } = useCart();
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
 async function placeOrder() {
-    const total = cart.reduce(
-  (sum, item) => sum + item.price * item.quantity,
-  0
-);
+    async function placeOrder() {
+  if (!name || !phone || !address) {
+    Swal.fire({
+      icon: "warning",
+      title: "সব তথ্য পূরণ করুন",
+    });
+    return;
+  }
+
+  const total = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -26,13 +36,26 @@ async function placeOrder() {
     return;
   }
 
-const { error } = await supabase
-  .from("orders")
-  .insert({
-    user_id: user.id,
-    total,
-    status: "Pending",
-  });
+  const { error } = await supabase
+    .from("orders")
+    .insert({
+      user_id: user.id,
+
+      customer_name: name,
+      phone,
+      address,
+
+      products: cart,
+
+      subtotal: total,
+      delivery_fee: 0,
+      total,
+
+      payment_method: "Cash on Delivery",
+
+      status: "Pending",
+    });
+
   if (error) {
     Swal.fire({
       icon: "error",
@@ -41,13 +64,15 @@ const { error } = await supabase
     });
     return;
   }
-
-  Swal.fire({
+    }
+  await Swal.fire({
     icon: "success",
     title: "Order Placed 🎉",
     text: "Your order has been placed successfully.",
     confirmButtonColor: "#15803d",
   });
+
+  clearCart();
 }
   return (
     <main className="mx-auto max-w-5xl px-6 py-10">

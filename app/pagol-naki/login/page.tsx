@@ -31,14 +31,18 @@ console.log("ERROR =", error);
     }
 
     if (data.user?.email !== ADMIN_EMAIL) {
-      await supabase.auth.signOut();
-      alert("Access denied!");
-      return;
-    }
-alert("Login Success ✅");
-    alert("Login Success");
+  await supabase.auth.signOut();
+  alert("Access denied!");
+  return;
+}
 
-window.location.href = "/pagol-naki";
+// Admin cookie set
+document.cookie = "admin-auth=true; path=/; max-age=86400";
+
+alert("Login Success ✅");
+
+router.push("/pagol-naki");
+router.refresh();
   }
 
   return (

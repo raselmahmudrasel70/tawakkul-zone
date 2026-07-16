@@ -1,25 +1,53 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
-import type { Product } from "@/types/product";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 
-type WishlistContextType = {
-  wishlist: Product[];
-  addToWishlist: (product: Product) => void;
-  removeFromWishlist: (id: number) => void;
-  isInWishlist: (id: number) => boolean;
+export type WishlistItem = {
+  id: number;
+  name: string;
+  price: number;
+  images: string;
 };
 
-const WishlistContext = createContext<WishlistContextType | null>(null);
+type WishlistContextType = {
+  wishlist: WishlistItem[];
+  addToWishlist: (product: WishlistItem) => void;
+  removeFromWishlist: (id: number) => void;
+  clearWishlist: () => void;
+};
+
+const WishlistContext = createContext<WishlistContextType | undefined>(
+  undefined
+);
 
 export function WishlistProvider({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
-  const [wishlist, setWishlist] = useState<Product[]>([]);
+  const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
 
-  const addToWishlist = (product: Product) => {
+  // Load Wishlist
+  useEffect(() => {
+    const saved = localStorage.getItem("wishlist");
+
+    if (saved) {
+      setWishlist(JSON.parse(saved));
+    }
+  }, []);
+
+  // Save Wishlist
+  useEffect(() => {
+    localStorage.setItem("wishlist", JSON.stringify(wishlist));
+  }, [wishlist]);
+
+  const addToWishlist = (product: WishlistItem) => {
     setWishlist((prev) => {
       const exists = prev.find((item) => item.id === product.id);
 
@@ -30,13 +58,11 @@ export function WishlistProvider({
   };
 
   const removeFromWishlist = (id: number) => {
-    setWishlist((prev) =>
-      prev.filter((item) => item.id !== id)
-    );
+    setWishlist((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const isInWishlist = (id: number) => {
-    return wishlist.some((item) => item.id === id);
+  const clearWishlist = () => {
+    setWishlist([]);
   };
 
   return (
@@ -45,7 +71,7 @@ export function WishlistProvider({
         wishlist,
         addToWishlist,
         removeFromWishlist,
-        isInWishlist,
+        clearWishlist,
       }}
     >
       {children}

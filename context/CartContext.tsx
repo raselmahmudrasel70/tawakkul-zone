@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 
 export type CartItem = {
   id: number;
@@ -16,6 +22,7 @@ type CartContextType = {
   increaseQuantity: (id: number) => void;
   decreaseQuantity: (id: number) => void;
   removeFromCart: (id: number) => void;
+  clearCart: () => void;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -26,6 +33,20 @@ export function CartProvider({
   children: ReactNode;
 }) {
   const [cart, setCart] = useState<CartItem[]>([]);
+
+  // Load cart
+  useEffect(() => {
+    const savedCart = localStorage.getItem("cart");
+
+    if (savedCart) {
+      setCart(JSON.parse(savedCart));
+    }
+  }, []);
+
+  // Save cart
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
 
   // Add Product
   const addToCart = (product: Omit<CartItem, "quantity">) => {
@@ -44,7 +65,7 @@ export function CartProvider({
     });
   };
 
-  // +
+  // Increase
   const increaseQuantity = (id: number) => {
     setCart((prev) =>
       prev.map((item) =>
@@ -55,7 +76,7 @@ export function CartProvider({
     );
   };
 
-  // -
+  // Decrease
   const decreaseQuantity = (id: number) => {
     setCart((prev) =>
       prev
@@ -70,18 +91,14 @@ export function CartProvider({
 
   // Remove
   const removeFromCart = (id: number) => {
-  console.log("Remove:", id);
+    setCart((prev) => prev.filter((item) => item.id !== id));
+  };
 
-  setCart((prev) => {
-    console.log("Before", prev);
+  // Clear Cart
+  const clearCart = () => {
+    setCart([]);
+  };
 
-    const updated = prev.filter((item) => item.id !== id);
-
-    console.log("After", updated);
-
-    return updated;
-  });
-};
   return (
     <CartContext.Provider
       value={{
@@ -90,6 +107,7 @@ export function CartProvider({
         increaseQuantity,
         decreaseQuantity,
         removeFromCart,
+        clearCart,
       }}
     >
       {children}
