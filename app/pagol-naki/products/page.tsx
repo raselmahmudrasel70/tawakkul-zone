@@ -1,13 +1,26 @@
+import { redirect } from "next/navigation";
+import { createServerSupabaseClient } from "@/lib/supabase-server";
 import Link from "next/link";
 import Image from "next/image";
-import { supabase } from "@/lib/supabase";
 import DeleteButton from "./DeleteButton";
+
+const ADMIN_EMAIL = "00tamim09@gmail.com";
+
 export default async function ProductsPage() {
+  const supabase = await createServerSupabaseClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user || user.email !== ADMIN_EMAIL) {
+    redirect("/");
+  }
+
   const { data: products, error } = await supabase
     .from("products")
     .select("*")
     .order("id", { ascending: false });
-
   return (
     <main className="mx-auto max-w-7xl px-6 py-10">
       {/* Header */}

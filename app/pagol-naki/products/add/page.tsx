@@ -25,7 +25,18 @@ const [image, setImage] = useState<File | null>(null);
 const [loading, setLoading] = useState(false);
 async function handleSubmit(e: React.FormEvent) {
   e.preventDefault();
+const {
+  data: { user },
+  error: userError,
+} = await supabase.auth.getUser();
 
+console.log("USER:", user);
+console.log("USER ERROR:", userError);
+
+if (!user) {
+  alert("❌ Supabase session নেই। আবার Admin Login করুন।");
+  return;
+}
   setLoading(true);
 
   let imageUrl = "";
