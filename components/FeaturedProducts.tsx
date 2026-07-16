@@ -156,7 +156,14 @@ const isWishlisted = (id: number) =>
   )}
 </div>
               <button
-                onClick={() => addToCart(product)}
+                onClick={() =>
+  addToCart({
+    id: Number(product.id),
+    name: product.name,
+    price: Number(product.price),
+    images: product.images,
+  })
+}
                 className="mt-5 w-full rounded-xl bg-green-700 py-2 font-semibold text-white transition hover:bg-green-800"
               >
                 Add to Cart

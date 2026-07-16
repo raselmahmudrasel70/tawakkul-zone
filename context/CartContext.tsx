@@ -70,9 +70,18 @@ export function CartProvider({
 
   // Remove
   const removeFromCart = (id: number) => {
-    setCart((prev) => prev.filter((item) => item.id !== id));
-  };
+  console.log("Remove:", id);
 
+  setCart((prev) => {
+    console.log("Before", prev);
+
+    const updated = prev.filter((item) => item.id !== id);
+
+    console.log("After", updated);
+
+    return updated;
+  });
+};
   return (
     <CartContext.Provider
       value={{

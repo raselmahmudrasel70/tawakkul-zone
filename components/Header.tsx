@@ -1,44 +1,60 @@
 "use client";
-import SearchOverlay from "./SearchOverlay";
-import SearchResults from "./SearchResults";
-import SearchBar from "./SearchBar";
+
 import Link from "next/link";
+import SearchBar from "./SearchBar";
+import SearchResults from "./SearchResults";
+import { supabase } from "@/lib/supabase";
 import { Search, Heart, ShoppingCart, User, X } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 export default function Header() {
+  const [user, setUser] = useState<any>(null);
+  useEffect(() => {
+  supabase.auth.getUser().then(({ data }) => {
+    setUser(data.user);
+  });
+
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange((_event, session) => {
+    setUser(session?.user ?? null);
+  });
+
+  return () => subscription.unsubscribe();
+}, []);
   const { cart } = useCart();
   const { wishlist } = useWishlist();
+
   const [showSearch, setShowSearch] = useState(false);
   const [search, setSearch] = useState("");
-  return (
-    <header className="sticky top-0 z-50 bg-green-950/90 backdrop-blur-md text-white shadow-lg">
 
+  return (
+    <header className="sticky top-0 z-50 bg-green-950 text-white shadow-lg">
       {/* ================= Desktop ================= */}
       <div className="hidden lg:block">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-
+        <div className="mx-auto flex h-24 max-w-7xl items-center justify-between px-8">
           {/* Logo */}
-          <div>
-            <h1 className="text-2xl font-bold">
+          <div className="shrink-0">
+            <h1 className="text-3xl font-bold leading-none">
               <span className="text-cyan-300">Tawakkul</span>{" "}
               <span className="text-amber-300">Zone</span>
             </h1>
 
-            <p className="text-xs text-green-200">
+            <p className="mt-1 text-xs text-green-200">
               বিশ্বাসে শুরু, বিশ্বস্ততায় পথচলা
             </p>
           </div>
 
           {/* Search */}
-          <SearchBar />
+          <div className="mx-8 flex-1 max-w-xl">
+            <SearchBar />
+          </div>
 
           {/* Icons */}
-          <div className="flex items-center gap-5">
-
+          <div className="flex shrink-0 items-center gap-6">
             <Link href="/wishlist" className="relative">
-              <Heart className="hover:text-pink-400" />
+              <Heart className="hover:text-pink-400 transition" />
 
               {wishlist.length > 0 && (
                 <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
@@ -48,54 +64,76 @@ export default function Header() {
             </Link>
 
             <Link href="/cart" className="relative">
-              <ShoppingCart className="hover:text-yellow-400" />
+              <ShoppingCart className="hover:text-yellow-400 transition" />
 
-              <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
-                {cart.length}
-              </span>
+              {cart.length > 0 && (
+                <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
+                  {cart.length}
+                </span>
+              )}
             </Link>
 
-            <Link href="/dashboard">
-              <User className="cursor-pointer hover:text-cyan-300" />
-            </Link>
+            {user ? (
+  <>
+    <Link href="/dashboard">
+      <User className="cursor-pointer hover:text-cyan-300 transition" />
+    </Link>
 
+    <button
+      onClick={async () => {
+        await supabase.auth.signOut();
+      }}
+      className="rounded-lg border border-red-500 px-4 py-2 hover:bg-red-600"
+    >
+      Logout
+    </button>
+  </>
+) : (
+  <>
+    <Link href="/login">
+      <button className="rounded-lg border border-white px-4 py-2 hover:bg-white hover:text-green-900">
+        Login
+      </button>
+    </Link>
+
+    <Link href="/signup">
+      <button className="rounded-lg bg-green-700 px-4 py-2 hover:bg-green-800">
+        Signup
+      </button>
+    </Link>
+  </>
+)}
           </div>
-
         </div>
       </div>
 
       {/* ================= Mobile ================= */}
       <div className="lg:hidden">
         <div className="mx-auto max-w-7xl px-2 py-3">
-{showSearch && (
-  <div className="border-t border-white/10 bg-green-950 p-3">
+          {showSearch && (
+            <div className="border-t border-white/10 bg-green-950 p-3">
+              <div className="flex items-center rounded-full bg-white px-4">
+                <Search size={18} className="text-gray-500" />
 
-    <div className="flex items-center rounded-full bg-white px-4">
+                <input
+                  autoFocus
+                  type="text"
+                  placeholder="Search products..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="flex-1 bg-transparent px-3 py-3 text-black outline-none"
+                />
 
-      <Search size={18} className="text-gray-500" />
+                <button onClick={() => setShowSearch(false)}>
+                  <X size={20} className="text-gray-500" />
+                </button>
+              </div>
 
-      <input
-  autoFocus
-  type="text"
-  placeholder="Search products..."
-  value={search}
-  onChange={(e) => setSearch(e.target.value)}
-  className="flex-1 bg-transparent px-3 py-3 text-black outline-none"
-/>
+              <SearchResults search={search} />
+            </div>
+          )}
 
-      <button
-        onClick={() => setShowSearch(false)}
-      >
-        <X size={20} className="text-gray-500" />
-      </button>
-
-    </div>
-    <SearchResults search={search} />
-  </div>
-)}
-          {/* Top Row */}
           <div className="flex items-center justify-between">
-
             {/* Logo */}
             <div>
               <h1 className="text-xl font-bold">
@@ -103,52 +141,47 @@ export default function Header() {
                 <span className="text-amber-300">Zone</span>
               </h1>
 
-              <p className="hidden md:block text-xs text-green-200">
-  বিশ্বাসে শুরু, বিশ্বস্ততায় পথচলা
-</p>
+              <p className="hidden text-xs text-green-200 md:block">
+                বিশ্বাসে শুরু, বিশ্বস্ততায় পথচলা
+              </p>
             </div>
 
             {/* Icons */}
             <div className="flex items-center gap-3">
+              <button
+                onClick={() => setShowSearch(true)}
+                className="transition hover:text-cyan-300"
+              >
+                <Search size={22} />
+              </button>
 
-  <button
-    onClick={() => setShowSearch(true)}
-    className="transition hover:text-cyan-300"
-  >
-    <Search size={22} />
-  </button>
+              <Link href="/wishlist" className="relative">
+                <Heart size={22} />
 
-  <Link href="/wishlist" className="relative">
-    <Heart size={22} />
+                {wishlist.length > 0 && (
+                  <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
+                    {wishlist.length}
+                  </span>
+                )}
+              </Link>
 
-    {wishlist.length > 0 && (
-      <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold">
-        {wishlist.length}
-      </span>
-    )}
-  </Link>
+              <Link href="/cart" className="relative">
+                <ShoppingCart size={22} />
 
-  <Link href="/cart" className="relative">
-    <ShoppingCart size={22} />
+                {cart.length > 0 && (
+                  <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
+                    {cart.length}
+                  </span>
+                )}
+              </Link>
 
-    {cart.length > 0 && (
-      <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold">
-        {cart.length}
-      </span>
-    )}
-  </Link>
-
-  <Link href="/dashboard">
-    <User size={22} />
-  </Link>
-
-</div>
-</div>
-
-
+              <Link href="/dashboard">
+                <User size={22} />
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
-
     </header>
   );
 }

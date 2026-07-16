@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { WishlistProvider } from "@/context/WishlistContext";
 import Header from "@/components/Header";
 import { CartProvider } from "@/context/CartContext";
+import { WishlistProvider } from "@/context/WishlistContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,26 +19,28 @@ export const metadata: Metadata = {
   title: "Tawakkul Zone",
   description: "Premium Islamic Fashion & Clothing",
 };
+
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-screen flex flex-col">
         <CartProvider>
-  <WishlistProvider>
-    <Header/>
-     Tawakkul Zone
-     <main className="flex-1">
-      {children}
-    </main>
-  </WishlistProvider>
-</CartProvider>
+          <WishlistProvider>
+            <Header />
+
+            <main className="flex-1">
+              {children}
+            </main>
+
+          </WishlistProvider>
+        </CartProvider>
       </body>
     </html>
   );

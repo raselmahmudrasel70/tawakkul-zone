@@ -17,11 +17,12 @@ export default function ProductRow({
 }: ProductRowProps) {
   return (
     <div className="flex items-center gap-5 rounded-2xl border bg-black p-4 shadow">
-      <div className="relative h-28 w-28 overflow-hidden rounded-xl">
+      <div className="relative h-28 w-28 overflow-hidden rounded-xl flex-shrink-0">
         <Image
   src={images || "/products/product1.jpg"}
   alt={name}
   fill
+  sizes="112px"
   className="object-cover"
 />
       </div>

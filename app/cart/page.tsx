@@ -3,7 +3,9 @@ import ProductRow from "@/components/ProductRow";
 import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 import SummaryCard from "@/components/SummaryCard";
+import { useRouter } from "next/navigation";
 export default function CartPage() {
+  const router = useRouter();
   const {
   cart,
   increaseQuantity,
@@ -82,9 +84,12 @@ export default function CartPage() {
     <span>৳ {total}</span>
   </div>
 
-  <button className="w-full rounded-xl bg-pink-700 py-3 font-semibold text-white transition hover:bg-green-800">
-    Proceed to Checkout
-  </button>
+  <button
+  onClick={() => router.push("/checkout")}
+  className="w-full rounded-xl bg-pink-700 py-3 font-semibold text-white transition hover:bg-green-800"
+>
+  Proceed to Checkout
+</button>
 </SummaryCard>
         </div>
       )}

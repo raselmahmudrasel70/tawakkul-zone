@@ -60,22 +60,22 @@ const discountedPrice =
     <>
       <div className="flex items-center gap-3">
 
-        <span className="text-5xl font-extrabold text-red-500">
+        <span className="text-5xl font-extrabold text-green-500">
           ৳ {discountedPrice.toFixed(0)}
         </span>
 
-        <span className="rounded-full bg-red-600 px-3 py-1 text-sm font-bold text-white">
+        <span className="rounded-full bg-white px-3 py-1 text-sm font-bold text-red-600">
           -{product.discount}%
         </span>
 
       </div>
 
-      <p className="mt-2 text-2xl font-semibold text-green-400 line-through">
+      <p className="mt-2 text-2xl font-semibold text-red-600 line-through">
         ৳ {product.price}
       </p>
     </>
   ) : (
-    <p className="text-5xl font-extrabold text-emerald-400">
+    <p className="text-5xl font-extrabold text-green-400">
       ৳ {product.price}
     </p>
   )}

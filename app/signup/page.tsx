@@ -9,12 +9,11 @@ import {
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
-
+import Swal from "sweetalert2";
 export default function SignupPage() {
-
+const [fullName, setFullName] = useState("");
 const [showPassword, setShowPassword] = useState(false);
 const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-const [username, setUsername] = useState("");
 const [email, setEmail] = useState("");
 const [password, setPassword] = useState("");
 const [confirmPassword, setConfirmPassword] = useState("");
@@ -22,24 +21,54 @@ const [loading, setLoading] = useState(false);
 const router = useRouter();
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
-
+if (!fullName.trim()) {
+  alert("Please enter your full name");
+  return;
+}
   if (password !== confirmPassword) {
     alert("Passwords do not match");
     return;
   }
 
   setLoading(true);
+setLoading(true);
 
+const username =
+  "TZ" +
+  crypto.randomUUID().replace(/-/g, "").slice(0, 8).toUpperCase();
   const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
+  email,
+  password,
+  options: {
+    data: {
+      username: username,
+      full_name: fullName,
+    },
+  },
+});
+
+ if (error) {
+  alert(error.message);
+  setLoading(false);
+  return;
+}
+
+if (data.user) {
+  await Swal.fire({
+    icon: "success",
+    title: "Account Created!",
+    html: `
+      <p>Your account has been created successfully.</p>
+      <p><b>Please verify your email before logging in.</b></p>
+    `,
+    confirmButtonText: "Go to Login",
+    confirmButtonColor: "#16a34a",
   });
 
-  if (error) {
-    alert(error.message);
-    setLoading(false);
-    return;
-  }
+  router.push("/login");
+}
+
+setLoading(false);
 
   /*if (data.user) {
     const { error: profileError } = await supabase
@@ -57,20 +86,31 @@ const handleSubmit = async (e: React.FormEvent) => {
 
     router.push("/pagol-naki");
   }*/
-if (data.user) {
-  alert("Account created successfully!");
-  router.push("/pagol-naki");
-}
-  setLoading(false);
+
 };
     return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-green-100 via-yellow-100 to-yellow-50 px-4 py-10">
-      {/* Background Effects */}
+    <main className="min-h-screen pt-24 pb-16 px-4 flex items-center justify-center">
 
 <div className="absolute left-0 top-0 h-80 w-80 rounded-full bg-green-700/10 blur-3xl"></div>
 
 <div className="absolute bottom-0 right-0 h-80 w-80 rounded-full bg-yellow-400/20 blur-3xl"></div>
-      <div className="relative z-10 w-full max-w-md rounded-[32px] border border-white/60 bg-white/80 p-8 shadow-2xl backdrop-blur-xl">
+      <div
+  className="
+    relative z-10
+    w-full
+    max-w-md
+    md:max-w-lg
+    lg:max-w-xl
+    rounded-[32px]
+    border border-white/60
+    bg-white/90
+    p-6
+    md:p-8
+    lg:p-10
+    shadow-2xl
+    backdrop-blur-xl
+  "
+>
        <div className="mb-6 flex justify-center">
   <img
     src="/logo.png"
@@ -90,22 +130,20 @@ if (data.user) {
 
           <div>
   <label className="mb-2 block font-semibold text-blue-600">
-    Username
+    Enter Your Full Name
   </label>
+<div className="flex items-center rounded-2xl border border-gray-200 bg-white px-4 transition focus-within:border-green-700 focus-within:ring-4 focus-within:ring-green-100">
+  <User className="h-5 w-5 text-green-700" />
 
-  <div className="flex items-center rounded-2xl border border-gray-200 bg-white px-4 transition focus-within:border-green-700 focus-within:ring-4 focus-within:ring-green-100">
-    <User className="h-5 w-5 text-green-700" />
-
-    <input
-  type="text"
-  value={username}
-  onChange={(e) => setUsername(e.target.value)}
-  placeholder="Choose your username"
-  className="w-full bg-transparent px-3 py-4 text-gray-900 placeholder:text-gray-500 outline-none"
-/>
+  <input
+    type="text"
+    value={fullName}
+    onChange={(e) => setFullName(e.target.value)}
+    placeholder="Enter your full name"
+    className="w-full bg-transparent px-3 py-4 text-gray-900 placeholder:text-gray-500 outline-none"
+  />
   </div>
 </div>
-
           <div>
   <label className="mb-2 block font-semibold text-blue-600">
     Email Address
@@ -175,7 +213,7 @@ if (data.user) {
           <button
   type="submit"
   disabled={loading}
-  className="w-full rounded-xl bg-green-700 py-3 font-bold text-white hover:bg-green-800 disabled:opacity-50"
+  className="mt-2 w-full rounded-2xl bg-emerald-600 py-4 text-lg font-bold text-white transition duration-300 hover:bg-emerald-700"
 >
   {loading ? "Creating..." : "Create Account"}
 </button>
