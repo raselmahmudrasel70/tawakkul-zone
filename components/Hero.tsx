@@ -13,13 +13,7 @@ export default function Hero() {
 />
 
 {/* Mobile */}
-<Image
-  src="/banner-mobile.jpg"
-  alt="Mobile Banner"
-  fill
-  priority
-  className="block md:hidden object-cover"
-/>
+
 
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/60" />

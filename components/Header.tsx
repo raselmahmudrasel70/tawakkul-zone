@@ -4,35 +4,70 @@ import Link from "next/link";
 import SearchBar from "./SearchBar";
 import SearchResults from "./SearchResults";
 import { supabase } from "@/lib/supabase";
-import { Search, Heart, ShoppingCart, User, X } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import {
+  Search,
+  Heart,
+  ShoppingCart,
+  User,
+  Menu,
+  X,
+} from "lucide-react";
+
 export default function Header() {
-  const [user, setUser] = useState<any>(null);
-  useEffect(() => {
-  supabase.auth.getUser().then(({ data }) => {
-    setUser(data.user);
-  });
+  const menuRef = useRef<HTMLDivElement>(null);
 
-  const {
-    data: { subscription },
-  } = supabase.auth.onAuthStateChange((_event, session) => {
-    setUser(session?.user ?? null);
-  });
-
-  return () => subscription.unsubscribe();
-}, []);
   const { cart } = useCart();
   const { wishlist } = useWishlist();
 
+  const [user, setUser] = useState<any>(null);
   const [showSearch, setShowSearch] = useState(false);
   const [search, setSearch] = useState("");
+  const [showMenu, setShowMenu] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node)
+      ) {
+        setShowMenu(false);
+      }
+    }
+
+    if (showMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener(
+        "mousedown",
+        handleClickOutside
+      );
+    };
+  }, [showMenu]);
 
   return (
     <header className="sticky top-0 z-50 bg-green-950 text-white shadow-lg">
-      {/* ================= Desktop ================= */}
-      <div className="hidden lg:block">
+
+      {/* Desktop */}
+            <div className="hidden lg:block">
         <div className="mx-auto flex h-24 max-w-7xl items-center justify-between px-8">
           {/* Logo */}
           <div className="shrink-0">
@@ -107,12 +142,15 @@ export default function Header() {
         </div>
       </div>
 
-      {/* ================= Mobile ================= */}
-      <div className="lg:hidden">
+      {/* Mobile */}
+            <div className="lg:hidden">
         <div className="mx-auto max-w-7xl px-2 py-3">
+
           {showSearch && (
             <div className="border-t border-white/10 bg-green-950 p-3">
+
               <div className="flex items-center rounded-full bg-white px-4">
+
                 <Search size={18} className="text-gray-500" />
 
                 <input
@@ -127,30 +165,32 @@ export default function Header() {
                 <button onClick={() => setShowSearch(false)}>
                   <X size={20} className="text-gray-500" />
                 </button>
+
               </div>
 
               <SearchResults search={search} />
+
             </div>
           )}
 
           <div className="flex items-center justify-between">
-            {/* Logo */}
+
             <div>
               <h1 className="text-xl font-bold">
                 <span className="text-cyan-300">Tawakkul</span>{" "}
                 <span className="text-amber-300">Zone</span>
               </h1>
 
-              <p className="hidden text-xs text-green-200 md:block">
+              <p className="hidden md:block text-xs text-green-200">
                 বিশ্বাসে শুরু, বিশ্বস্ততায় পথচলা
               </p>
             </div>
 
-            {/* Icons */}
             <div className="flex items-center gap-3">
+
               <button
                 onClick={() => setShowSearch(true)}
-                className="transition hover:text-cyan-300"
+                className="hover:text-cyan-300 transition"
               >
                 <Search size={22} />
               </button>
@@ -159,7 +199,7 @@ export default function Header() {
                 <Heart size={22} />
 
                 {wishlist.length > 0 && (
-                  <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
+                  <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs">
                     {wishlist.length}
                   </span>
                 )}
@@ -169,19 +209,72 @@ export default function Header() {
                 <ShoppingCart size={22} />
 
                 {cart.length > 0 && (
-                  <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
+                  <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs">
                     {cart.length}
                   </span>
                 )}
               </Link>
 
-              <Link href="/dashboard">
-                <User size={22} />
-              </Link>
+              <button
+                onClick={() => setShowMenu((prev) => !prev)}
+                className="hover:text-cyan-300 transition"
+              >
+                {showMenu ? <X size={24} /> : <Menu size={24} />}
+              </button>
+
             </div>
           </div>
+
+          {showMenu && (
+            <div
+              ref={menuRef}
+              className="absolute right-2 top-16 z-50 w-56 rounded-xl border border-green-700 bg-green-900 p-3 shadow-xl"
+            >
+              {user ? (
+                <>
+                  <Link
+                    href="/dashboard"
+                    className="block rounded px-3 py-2 hover:bg-green-800"
+                    onClick={() => setShowMenu(false)}
+                  >
+                    👤 Dashboard
+                  </Link>
+
+                  <button
+                    onClick={async () => {
+                      await supabase.auth.signOut();
+                      setShowMenu(false);
+                    }}
+                    className="mt-2 w-full rounded bg-red-600 px-3 py-2 text-left hover:bg-red-700"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="block rounded px-3 py-2 hover:bg-green-800"
+                    onClick={() => setShowMenu(false)}
+                  >
+                    Login
+                  </Link>
+
+                  <Link
+                    href="/signup"
+                    className="mt-2 block rounded bg-green-700 px-3 py-2 text-center hover:bg-green-800"
+                    onClick={() => setShowMenu(false)}
+                  >
+                    Signup
+                  </Link>
+                </>
+              )}
+            </div>
+          )}
+
         </div>
       </div>
+
     </header>
   );
 }
