@@ -24,7 +24,24 @@ async function placeOrder() {
     });
     return;
   }
+if (!name || !phone || !address) {
+  Swal.fire({
+    icon: "warning",
+    title: "সব তথ্য পূরণ করুন",
+  });
+  return;
+}
 
+const phoneRegex = /^01\d{9}$/;
+
+if (!phoneRegex.test(phone)) {
+  Swal.fire({
+    icon: "warning",
+    title: "Enter a valid phone number",
+    text: "Phone number must start with 01 and contain exactly 11 digits.",
+  });
+  return;
+}
   const total = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
@@ -33,7 +50,7 @@ async function placeOrder() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
+console.log("User:", user);
   if (!user) {
     Swal.fire({
       icon: "error",
@@ -92,11 +109,17 @@ setAddress("");
         />
 
         <input
-          className="w-full rounded-lg border p-3"
-          placeholder="Phone Number"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-        />
+  type="tel"
+  inputMode="numeric"
+  maxLength={11}
+  className="w-full rounded-lg border p-3"
+  placeholder="Phone Number"
+  value={phone}
+  onChange={(e) => {
+    const value = e.target.value.replace(/\D/g, "");
+    setPhone(value);
+  }}
+/>
 
         <textarea
           className="w-full rounded-lg border p-3"

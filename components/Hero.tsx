@@ -58,7 +58,7 @@ useEffect(() => {
           </p>
 
           <button
-  onClick={() => router.push(loggedIn ? "/products" : "/signup")}
+  onClick={() => router.push(loggedIn ? "/cart" : "/signup")}
   className="mt-8 rounded-xl bg-yellow-400 px-8 py-3 font-bold text-black hover:bg-yellow-300 transition"
 >
   {loggedIn ? "🛍️ এখনই কেনাকাটা করুন" : "অর্ডার করতে সাইন আপ করুন 😊"}
