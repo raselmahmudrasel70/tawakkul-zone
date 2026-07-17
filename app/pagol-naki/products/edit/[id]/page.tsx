@@ -6,33 +6,17 @@ import { supabase } from "@/lib/supabase";
 
 export default function EditProductPage() {
   const params = useParams();
-const router = useRouter();
+  const router = useRouter();
 
-const id = Number(params.id);
+  const id = Number(params.id);
 
-const [loading, setLoading] = useState(true);
-const [name, setName] = useState("");
-const [price, setPrice] = useState("");
-const [category, setCategory] = useState("");
-const [discount, setDiscount] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-const [slug, setSlug] = useState("");
-const [brand, setBrand] = useState("");
-const [sku, setSku] = useState("");
-const [description, setDescription] = useState("");
-const [rating, setRating] = useState("5");
-
-const [stock, setStock] = useState(true);
-
-const [featured, setFeatured] = useState(false);
-const [newArrival, setNewArrival] = useState(false);
-const [freeDelivery, setFreeDelivery] = useState(false);
-const [cashOnDelivery, setCashOnDelivery] = useState(false);
-const [isActive, setIsActive] = useState(true);
-
-const [image, setImage] = useState<File | null>(null);
-const [oldImage, setOldImage] = useState("");
-const [saving, setSaving] = useState(false);
+  const [name, setName] = useState("");
+  const [price, setPrice] = useState("");
+  const [category, setCategory] = useState("");
+  const [discount, setDiscount] = useState("");
 
   useEffect(() => {
     async function loadProduct() {
@@ -61,6 +45,37 @@ const [saving, setSaving] = useState(false);
     }
   }, [id, router]);
 
+  async function updateProduct() {
+    try {
+      setSaving(true);
+
+      const { error } = await supabase
+        .from("products")
+        .update({
+          name,
+          price: Number(price),
+          category,
+          discount: Number(discount),
+        })
+        .eq("id", id);
+
+      if (error) {
+        alert(error.message);
+        return;
+      }
+
+      alert("✅ Product Updated Successfully");
+
+      router.push("/pagol-naki/products");
+      router.refresh();
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center text-xl">
@@ -71,43 +86,48 @@ const [saving, setSaving] = useState(false);
 
   return (
     <main className="mx-auto max-w-xl p-8">
-      <h1 className="mb-6 text-3xl font-bold">✏️ Edit Product</h1>
+      <h1 className="mb-6 text-3xl font-bold">
+        ✏️ Edit Product
+      </h1>
 
       <div className="space-y-4 rounded-xl border p-6">
+
         <input
           className="w-full rounded border p-3"
+          placeholder="Product Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Product Name"
         />
 
         <input
           className="w-full rounded border p-3"
+          placeholder="Price"
           value={price}
           onChange={(e) => setPrice(e.target.value)}
-          placeholder="Price"
         />
 
         <input
           className="w-full rounded border p-3"
+          placeholder="Category"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          placeholder="Category"
         />
 
         <input
           className="w-full rounded border p-3"
+          placeholder="Discount"
           value={discount}
           onChange={(e) => setDiscount(e.target.value)}
-          placeholder="Discount"
         />
 
         <button
-          className="w-full rounded bg-green-700 p-3 text-white"
-          onClick={() => alert("Next Step: Update Function")}
+          onClick={updateProduct}
+          disabled={saving}
+          className="w-full rounded bg-green-700 p-3 font-semibold text-white hover:bg-green-800 disabled:opacity-50"
         >
-          Update Product
+          {saving ? "Updating..." : "Update Product"}
         </button>
+
       </div>
     </main>
   );
