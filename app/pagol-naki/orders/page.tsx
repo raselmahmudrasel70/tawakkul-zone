@@ -1,5 +1,5 @@
 import { supabaseAdmin } from "@/lib/supabase-admin";
-
+import Link from "next/link";
 export const dynamic = "force-dynamic";
 
 export default async function OrdersPage() {
@@ -58,9 +58,14 @@ const { data: orders, error } = await supabase
                   key={order.id}
                   className="border-b hover:bg-gray-200"
                 >
-                  <td className="p-4 font-semibold text-yellow-700">
-                    #{order.id}
-                  </td>
+                  <td className="p-4 font-semibold">
+  <Link
+    href={`/pagol-naki/orders/${order.id}`}
+    className="text-green-700 hover:underline"
+  >
+    #{order.id}
+  </Link>
+</td>
 
                   <td className="p-4 text-black">
                     {order.customer_name}

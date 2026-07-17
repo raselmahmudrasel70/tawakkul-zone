@@ -1,113 +1,108 @@
-"use client";
+import { notFound } from "next/navigation";
+import Image from "next/image";
+import { supabaseAdmin } from "@/lib/supabase-admin";
+import ProductActions from "@/components/ProductActions";
+export const dynamic = "force-dynamic";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+export default async function ProductPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
 
-export default function EditProductPage() {
-  const params = useParams();
-const router = useRouter();
+  const { data: product, error } = await supabaseAdmin
+    .from("products")
+    .select("*")
+    .eq("id", id)
+    .single();
 
-const id = Number(params.id);
-
-const [loading, setLoading] = useState(true);
-const [name, setName] = useState("");
-const [price, setPrice] = useState("");
-const [category, setCategory] = useState("");
-const [discount, setDiscount] = useState("");
-
-const [slug, setSlug] = useState("");
-const [brand, setBrand] = useState("");
-const [sku, setSku] = useState("");
-const [description, setDescription] = useState("");
-const [rating, setRating] = useState("5");
-
-const [stock, setStock] = useState(true);
-
-const [featured, setFeatured] = useState(false);
-const [newArrival, setNewArrival] = useState(false);
-const [freeDelivery, setFreeDelivery] = useState(false);
-const [cashOnDelivery, setCashOnDelivery] = useState(false);
-const [isActive, setIsActive] = useState(true);
-
-const [image, setImage] = useState<File | null>(null);
-const [oldImage, setOldImage] = useState("");
-const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    async function loadProduct() {
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .eq("id", id)
-        .single();
-
-      if (error) {
-        alert(error.message);
-        router.push("/pagol-naki/products");
-        return;
-      }
-
-      setName(data.name ?? "");
-      setPrice(String(data.price ?? ""));
-      setCategory(data.category ?? "");
-      setDiscount(String(data.discount ?? 0));
-
-      setLoading(false);
-    }
-
-    if (!isNaN(id)) {
-      loadProduct();
-    }
-  }, [id, router]);
-
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center text-xl">
-        Loading...
-      </div>
-    );
+  if (error || !product) {
+    notFound();
   }
 
+  const image = product.images || "";
+
+  const discountedPrice =
+    product.discount > 0
+      ? Math.round(product.price - (product.price * product.discount) / 100)
+      : product.price;
+
   return (
-    <main className="mx-auto max-w-xl p-8">
-      <h1 className="mb-6 text-3xl font-bold">✏️ Edit Product</h1>
+    <main className="mx-auto max-w-7xl px-4 py-10">
+      <div className="grid gap-10 md:grid-cols-2">
 
-      <div className="space-y-4 rounded-xl border p-6">
-        <input
-          className="w-full rounded border p-3"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Product Name"
-        />
+        {/* Image */}
+        {image ? (
+  <div className="relative aspect-square overflow-hidden rounded-xl border">
+    <Image
+      src={image}
+      alt={product.name}
+      fill
+      sizes="(max-width: 768px) 100vw, 50vw"
+      className="object-cover"
+    />
+  </div>
+) : (
+  <div className="flex aspect-square items-center justify-center rounded-xl border">
+    No Image
+  </div>
+)}
 
-        <input
-          className="w-full rounded border p-3"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-          placeholder="Price"
-        />
+        {/* Details */}
+        <div>
+          <h1 className="text-4xl font-bold">
+            {product.name}
+          </h1>
 
-        <input
-          className="w-full rounded border p-3"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          placeholder="Category"
-        />
+          <p className="mt-2 text-gray-400">
+            Brand: {product.brand}
+          </p>
 
-        <input
-          className="w-full rounded border p-3"
-          value={discount}
-          onChange={(e) => setDiscount(e.target.value)}
-          placeholder="Discount"
-        />
+          <p className="text-gray-400">
+            Category: {product.category}
+          </p>
 
-        <button
-          className="w-full rounded bg-green-700 p-3 text-white"
-          onClick={() => alert("Next Step: Update Function")}
-        >
-          Update Product
-        </button>
+          <p className="mt-2">
+            ⭐ {product.rating}/5
+          </p>
+
+          <div className="mt-6 flex items-center gap-4">
+            {product.discount > 0 && (
+              <span className="text-2xl text-gray-500 line-through">
+                ৳{product.price}
+              </span>
+            )}
+
+            <span className="text-4xl font-bold text-green-500">
+              ৳{discountedPrice}
+            </span>
+
+            {product.discount > 0 && (
+              <span className="rounded bg-red-600 px-2 py-1 text-white">
+                -{product.discount}%
+              </span>
+            )}
+          </div>
+
+          <div className="mt-6">
+            {product.stock ? (
+              <span className="font-semibold text-green-500">
+                In Stock
+              </span>
+            ) : (
+              <span className="font-semibold text-red-500">
+                Out of Stock
+              </span>
+            )}
+          </div>
+
+          <p className="mt-8 whitespace-pre-line text-gray-300">
+            {product.description}
+          </p>
+
+          <ProductActions product={product} />
+        </div>
       </div>
     </main>
   );
