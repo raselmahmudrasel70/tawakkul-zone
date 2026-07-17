@@ -183,14 +183,18 @@ async function loadProfile() {
 
       <td>
         <span
-          className={`rounded-full px-3 py-1 text-sm ${
-            order.status === "Completed"
-              ? "bg-emerald-100 text-emerald-700"
-              : "bg-yellow-100 text-yellow-700"
-          }`}
-        >
-          {order.status}
-        </span>
+  className={`rounded-full px-3 py-1 text-sm font-semibold ${
+    order.status === "Pending"
+      ? "bg-yellow-200 text-yellow-800"
+      : order.status === "Accepted"
+      ? "bg-cyan-200 text-cyan-800"
+      : order.status === "Delivered"
+      ? "bg-green-200 text-green-800"
+      : "bg-red-200 text-red-800"
+  }`}
+>
+  {order.status}
+</span>
       </td>
 
       <td className="font-medium text-green-600">

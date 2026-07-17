@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabase-admin";
-import { updateOrderStatus } from "../actions";
+import { updateOrderStatus, deleteOrder } from "../actions";
 import Link from "next/link";
 export const dynamic = "force-dynamic";
 
@@ -53,6 +53,18 @@ export default async function OrderDetailsPage({
   >
     ⬅ Back
   </Link>
+  <form
+  action={async () => {
+    "use server";
+    await deleteOrder(Number(order.id));
+  }}
+>
+  <button
+    className="rounded-xl bg-red-600 px-6 py-3 font-bold text-white transition hover:bg-red-700"
+  >
+    🗑 Delete Order
+  </button>
+</form>
 </div>
   const products = Array.isArray(order.products)
     ? order.products
@@ -96,18 +108,18 @@ export default async function OrderDetailsPage({
             <p>
               <span className="font-bold text-yellow-400">Status:</span>{" "}
               <span
-  className={`rounded-full px-3 py-1 font-semibold ${
-    order.status === "Pending"
-      ? "bg-yellow-300 text-yellow-800"
-      : order.status === "Accepted"
-      ? "bg-cyan-300 text-cyan-900"
-      : order.status === "Delivered"
-      ? "bg-green-300 text-green-900"
-      : "bg-red-300 text-red-900"
-  }`}
->
-  {order.status}
-</span>
+                className={`rounded-full px-3 py-1 font-semibold ${
+                  order.status === "Pending"
+                    ? "bg-yellow-300 text-yellow-800"
+                    : order.status === "Accepted"
+                    ? "bg-cyan-300 text-cyan-900"
+                    : order.status === "Delivered"
+                    ? "bg-green-300 text-green-900"
+                    : "bg-red-300 text-red-900"
+                }`}
+              >
+                {order.status}
+              </span>
             </p>
           </div>
         </div>
@@ -136,6 +148,49 @@ export default async function OrderDetailsPage({
             </p>
           </div>
         </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="mt-8 flex flex-wrap gap-4">
+        <form
+          action={async () => {
+            "use server";
+            await updateOrderStatus(Number(order.id), "Accepted");
+          }}
+        >
+          <button className="rounded-xl bg-cyan-500 px-6 py-3 font-bold text-white hover:bg-cyan-600">
+            ✅ Accept Order
+          </button>
+        </form>
+
+        <form
+          action={async () => {
+            "use server";
+            await updateOrderStatus(Number(order.id), "Delivered");
+          }}
+        >
+          <button className="rounded-xl bg-green-600 px-6 py-3 font-bold text-white hover:bg-green-700">
+            🚚 Mark Delivered
+          </button>
+        </form>
+
+        <form
+          action={async () => {
+            "use server";
+            await deleteOrder(Number(order.id));
+          }}
+        >
+          <button className="rounded-xl bg-red-600 px-6 py-3 font-bold text-white hover:bg-red-700">
+            🗑 Delete Order
+          </button>
+        </form>
+
+        <Link
+          href="/pagol-naki/orders"
+          className="rounded-xl bg-gray-700 px-6 py-3 font-bold text-white hover:bg-gray-800"
+        >
+          ⬅ Back
+        </Link>
       </div>
 
       {/* Products */}
