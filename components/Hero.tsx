@@ -2,18 +2,26 @@ import Image from "next/image";
 
 export default function Hero() {
   return (
-    <section className="relative h-[80vh] md:h-screen w-full overflow-hidden">
+    <section className="relative h-[35vh] md:h-screen w-full overflow-hidden">
      {/* Desktop */}
 <Image
   src="/banner-desktop.jpg"
   alt="Desktop Banner"
   fill
   priority
+  sizes="100vw"
   className="hidden md:block object-cover"
 />
 
 {/* Mobile */}
-
+<Image
+  src="/banner-desktop.jpg"
+  alt="Mobile Banner"
+  fill
+  priority
+  sizes="100vw"
+  className="block md:hidden object-cover"
+/>
 
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/60" />
@@ -31,7 +39,7 @@ export default function Hero() {
           </p>
 
           <button className="mt-8 rounded-xl bg-yellow-400 px-8 py-3 font-bold text-black hover:bg-yellow-300 transition">
-            এখনই কিনুন
+            অর্ডার করতে সাইন আপ করুন 😊
           </button>
         </div>
       </div>
