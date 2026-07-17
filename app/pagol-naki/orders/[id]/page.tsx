@@ -20,52 +20,7 @@ export default async function OrderDetailsPage({
   if (error || !order) {
     notFound();
   }
-<div className="mt-8 flex flex-wrap gap-4">
-  <form
-    action={async () => {
-      "use server";
-      await updateOrderStatus(Number(order.id), "Accepted");
-    }}
-  >
-    <button
-      className="rounded-xl bg-cyan-500 px-6 py-3 font-bold text-white transition hover:bg-cyan-600"
-    >
-      ✅ Accept Order
-    </button>
-  </form>
-
-  <form
-    action={async () => {
-      "use server";
-      await updateOrderStatus(Number(order.id), "Delivered");
-    }}
-  >
-    <button
-      className="rounded-xl bg-green-600 px-6 py-3 font-bold text-white transition hover:bg-green-700"
-    >
-      🚚 Mark Delivered
-    </button>
-  </form>
-
-  <Link
-    href="/pagol-naki/orders"
-    className="rounded-xl bg-gray-700 px-6 py-3 font-bold text-white transition hover:bg-gray-800"
-  >
-    ⬅ Back
-  </Link>
-  <form
-  action={async () => {
-    "use server";
-    await deleteOrder(Number(order.id));
-  }}
->
-  <button
-    className="rounded-xl bg-red-600 px-6 py-3 font-bold text-white transition hover:bg-red-700"
-  >
-    🗑 Delete Order
-  </button>
-</form>
-</div>
+  
   const products = Array.isArray(order.products)
     ? order.products
     : [];
