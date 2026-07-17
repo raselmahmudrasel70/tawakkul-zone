@@ -31,16 +31,16 @@ export function WishlistProvider({
 }: {
   children: ReactNode;
 }) {
-  const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
+  const [wishlist, setWishlist] = useState<WishlistItem[]>(() => {
+    if (typeof window === "undefined") return [];
 
-  // Load Wishlist
-  useEffect(() => {
-    const saved = localStorage.getItem("wishlist");
-
-    if (saved) {
-      setWishlist(JSON.parse(saved));
+    try {
+      const saved = localStorage.getItem("wishlist");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
     }
-  }, []);
+  });
 
   // Save Wishlist
   useEffect(() => {

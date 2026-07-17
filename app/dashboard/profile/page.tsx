@@ -3,37 +3,87 @@ import { Mail, Phone, MapPin, Calendar, Pencil } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
+type ProfileData = {
+  full_name?: string;
+  username?: string;
+  phone?: string;
+  address?: string;
+} | null;
+
+type UserData = {
+  email?: string;
+} | null;
+
 export default function ProfilePage() {
-  const [profile, setProfile] = useState<any>(null);
-  const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<ProfileData>(null);
+  const [user, setUser] = useState<UserData>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
-  async function loadProfile() {
-    const {
-  data: { user },
-} = await supabase.auth.getUser();
+    async function loadProfile() {
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
 
-if (!user) return;
+      if (error) {
+        setError("Unable to load your profile. Please try again.");
+        setIsLoading(false);
+        return;
+      }
 
-setUser(user);
+      if (!user) {
+        setError("Please sign in to view your profile.");
+        setIsLoading(false);
+        return;
+      }
 
-    const { data } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", user.id)
-      .single();
+      setUser(user);
 
-    setProfile(data);
+      const { data, error: profileError } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      if (profileError) {
+        setError("Unable to load profile details.");
+      } else {
+        setProfile(data);
+      }
+
+      setIsLoading(false);
+    }
+
+    loadProfile();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex h-80 items-center justify-center">
+        Loading...
+      </div>
+    );
   }
 
-  loadProfile();
-}, []);
-if (!profile) {
-  return (
-    <div className="flex h-80 items-center justify-center">
-      Loading...
-    </div>
-  );
-}
+  if (error) {
+    return (
+      <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+        <p className="text-xl font-semibold text-slate-900">Profile unavailable</p>
+        <p className="mt-3 text-sm text-slate-500">{error}</p>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+        <p className="text-xl font-semibold text-slate-900">No profile data found</p>
+        <p className="mt-3 text-sm text-slate-500">Please update your profile information.</p>
+      </div>
+    );
+  }
   return (
     <div className="space-y-6">
       {/* Page Title */}

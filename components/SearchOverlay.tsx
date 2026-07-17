@@ -1,9 +1,6 @@
-"use client";
-import { useState } from "react";
+﻿"use client";
 
-const [showSearch, setShowSearch] = useState(false);
 export default function SearchOverlay() {
-    
   return (
     <div className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm">
       <div className="mx-auto mt-4 w-full max-w-lg px-4">

@@ -1,6 +1,5 @@
 "use client";
 import ProductRow from "@/components/ProductRow";
-import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 import SummaryCard from "@/components/SummaryCard";
 import { useRouter } from "next/navigation";

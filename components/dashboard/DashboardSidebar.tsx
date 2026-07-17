@@ -30,7 +30,7 @@ const menuItems = [
   },
   {
     name: "Wishlist",
-    href: "/dashboard/wishlist",
+    href: "/wishlist",
     icon: Heart,
   },
   {

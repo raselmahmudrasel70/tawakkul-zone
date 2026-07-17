@@ -22,7 +22,7 @@ export default function Header() {
   const { cart } = useCart();
   const { wishlist } = useWishlist();
 
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
   const [showSearch, setShowSearch] = useState(false);
   const [search, setSearch] = useState("");
   const [showMenu, setShowMenu] = useState(false);
@@ -125,16 +125,18 @@ export default function Header() {
   </>
 ) : (
   <>
-    <Link href="/login">
-      <button className="rounded-lg border border-white px-4 py-2 hover:bg-white hover:text-green-900">
-        Login
-      </button>
+    <Link
+      href="/login"
+      className="inline-flex items-center justify-center rounded-lg border border-white px-4 py-2 hover:bg-white hover:text-green-900"
+    >
+      Login
     </Link>
 
-    <Link href="/signup">
-      <button className="rounded-lg bg-green-700 px-4 py-2 hover:bg-green-800">
-        Signup
-      </button>
+    <Link
+      href="/signup"
+      className="inline-flex items-center justify-center rounded-lg bg-green-700 px-4 py-2 hover:bg-green-800"
+    >
+      Signup
     </Link>
   </>
 )}

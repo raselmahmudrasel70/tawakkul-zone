@@ -1,14 +1,14 @@
 import Link from "next/link";
 import Image from "next/image";
 import DeleteButton from "./DeleteButton";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 
 export const dynamic = "force-dynamic";
 export default async function ProductsPage() {
-  const { data: products, error } = await supabase
-  .from("products")
-  .select("*")
-  .order("id", { ascending: false });
+  const { data: products, error } = await supabaseAdmin
+    .from("products")
+    .select("*")
+    .order("id", { ascending: false });
   return (
     <main className="mx-auto max-w-7xl px-6 py-10">
       {/* Header */}

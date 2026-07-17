@@ -7,7 +7,7 @@ export default function SearchBar() {
   const [search, setSearch] = useState("");
 
   return (
-    <div className="relative hidden w-96 md:block">
+    <div suppressHydrationWarning className="relative hidden w-96 md:block">
 
   <div className="flex items-center rounded-full bg-white px-4 py-2 shadow-md">
     <Search

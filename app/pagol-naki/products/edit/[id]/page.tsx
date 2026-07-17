@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
 
 export default function EditProductPage() {
   const params = useParams();
@@ -20,18 +19,16 @@ export default function EditProductPage() {
 
   useEffect(() => {
     async function loadProduct() {
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .eq("id", id)
-        .single();
+      const response = await fetch(`/pagol-naki/products/actions?id=${id}`);
+      const result = await response.json();
 
-      if (error) {
-        alert(error.message);
+      if (!response.ok || !result.product) {
+        alert(result.error || "Failed to load product.");
         router.push("/pagol-naki/products");
         return;
       }
 
+      const data = result.product;
       setName(data.name ?? "");
       setPrice(String(data.price ?? ""));
       setCategory(data.category ?? "");
@@ -46,34 +43,32 @@ export default function EditProductPage() {
   }, [id, router]);
 
   async function updateProduct() {
-    try {
-      setSaving(true);
+    setSaving(true);
 
-      const { error } = await supabase
-        .from("products")
-        .update({
-          name,
-          price: Number(price),
-          category,
-          discount: Number(discount),
-        })
-        .eq("id", id);
+    const response = await fetch(`/pagol-naki/products/actions?id=${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name,
+        price: Number(price),
+        category,
+        discount: Number(discount),
+      }),
+    });
 
-      if (error) {
-        alert(error.message);
-        return;
-      }
+    const result = await response.json();
+    setSaving(false);
 
-      alert("✅ Product Updated Successfully");
-
-      router.push("/pagol-naki/products");
-      router.refresh();
-    } catch (err) {
-      console.error(err);
-      alert("Something went wrong.");
-    } finally {
-      setSaving(false);
+    if (!response.ok) {
+      alert(result.error || "Update failed.");
+      return;
     }
+
+    alert("✅ Product Updated Successfully");
+    router.push("/pagol-naki/products");
+    router.refresh();
   }
 
   if (loading) {

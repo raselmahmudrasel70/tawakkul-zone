@@ -90,7 +90,14 @@ const { data: orders, error } = await supabase
                   </td>
 
                   <td className="p-4 text-black">
-                    {new Date(order.created_at).toLocaleDateString()}
+                    {new Date(order.created_at).toLocaleString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                      hour: "numeric",
+                      minute: "2-digit",
+                      hour12: true,
+                    })}
                   </td>
                 </tr>
               ))}

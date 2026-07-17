@@ -15,28 +15,28 @@ export default function EditProfilePage() {
   const [address, setAddress] = useState("");
 
   useEffect(() => {
+    async function loadProfile() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) return;
+
+      const { data } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      if (data) {
+        setFullName(data.full_name || "");
+        setPhone(data.phone || "");
+        setAddress(data.address || "");
+      }
+    }
+
     loadProfile();
   }, []);
-
-  async function loadProfile() {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) return;
-
-    const { data } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", user.id)
-      .single();
-
-    if (data) {
-      setFullName(data.full_name || "");
-      setPhone(data.phone || "");
-      setAddress(data.address || "");
-    }
-  }
 
   async function saveProfile(e: React.FormEvent) {
     e.preventDefault();

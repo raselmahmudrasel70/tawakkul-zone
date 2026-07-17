@@ -1,0 +1,44 @@
+import { NextRequest, NextResponse } from "next/server";
+import { supabaseAdmin } from "@/lib/supabase-admin";
+import { ADMIN_EMAIL, createAdminToken } from "@/lib/admin-auth";
+
+const COOKIE_NAME = "admin-auth";
+const COOKIE_MAX_AGE = 60 * 60 * 24;
+
+function getCookieOptions() {
+  return {
+    httpOnly: true,
+    sameSite: "strict" as const,
+    path: "/pagol-naki",
+    maxAge: COOKIE_MAX_AGE,
+    secure: process.env.NODE_ENV === "production",
+  };
+}
+
+export async function POST(request: NextRequest) {
+  const body = await request.json();
+  const email = String(body.email || "").trim();
+  const password = String(body.password || "");
+
+  if (!email || !password) {
+    return NextResponse.json({ error: "Email and password are required." }, { status: 400 });
+  }
+
+  if (email !== ADMIN_EMAIL) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  }
+
+  const { data, error } = await supabaseAdmin.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (error || !data.user) {
+    return NextResponse.json({ error: error?.message ?? "Invalid credentials." }, { status: 401 });
+  }
+
+  const token = await createAdminToken(email);
+  const response = NextResponse.json({ success: true });
+  response.cookies.set(COOKIE_NAME, token, getCookieOptions());
+  return response;
+}

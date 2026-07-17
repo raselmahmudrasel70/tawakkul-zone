@@ -26,7 +26,13 @@ export default async function OrderDetailsPage({
     notFound();
   }
 
-  const products = Array.isArray(order.products)
+  type OrderProduct = {
+    name: string;
+    quantity: number;
+    price: number;
+  };
+
+  const products: OrderProduct[] = Array.isArray(order.products)
     ? order.products
     : [];
 
@@ -62,6 +68,20 @@ export default async function OrderDetailsPage({
               <p>
                 <span className="font-bold text-yellow-400">Payment:</span>{" "}
                 {order.payment_method}
+              </p>
+
+              <p>
+                <span className="font-bold text-yellow-400">Order date:</span>{" "}
+                <span className="text-white">
+                  {new Date(order.created_at).toLocaleString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                    hour: "numeric",
+                    minute: "2-digit",
+                    hour12: true,
+                  })}
+                </span>
               </p>
 
               <p>
@@ -165,7 +185,7 @@ export default async function OrderDetailsPage({
           </h2>
 
           <div className="space-y-4">
-            {products.map((item: any, index: number) => (
+            {products.map((item, index: number) => (
               <div
                 key={index}
                 className="flex items-center justify-between rounded-xl border border-cyan-700 bg-black p-4 transition hover:bg-gray-800"
