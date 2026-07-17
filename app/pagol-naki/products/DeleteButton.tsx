@@ -6,9 +6,13 @@ import { supabase } from "@/lib/supabase";
 
 type DeleteButtonProps = {
   id: string;
+  onDelete?: () => void;
 };
 
-export default function DeleteButton({ id }: DeleteButtonProps) {
+export default function DeleteButton({
+  id,
+  onDelete,
+}: DeleteButtonProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -34,7 +38,10 @@ export default function DeleteButton({ id }: DeleteButtonProps) {
     }
 
     alert("✅ Product deleted successfully!");
-    router.refresh();
+
+onDelete?.();
+router.refresh();
+    window.location.reload();
   }
 
   return (

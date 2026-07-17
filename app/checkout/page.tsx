@@ -10,7 +10,13 @@ export default function CheckoutPage() {
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
 async function placeOrder() {
-    async function placeOrder() {
+  if (cart.length === 0) {
+  Swal.fire({
+    icon: "warning",
+    title: "Your cart is empty",
+  });
+  return;
+}
   if (!name || !phone || !address) {
     Swal.fire({
       icon: "warning",
@@ -36,25 +42,18 @@ async function placeOrder() {
     return;
   }
 
-  const { error } = await supabase
-    .from("orders")
-    .insert({
-      user_id: user.id,
-
-      customer_name: name,
-      phone,
-      address,
-
-      products: cart,
-
-      subtotal: total,
-      delivery_fee: 0,
-      total,
-
-      payment_method: "Cash on Delivery",
-
-      status: "Pending",
-    });
+  const { error } = await supabase.from("orders").insert({
+    user_id: user.id,
+    customer_name: name,
+    phone,
+    address,
+    products: cart,
+    subtotal: total,
+    delivery_fee: 0,
+    total,
+    payment_method: "Cash on Delivery",
+    status: "Pending",
+  });
 
   if (error) {
     Swal.fire({
@@ -64,7 +63,7 @@ async function placeOrder() {
     });
     return;
   }
-    }
+
   await Swal.fire({
     icon: "success",
     title: "Order Placed 🎉",
@@ -73,6 +72,9 @@ async function placeOrder() {
   });
 
   clearCart();
+  setName("");
+setPhone("");
+setAddress("");
 }
   return (
     <main className="mx-auto max-w-5xl px-6 py-10">

@@ -3,7 +3,7 @@ import Image from "next/image";
 import DeleteButton from "./DeleteButton";
 import { supabase } from "@/lib/supabase";
 
-
+export const dynamic = "force-dynamic";
 export default async function ProductsPage() {
   const { data: products, error } = await supabase
   .from("products")

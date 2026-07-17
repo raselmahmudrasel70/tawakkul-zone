@@ -178,7 +178,7 @@ async function loadProfile() {
   {orders.map((order) => (
     <tr key={order.id} className="border-b">
       <td className="text-slate-600">
-        #{order.id.slice(0, 8)}
+        #{String(order.id).slice(0, 8)}
       </td>
 
       <td>
