@@ -8,7 +8,7 @@ export default function Categories({
   setSelectedCategory: React.Dispatch<React.SetStateAction<string>>;
 }) {
   const categories = [
-    "All",
+    "All Products",
     "Three Piece",
     "Saree",
     "Abaya",
@@ -18,9 +18,9 @@ export default function Categories({
   ];
 
   return (
-    <section className="bg-white py-16">
+    <section className="bg-white py-8">
       <div className="mx-auto max-w-7xl px-6">
-        <h2 className="mb-10 text-center text-4xl font-bold text-green-900">
+        <h2 className="mb-10 text-center text-2xl font-bold text-green-900">
           🛍️ Categories
         </h2>
 

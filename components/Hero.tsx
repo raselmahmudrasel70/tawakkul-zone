@@ -1,27 +1,46 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 export default function Hero() {
+ const router = useRouter();
+const [loggedIn, setLoggedIn] = useState(false);
+
+useEffect(() => {
+  const checkUser = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    setLoggedIn(!!user);
+  };
+
+  checkUser();
+}, []);
   return (
     <section className="relative h-[35vh] md:h-screen w-full overflow-hidden">
-     {/* Desktop */}
-<Image
-  src="/banner-desktop.jpg"
-  alt="Desktop Banner"
-  fill
-  priority
-  sizes="100vw"
-  className="hidden md:block object-cover"
-/>
+      {/* Desktop */}
+      <Image
+        src="/banner-desktop.jpg"
+        alt="Desktop Banner"
+        fill
+        priority
+        sizes="100vw"
+        className="hidden md:block object-cover"
+      />
 
-{/* Mobile */}
-<Image
-  src="/banner-desktop.jpg"
-  alt="Mobile Banner"
-  fill
-  priority
-  sizes="100vw"
-  className="block md:hidden object-cover"
-/>
+      {/* Mobile */}
+      <Image
+        src="/banner-desktop.jpg"
+        alt="Mobile Banner"
+        fill
+        priority
+        sizes="100vw"
+        className="block md:hidden object-cover"
+      />
 
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/60" />
@@ -38,9 +57,12 @@ export default function Hero() {
             বিশ্বাসে শুরু, বিশ্বস্ততায় পথচলা।
           </p>
 
-          <button className="mt-8 rounded-xl bg-yellow-400 px-8 py-3 font-bold text-black hover:bg-yellow-300 transition">
-            অর্ডার করতে সাইন আপ করুন 😊
-          </button>
+          <button
+  onClick={() => router.push(loggedIn ? "/products" : "/signup")}
+  className="mt-8 rounded-xl bg-yellow-400 px-8 py-3 font-bold text-black hover:bg-yellow-300 transition"
+>
+  {loggedIn ? "🛍️ এখনই কেনাকাটা করুন" : "অর্ডার করতে সাইন আপ করুন 😊"}
+</button>
         </div>
       </div>
     </section>

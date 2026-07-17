@@ -57,7 +57,7 @@ const isWishlisted = (id: number) =>
             <div
             
   key={product.id}
-  className="rounded-2xl bg-white p-6 shadow-lg transition duration-300 hover:-translate-y-2 hover:shadow-2xl"
+  className="rounded-2xl bg-gray-300 p-6 shadow-lg transition duration-300 hover:-translate-y-2 hover:shadow-2xl"
 >
   <div className="relative mb-4 h-56 overflow-hidden rounded-xl">
 
