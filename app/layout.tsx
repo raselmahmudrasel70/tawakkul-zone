@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
@@ -49,8 +50,7 @@ export const metadata: Metadata = {
 
   openGraph: {
     title: "Tawakkul Zone",
-    description:
-      "Premium Islamic Fashion & Clothing in Bangladesh.",
+    description: "Premium Islamic Fashion & Clothing in Bangladesh.",
     url: "https://tawakkulzone.shop",
     siteName: "Tawakkul Zone",
     locale: "en_US",
@@ -68,8 +68,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Tawakkul Zone",
-    description:
-      "Premium Islamic Fashion & Clothing",
+    description: "Premium Islamic Fashion & Clothing",
     images: ["/icon.png"],
   },
 
@@ -91,6 +90,20 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-screen flex flex-col">
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
+          strategy="afterInteractive"
+        />
+
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}');
+          `}
+        </Script>
+
         <CartProvider>
           <WishlistProvider>
             <Header />
@@ -98,7 +111,6 @@ export default function RootLayout({
             <main className="flex-1">
               {children}
             </main>
-
           </WishlistProvider>
         </CartProvider>
       </body>
