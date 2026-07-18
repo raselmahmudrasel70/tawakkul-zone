@@ -132,24 +132,72 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: "Missing product id." }, { status: 400 });
   }
 
-  const body = await request.json();
+  const formData = await request.formData();
   const updateData: Record<string, unknown> = {};
 
-  if (typeof body.name === "string") updateData.name = body.name.trim();
-  if (typeof body.slug === "string") updateData.slug = body.slug.trim();
-  if (typeof body.category === "string") updateData.category = body.category.trim();
-  if (typeof body.brand === "string") updateData.brand = body.brand.trim();
-  if (typeof body.sku === "string") updateData.sku = body.sku.trim();
-  if (typeof body.description === "string") updateData.description = body.description.trim();
-  if (typeof body.price === "number") updateData.price = body.price;
-  if (typeof body.discount === "number") updateData.discount = body.discount;
-  if (typeof body.rating === "number") updateData.rating = body.rating;
-  if (typeof body.stock === "boolean") updateData.stock = body.stock;
-  if (typeof body.featured === "boolean") updateData.featured = body.featured;
-  if (typeof body.newArrival === "boolean") updateData.new_arrival = body.newArrival;
-  if (typeof body.freeDelivery === "boolean") updateData.free_delivery = body.freeDelivery;
-  if (typeof body.cashOnDelivery === "boolean") updateData.cash_on_delivery = body.cashOnDelivery;
-  if (typeof body.isActive === "boolean") updateData.is_active = body.isActive;
+  const name = String(formData.get("name") || "").trim();
+  const slug = String(formData.get("slug") || "").trim();
+  const category = String(formData.get("category") || "").trim();
+  const brand = String(formData.get("brand") || "").trim();
+  const sku = String(formData.get("sku") || "").trim();
+  const description = String(formData.get("description") || "").trim();
+  const priceValue = String(formData.get("price") || "").trim();
+  const discountValue = String(formData.get("discount") || "").trim();
+  const ratingValue = String(formData.get("rating") || "").trim();
+  const stockValue = String(formData.get("stock") || "").trim();
+  const featuredValue = String(formData.get("featured") || "").trim();
+  const newArrivalValue = String(formData.get("newArrival") || "").trim();
+  const freeDeliveryValue = String(formData.get("freeDelivery") || "").trim();
+  const cashOnDeliveryValue = String(formData.get("cashOnDelivery") || "").trim();
+  const isActiveValue = String(formData.get("isActive") || "").trim();
+  const imageFile = formData.get("image");
+
+  if (name) updateData.name = name;
+  if (slug) updateData.slug = slug;
+  if (category) updateData.category = category;
+  if (brand) updateData.brand = brand;
+  if (sku) updateData.sku = sku;
+  if (description) updateData.description = description;
+  if (priceValue !== "") {
+    const parsedPrice = Number(priceValue);
+    if (!Number.isNaN(parsedPrice)) updateData.price = parsedPrice;
+  }
+  if (discountValue !== "") {
+    const parsedDiscount = Number(discountValue);
+    if (!Number.isNaN(parsedDiscount)) updateData.discount = parsedDiscount;
+  }
+  if (ratingValue !== "") {
+    const parsedRating = Number(ratingValue);
+    if (!Number.isNaN(parsedRating)) updateData.rating = parsedRating;
+  }
+  if (stockValue !== "") updateData.stock = stockValue === "true";
+  if (featuredValue !== "") updateData.featured = featuredValue === "true";
+  if (newArrivalValue !== "") updateData.new_arrival = newArrivalValue === "true";
+  if (freeDeliveryValue !== "") updateData.free_delivery = freeDeliveryValue === "true";
+  if (cashOnDeliveryValue !== "") updateData.cash_on_delivery = cashOnDeliveryValue === "true";
+  if (isActiveValue !== "") updateData.is_active = isActiveValue === "true";
+
+  if (imageFile instanceof File && imageFile.size > 0) {
+    const fileName = `${Date.now()}-${imageFile.name}`;
+    const fileData = await imageFile.arrayBuffer();
+
+    const { error: uploadError } = await supabaseAdmin.storage
+      .from("products")
+      .upload(fileName, new Uint8Array(fileData), {
+        cacheControl: "3600",
+        upsert: false,
+      });
+
+    if (uploadError) {
+      return NextResponse.json({ error: uploadError.message }, { status: 500 });
+    }
+
+    const { data: publicUrlData } = supabaseAdmin.storage
+      .from("products")
+      .getPublicUrl(fileName);
+
+    updateData.images = publicUrlData.publicUrl;
+  }
 
   if (Object.keys(updateData).length === 0) {
     return NextResponse.json({ error: "Nothing to update." }, { status: 400 });

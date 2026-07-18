@@ -16,6 +16,8 @@ export default function EditProductPage() {
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("");
   const [discount, setDiscount] = useState("");
+  const [image, setImage] = useState<File | null>(null);
+  const [currentImageUrl, setCurrentImageUrl] = useState("");
 
   useEffect(() => {
     async function loadProduct() {
@@ -33,6 +35,7 @@ export default function EditProductPage() {
       setPrice(String(data.price ?? ""));
       setCategory(data.category ?? "");
       setDiscount(String(data.discount ?? 0));
+      setCurrentImageUrl(data.images ?? "");
 
       setLoading(false);
     }
@@ -45,17 +48,18 @@ export default function EditProductPage() {
   async function updateProduct() {
     setSaving(true);
 
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("price", price);
+    formData.append("category", category);
+    formData.append("discount", discount);
+    if (image) {
+      formData.append("image", image);
+    }
+
     const response = await fetch(`/pagol-naki/products/actions?id=${id}`, {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name,
-        price: Number(price),
-        category,
-        discount: Number(discount),
-      }),
+      body: formData,
     });
 
     const result = await response.json();
@@ -114,6 +118,32 @@ export default function EditProductPage() {
           value={discount}
           onChange={(e) => setDiscount(e.target.value)}
         />
+
+        <div>
+          <label className="mb-2 block font-semibold text-gray-700">
+            Product Image
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              if (e.target.files?.[0]) {
+                setImage(e.target.files[0]);
+              }
+            }}
+            className="w-full rounded border p-2"
+          />
+          {currentImageUrl ? (
+            <div className="mt-3 rounded border p-3">
+              <p className="mb-2 text-sm text-gray-600">Current image</p>
+              <img
+                src={currentImageUrl}
+                alt={name || "Product preview"}
+                className="h-40 w-full rounded object-cover"
+              />
+            </div>
+          ) : null}
+        </div>
 
         <button
           onClick={updateProduct}

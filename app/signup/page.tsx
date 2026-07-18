@@ -58,8 +58,8 @@ if (data.user) {
     icon: "success",
     title: "Account Created!",
     html: `
-      <p>Your account has been created successfully.</p>
-      <p><b>Please verify your email before logging in.</b></p>
+      <p class="text-green-600">Your account has been created successfully.</p>
+      <p class="text-red-600"><b>Please verify your email before logging in.</b></p>
     `,
     confirmButtonText: "Go to Login",
     confirmButtonColor: "#16a34a",

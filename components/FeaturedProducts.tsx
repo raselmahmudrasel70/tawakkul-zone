@@ -39,7 +39,7 @@ export default function FeaturedProducts({
   }, []);
 
   const filteredProducts =
-    selectedCategory === "All"
+    selectedCategory === "All Products"
       ? products
       : products.filter((product) => product.category === selectedCategory);
 
