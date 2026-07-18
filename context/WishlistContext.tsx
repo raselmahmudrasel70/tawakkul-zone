@@ -32,30 +32,33 @@ export function WishlistProvider({
   children: ReactNode;
 }) {
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
+  const [loaded, setLoaded] = useState(false);
 
+  // Load wishlist from localStorage
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const timeoutId = window.setTimeout(() => {
-      try {
-        const saved = localStorage.getItem("wishlist");
-        if (saved) {
-          setWishlist(JSON.parse(saved));
-        }
-      } catch {
-        // Ignore invalid stored wishlist data
-      }
-    }, 0);
+    try {
+      const saved = localStorage.getItem("wishlist");
 
-    return () => window.clearTimeout(timeoutId);
+      if (saved) {
+        setWishlist(JSON.parse(saved));
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoaded(true);
+    }
   }, []);
 
-  // Save Wishlist
+  // Save wishlist to localStorage
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    localStorage.setItem("wishlist", JSON.stringify(wishlist));
-  }, [wishlist]);
+    if (typeof window === "undefined" || !loaded) return;
 
+    localStorage.setItem("wishlist", JSON.stringify(wishlist));
+  }, [wishlist, loaded]);
+
+  // Add Wishlist
   const addToWishlist = (product: WishlistItem) => {
     setWishlist((prev) => {
       const exists = prev.find((item) => item.id === product.id);
@@ -66,10 +69,12 @@ export function WishlistProvider({
     });
   };
 
+  // Remove Wishlist
   const removeFromWishlist = (id: number) => {
     setWishlist((prev) => prev.filter((item) => item.id !== id));
   };
 
+  // Clear Wishlist
   const clearWishlist = () => {
     setWishlist([]);
   };
