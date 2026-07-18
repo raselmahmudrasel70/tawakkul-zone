@@ -1,4 +1,4 @@
-﻿const ADMIN_AUTH_SECRET = process.env.ADMIN_AUTH_SECRET;
+﻿const ADMIN_AUTH_SECRET = process.env.ADMIN_AUTH_SECRET || "tawakkul-zone-admin-secret";
 export const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "";
 const TOKEN_LIFETIME_MS = 1000 * 60 * 60 * 24;
 

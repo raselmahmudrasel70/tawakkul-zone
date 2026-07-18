@@ -31,19 +31,28 @@ export function WishlistProvider({
 }: {
   children: ReactNode;
 }) {
-  const [wishlist, setWishlist] = useState<WishlistItem[]>(() => {
-    if (typeof window === "undefined") return [];
+  const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
 
-    try {
-      const saved = localStorage.getItem("wishlist");
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const timeoutId = window.setTimeout(() => {
+      try {
+        const saved = localStorage.getItem("wishlist");
+        if (saved) {
+          setWishlist(JSON.parse(saved));
+        }
+      } catch {
+        // Ignore invalid stored wishlist data
+      }
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, []);
 
   // Save Wishlist
   useEffect(() => {
+    if (typeof window === "undefined") return;
     localStorage.setItem("wishlist", JSON.stringify(wishlist));
   }, [wishlist]);
 

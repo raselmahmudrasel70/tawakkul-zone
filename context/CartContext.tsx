@@ -32,19 +32,28 @@ export function CartProvider({
 }: {
   children: ReactNode;
 }) {
-  const [cart, setCart] = useState<CartItem[]>(() => {
-    if (typeof window === "undefined") return [];
+  const [cart, setCart] = useState<CartItem[]>([]);
 
-    try {
-      const savedCart = localStorage.getItem("cart");
-      return savedCart ? JSON.parse(savedCart) : [];
-    } catch {
-      return [];
-    }
-  });
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const timeoutId = window.setTimeout(() => {
+      try {
+        const savedCart = localStorage.getItem("cart");
+        if (savedCart) {
+          setCart(JSON.parse(savedCart));
+        }
+      } catch {
+        // Ignore invalid stored cart data
+      }
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, []);
 
   // Save cart
   useEffect(() => {
+    if (typeof window === "undefined") return;
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
 

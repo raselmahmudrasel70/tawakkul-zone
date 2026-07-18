@@ -131,30 +131,12 @@ export default function CheckoutPage() {
         <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
           <div className="mb-4">
             <p className="text-sm font-semibold text-slate-900">Payment method</p>
-            <p className="mt-1 text-sm text-slate-500">Choose one payment option for your order.</p>
+            <p className="mt-1 text-sm text-slate-500">Cash on delivery is available for this order.</p>
           </div>
-          <div className="grid gap-3 sm:grid-cols-3">
-            {[
-              { value: "Bkash", label: "Bkash" },
-              { value: "Nagad", label: "Nagad" },
-              { value: "Cash On Delivery", label: "Cash On Delivery" },
-            ].map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => setPaymentMethod(option.value)}
-                className={`rounded-3xl border px-4 py-4 text-left transition ${
-                  paymentMethod === option.value
-                    ? "border-emerald-600 bg-emerald-100 text-slate-900"
-                    : "border-slate-200 bg-white text-slate-700 hover:border-slate-400"
-                }`}
-              >
-                <p className="font-semibold">{option.label}</p>
-                <p className="mt-1 text-sm text-slate-500">
-                  {paymentMethod === option.value ? "Selected" : "Tap to choose"}
-                </p>
-              </button>
-            ))}
+
+          <div className="rounded-3xl border border-emerald-600 bg-emerald-100 px-4 py-4 text-left">
+            <p className="font-semibold text-slate-900">Cash On Delivery</p>
+            <p className="mt-1 text-sm text-slate-600">Selected by default</p>
           </div>
         </div>
 

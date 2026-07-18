@@ -8,6 +8,8 @@ type ProfileData = {
   username?: string;
   phone?: string;
   address?: string;
+  created_at?: string;
+  [key: string]: unknown;
 } | null;
 
 type UserData = {
@@ -141,10 +143,12 @@ export default function ProfilePage() {
                 <Calendar className="shrink-0 text-emerald-600" size={22} />
                 <span className="font-medium text-slate-700">
                   Joined{" "}
-{new Date(profile.created_at).toLocaleDateString("en-US", {
-  month: "short",
-  year: "numeric",
-})}
+{profile.created_at
+  ? new Date(profile.created_at).toLocaleDateString("en-US", {
+      month: "short",
+      year: "numeric",
+    })
+  : "recently"}
                 </span>
               </div>
             </div>
