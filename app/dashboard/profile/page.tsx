@@ -5,7 +5,6 @@ import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 type ProfileData = {
   full_name?: string;
-  username?: string;
   phone?: string;
   address?: string;
   created_at?: string;
@@ -21,6 +20,7 @@ export default function ProfilePage() {
   const [user, setUser] = useState<UserData>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const isProUser = user?.email?.toLowerCase() === "00tamim09@gmail.com";
 
   useEffect(() => {
     async function loadProfile() {
@@ -111,18 +111,22 @@ export default function ProfilePage() {
 
           {/* User Info */}
           <div className="flex-1">
-            <h2 className="mb-6 text-4xl font-bold text-slate-900">
-              {profile.full_name}
-            </h2>
-<p className="mb-6 text-lg font-medium text-emerald-600">
-  @{profile.username}
-</p>
+            <div className="mb-6 flex flex-wrap items-center gap-3">
+              <h2 className="text-4xl font-bold text-slate-900">
+                {profile.full_name}
+              </h2>
+              {isProUser ? (
+                <span className="inline-flex items-center rounded-full bg-amber-500 px-3 py-1 text-sm font-semibold uppercase tracking-wide text-white shadow-sm">
+                  Pro
+                </span>
+              ) : null}
+            </div>
             <div className="grid gap-5 md:grid-cols-2">
               <div className="flex items-center gap-3">
                 <Mail className="shrink-0 text-emerald-600" size={22} />
                 <span className="font-medium text-slate-700">
-  {user?.email}
-</span>
+                  {user?.email}
+                </span>
               </div>
 
               <div className="flex items-center gap-3">
