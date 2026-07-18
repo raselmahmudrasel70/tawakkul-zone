@@ -27,15 +27,27 @@ export async function POST(request: NextRequest) {
   if (email !== ADMIN_EMAIL) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
+console.log("SERVICE ROLE EXISTS:", !!process.env.SUPABASE_SERVICE_ROLE_KEY);
+console.log(
+  "SERVICE ROLE PREFIX:",
+  process.env.SUPABASE_SERVICE_ROLE_KEY?.slice(0, 20)
+);
+ const { data, error } = await supabaseAdmin.auth.signInWithPassword({
+  email,
+  password,
+});
 
-  const { data, error } = await supabaseAdmin.auth.signInWithPassword({
-    email,
-    password,
-  });
+console.log("Supabase Login Error:", error);
+console.log("Supabase User:", data?.user);
 
-  if (error || !data.user) {
-    return NextResponse.json({ error: error?.message ?? "Invalid credentials." }, { status: 401 });
-  }
+if (error || !data.user) {
+  return NextResponse.json(
+    {
+      error: error?.message ?? "Invalid credentials.",
+    },
+    { status: 401 }
+  );
+}
 
   const token = await createAdminToken(email);
   const response = NextResponse.json({ success: true });
