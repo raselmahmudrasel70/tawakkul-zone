@@ -1,7 +1,20 @@
 import type { MetadataRoute } from "next";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://tawakkulzone.shop";
+
+  const { data: products } = await supabaseAdmin
+    .from("products")
+    .select("id");
+
+  const productUrls =
+    products?.map((product) => ({
+      url: `${baseUrl}/product/${product.id}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    })) ?? [];
 
   return [
     {
@@ -16,23 +29,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "daily",
       priority: 0.9,
     },
-    {
-      url: `${baseUrl}/cart`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/wishlist`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/dashboard`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.5,
-    },
+    ...productUrls,
   ];
 }
