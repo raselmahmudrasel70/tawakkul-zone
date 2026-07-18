@@ -16,9 +16,9 @@ const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
 (async () => {
-  const email = "00tamim09@gmail.com";
-  const password = "Tamim11@#1099";
-  const fullName = "Tamim Hasan";
+  const email = process.env.ADMIN_EMAIL;
+const password = process.env.ADMIN_PASSWORD;
+const fullName = "Tamim Hasan";
 
   const listResult = await supabaseAdmin.auth.admin.listUsers();
   if (listResult.error) {
