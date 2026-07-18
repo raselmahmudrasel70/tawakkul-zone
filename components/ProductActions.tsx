@@ -3,7 +3,18 @@
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 
-export default function ProductActions({ product }: { product: any }) {
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  images: string;
+}
+
+export default function ProductActions({
+  product,
+}: {
+  product: Product;
+}) {
   const { addToCart } = useCart();
   const { addToWishlist } = useWishlist();
 
