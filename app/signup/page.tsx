@@ -56,7 +56,7 @@ const username =
 if (data.user) {
   await Swal.fire({
     icon: "success",
-    title: "Account Created!",
+    title: "Account Created‼️",
     html: `
       <p class="text-green-600">Your account has been created successfully.</p>
       <p class="text-red-600"><b>Please verify your email before logging in.</b></p>
