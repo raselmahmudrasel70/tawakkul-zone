@@ -58,13 +58,16 @@ if (data.user) {
     icon: "success",
     title: "Account Created‼️",
     html: `
-      <p class="text-green-600">Your account has been created successfully.</p>
-      <p class="text-red-600"><b>Please verify your email before logging in.</b></p>
+      <p style="color:#16a34a;">
+        Your account has been created successfully.
+      </p>
+      <p style="color:#dc2626; font-weight:bold; margin-top:8px;">
+        Please verify your email before logging in.
+      </p>
     `,
     confirmButtonText: "Go to Login",
     confirmButtonColor: "#16a34a",
   });
-
   router.push("/login");
 }
 
