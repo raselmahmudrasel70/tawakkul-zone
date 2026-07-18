@@ -1,8 +1,56 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import ProductActions from "@/components/ProductActions";
+
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+
+  const { data: product } = await supabaseAdmin
+    .from("products")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (!product) {
+    return {
+      title: "Product Not Found | Tawakkul Zone",
+    };
+  }
+
+  const image = product.images || "/icon.png";
+
+  return {
+    title: product.name,
+    description:
+      product.description ||
+      `Buy ${product.name} online from Tawakkul Zone.`,
+
+    openGraph: {
+      title: product.name,
+      description:
+        product.description ||
+        `Buy ${product.name} online from Tawakkul Zone.`,
+      images: [image],
+    },
+
+    twitter: {
+      card: "summary_large_image",
+      title: product.name,
+      description:
+        product.description ||
+        `Buy ${product.name} online from Tawakkul Zone.`,
+      images: [image],
+    },
+  };
+}
 
 export default async function ProductPage({
   params,
@@ -32,24 +80,22 @@ export default async function ProductPage({
     <main className="mx-auto max-w-7xl px-4 py-10">
       <div className="grid gap-10 md:grid-cols-2">
 
-        {/* Image */}
         {image ? (
-  <div className="relative aspect-square overflow-hidden rounded-xl border">
-    <Image
-      src={image}
-      alt={product.name}
-      fill
-      sizes="(max-width: 768px) 100vw, 50vw"
-      className="object-cover"
-    />
-  </div>
-) : (
-  <div className="flex aspect-square items-center justify-center rounded-xl border">
-    No Image
-  </div>
-)}
+          <div className="relative aspect-square overflow-hidden rounded-xl border">
+            <Image
+              src={image}
+              alt={product.name}
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover"
+            />
+          </div>
+        ) : (
+          <div className="flex aspect-square items-center justify-center rounded-xl border">
+            No Image
+          </div>
+        )}
 
-        {/* Details */}
         <div>
           <h1 className="text-4xl font-bold">
             {product.name}
