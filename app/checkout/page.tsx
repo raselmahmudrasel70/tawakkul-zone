@@ -100,7 +100,7 @@ export default function CheckoutPage() {
     <main suppressHydrationWarning className="mx-auto max-w-5xl px-6 py-10 bg-slate-50">
       <h1 className="mb-8 text-4xl font-bold text-slate-900">Checkout</h1>
 
-      <div className="rounded-2xl bg-white p-8 shadow-xl shadow-slate-200/40 space-y-6">
+      <div className="rounded-2xl bg-cyan-100 p-8 shadow-xl shadow-slate-200/40 space-y-6">
         <div className="space-y-4">
           <input
             className="w-full rounded-2xl border border-slate-200 bg-white p-4 text-slate-900 shadow-sm transition focus:border-emerald-600 focus:outline-none"

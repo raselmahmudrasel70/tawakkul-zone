@@ -151,13 +151,19 @@ export default function FeaturedProducts({
                 </div>
 
                 <button
-                  onClick={() =>
-                    addToCart({
-                      id: product.id,
-                      name: product.name,
-                      price: product.price,
-                      images: product.images,
-                    })
+                  onClick={() => {
+  const discountedPrice =
+    product.discount > 0
+      ? Math.round(product.price - (product.price * product.discount) / 100)
+      : product.price;
+
+  addToCart({
+    id: product.id,
+    name: product.name,
+    price: discountedPrice,
+    images: product.images,
+  });
+}
                   }
                   className="mt-5 w-full rounded-xl bg-green-700 py-2 font-semibold text-white transition hover:bg-green-800"
                 >
