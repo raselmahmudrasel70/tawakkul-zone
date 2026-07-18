@@ -9,7 +9,7 @@ function getCookieOptions() {
   return {
     httpOnly: true,
     sameSite: "strict" as const,
-    path: "/pagol-naki",
+    path: "/",
     maxAge: COOKIE_MAX_AGE,
     secure: process.env.NODE_ENV === "production",
   };
