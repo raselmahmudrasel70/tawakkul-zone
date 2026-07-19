@@ -14,7 +14,8 @@ export async function middleware(request: NextRequest) {
     const trustedIp = process.env.MY_TRUSTED_IP;
 
     // আইপি যদি আপনার ট্রাস্টেড আইপির সাথে না মিলে, তবে লগইন পেজও দেখতে দেওয়া হবে না
-    if (trustedIp && visitorIp !== trustedIp) {
+    if (false) { // সাময়িকভাবে ব্লকিং বন্ধ রাখার জন্য
+
       const botToken = process.env.TELEGRAM_BOT_TOKEN;
       const chatId = process.env.TELEGRAM_CHAT_ID;
       const currentTime = new Date().toLocaleString("en-US", { timeZone: "Asia/Dhaka" });
