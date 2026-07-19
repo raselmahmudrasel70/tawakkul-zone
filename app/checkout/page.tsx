@@ -1,5 +1,6 @@
 ﻿"use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { useState } from "react";
@@ -17,6 +18,7 @@ export default function CheckoutPage() {
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("Cash On Delivery");
+const [transactionId, setTransactionId] = useState("");
 
   async function placeOrder() {
     if (cart.length === 0) {
@@ -96,74 +98,197 @@ export default function CheckoutPage() {
     router.push("/dashboard");
   }
 
-  return (
-    <main suppressHydrationWarning className="mx-auto max-w-5xl px-6 py-10 bg-slate-50">
-      <h1 className="mb-8 text-4xl font-bold text-slate-900">Checkout</h1>
+ return (
+  <main
+    suppressHydrationWarning
+    className="mx-auto max-w-5xl px-6 py-10 bg-slate-50"
+  >
+    <h1 className="mb-8 text-4xl font-bold text-slate-900">
+      Checkout
+    </h1>
 
-      <div className="rounded-2xl bg-cyan-100 p-8 shadow-xl shadow-slate-200/40 space-y-6">
-        <div className="space-y-4">
-          <input
-            className="w-full rounded-2xl border border-slate-200 bg-white p-4 text-slate-900 shadow-sm transition focus:border-emerald-600 focus:outline-none"
-            placeholder="Full Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
+    <div className="rounded-2xl bg-cyan-100 p-8 shadow-xl shadow-slate-200/40 space-y-6">
+      {/* Customer Info */}
+      <div className="space-y-4">
+        <input
+          className="w-full rounded-2xl border border-slate-200 bg-white p-4 text-slate-900 shadow-sm focus:border-emerald-600 focus:outline-none"
+          placeholder="Full Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
 
-          <input
-            type="tel"
-            inputMode="numeric"
-            maxLength={11}
-            className="w-full rounded-2xl border border-slate-200 bg-white p-4 text-slate-900 shadow-sm transition focus:border-emerald-600 focus:outline-none"
-            placeholder="Phone Number"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
-          />
+        <input
+          type="tel"
+          inputMode="numeric"
+          maxLength={11}
+          className="w-full rounded-2xl border border-slate-200 bg-white p-4 text-slate-900 shadow-sm focus:border-emerald-600 focus:outline-none"
+          placeholder="Phone Number"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
+        />
 
-          <textarea
-            className="w-full rounded-2xl border border-slate-200 bg-white p-4 text-slate-900 shadow-sm transition focus:border-emerald-600 focus:outline-none"
-            rows={4}
-            placeholder="Shipping Address"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-          />
-        </div>
-
-        <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
-          <div className="mb-4">
-            <p className="text-sm font-semibold text-slate-900">Payment method</p>
-            <p className="mt-1 text-sm text-slate-500">Cash on delivery is available for this order.</p>
-          </div>
-
-          <div className="rounded-3xl border border-emerald-600 bg-emerald-100 px-4 py-4 text-left">
-            <p className="font-semibold text-slate-900">Cash On Delivery</p>
-            <p className="mt-1 text-sm text-slate-600">Selected by default</p>
-          </div>
-        </div>
-
-        <div className="rounded-3xl border border-slate-200 bg-slate-100 p-5 text-slate-700">
-          <div className="flex justify-between text-slate-700">
-            <span>Subtotal</span>
-            <span>৳{subtotal}</span>
-          </div>
-          <div className="flex justify-between text-slate-700">
-            <span>Delivery Fee</span>
-            <span>৳{deliveryFee}</span>
-          </div>
-          <hr className="my-4 border-slate-200" />
-          <div className="flex justify-between text-lg font-semibold text-slate-900">
-            <span>Total</span>
-            <span>৳{total}</span>
-          </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={placeOrder}
-          className="w-full rounded-2xl bg-emerald-600 py-3 text-sm font-bold text-white transition hover:bg-emerald-700"
-        >
-          Place Order
-        </button>
+        <textarea
+          rows={4}
+          className="w-full rounded-2xl border border-slate-200 bg-white p-4 text-slate-900 shadow-sm focus:border-emerald-600 focus:outline-none"
+          placeholder="Shipping Address"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+        />
       </div>
-    </main>
-  );
+
+      {/* Payment Method */}
+      <div className="rounded-3xl border border-slate-200 bg-white p-5">
+        <h3 className="mb-4 text-lg font-bold text-slate-900">
+          Payment Method
+        </h3>
+{paymentMethod === "bKash" && (
+  <div className="mt-6 rounded-2xl border border-pink-300 bg-pink-50 p-5">
+    <h4 className="text-lg font-bold text-pink-700">
+      bKash Payment
+    </h4>
+
+    <p className="mt-3 text-sm text-slate-600">
+      Send Money to this number:
+    </p>
+
+    <div className="mt-2 flex items-center justify-between rounded-xl border bg-white p-3">
+      <span className="font-bold text-black">01637133488</span>
+
+      <button
+        type="button"
+        onClick={() => navigator.clipboard.writeText("01637133488")}
+        className="rounded-lg bg-pink-600 px-3 py-2 text-white"
+      >
+        Copy
+      </button>
+    </div>
+
+    <input
+      type="text"
+      placeholder="Enter Transaction ID"
+      value={transactionId}
+      onChange={(e) => setTransactionId(e.target.value)}
+      className="mt-4 w-full rounded-xl border p-3 text-pink-500"
+    />
+  </div>
+)}
+
+{paymentMethod === "Nagad" && (
+  <div className="mt-6 rounded-2xl border border-orange-300 bg-orange-50 p-5">
+    <h4 className="text-lg font-bold text-orange-700">
+      Nagad Payment
+    </h4>
+
+    <p className="mt-3 text-sm text-slate-600">
+      Send Money to this number:
+    </p>
+
+    <div className="mt-2 flex items-center justify-between rounded-xl border bg-white p-3">
+      <span className="font-bold text-black">01637133488</span>
+
+      <button
+        type="button"
+        onClick={() => navigator.clipboard.writeText("01637133488")}
+        className="rounded-lg bg-orange-500 px-3 py-2 text-white"
+      >
+        Copy
+      </button>
+    </div>
+
+    <input
+      type="text"
+      placeholder="Enter Transaction ID"
+      value={transactionId}
+      onChange={(e) => setTransactionId(e.target.value)}
+      className="mt-4 w-full rounded-xl border p-3 text-orange-500"
+    />
+  </div>
+)}
+        <div className="grid gap-4 sm:grid-cols-3">
+          <button
+            type="button"
+            onClick={() => setPaymentMethod("Cash On Delivery")}
+            className={`rounded-2xl border p-5 transition ${
+              paymentMethod === "Cash On Delivery"
+                ? "border-emerald-600 bg-emerald-50"
+                : "border-slate-200 bg-white hover:border-emerald-400"
+            }`}
+          >
+            <div className="text-4xl">📦</div>
+            <p className="mt-3 font-bold text-yellow-700">Cash On Delivery</p>
+            <p className="text-sm text-slate-500">Pay after delivery</p>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setPaymentMethod("bKash")}
+            className={`rounded-2xl border p-5 transition ${
+              paymentMethod === "bKash"
+                ? "border-pink-600 bg-pink-50"
+                : "border-slate-200 bg-white hover:border-pink-400"
+            }`}
+          >
+            <Image
+              src="/bkash.png"
+              alt="bKash"
+              width={110}
+              height={40}
+              className="mx-auto h-10 w-auto"
+            />
+            <p className="mt-3 font-bold text-yellow-700">bKash</p>
+            <p className="text-sm text-slate-500">Send Money</p>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setPaymentMethod("Nagad")}
+            className={`rounded-2xl border p-5 transition ${
+              paymentMethod === "Nagad"
+                ? "border-orange-500 bg-orange-50"
+                : "border-slate-200 bg-white hover:border-orange-400"
+            }`}
+          >
+            <Image
+              src="/nagad.png"
+              alt="Nagad"
+              width={110}
+              height={40}
+              className="mx-auto h-10 w-auto"
+            />
+            <p className="mt-3 font-bold text-yellow-700">Nagad</p>
+            <p className="text-sm text-slate-500">Cash In</p>
+          </button>
+        </div>
+      </div>
+
+      {/* Order Summary */}
+      <div className="rounded-3xl border border-slate-200 bg-white p-5">
+        <div className="flex justify-between text-black">
+          <span>Subtotal</span>
+          <span>৳{subtotal}</span>
+        </div>
+
+        <div className="flex justify-between text-black">
+          <span>Delivery Fee</span>
+          <span>৳{deliveryFee}</span>
+        </div>
+
+        <hr className="my-4" />
+
+        <div className="flex justify-between text-lg font-bold text-yellow-700">
+          <span>Total</span>
+          <span>৳{total}</span>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={placeOrder}
+        className="w-full rounded-2xl bg-emerald-600 py-3 font-bold text-white hover:bg-emerald-700"
+      >
+        Place Order
+      </button>
+    </div>
+  </main>
+ );
 }
