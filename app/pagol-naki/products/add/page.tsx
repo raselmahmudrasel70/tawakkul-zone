@@ -22,6 +22,10 @@ export default function AddProductPage() {
   const [cashOnDelivery, setCashOnDelivery] = useState(true);
   const [image, setImage] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+const originalPrice = Number(price) || 0;
+const discountPercent = Number(discount) || 0;
+const finalPrice =
+  originalPrice - (originalPrice * discountPercent) / 100;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -169,40 +173,64 @@ export default function AddProductPage() {
 
         {/* Pricing */}
         <div>
-          <h2 className="mb-5 text-2xl font-bold text-green-700">
-            💰 Pricing
-          </h2>
+  <h2 className="mb-5 text-2xl font-bold text-green-700">
+    💰 Pricing
+  </h2>
 
-          <div className="grid gap-5 md:grid-cols-2">
+  <div className="grid gap-5 md:grid-cols-3">
 
-            <div>
-              <label className="mb-2 block font-semibold text-yellow-700">
-                Price
-              </label>
+    {/* Main Price */}
+    <div>
+      <label className="mb-2 block font-semibold text-yellow-700">
+        Main Price
+      </label>
 
-              <input
-  type="number"
-  value={price}
-  onChange={(e) => setPrice(e.target.value)}
-  className="w-full rounded-xl border p-3 text-black"
-/>
-            </div>
+      <input
+        type="number"
+        value={price}
+        onChange={(e) => setPrice(e.target.value)}
+        placeholder="2000"
+        className="w-full rounded-xl border p-3 text-black"
+      />
+    </div>
 
-            <div>
-              <label className="mb-2 block font-semibold text-yellow-700">
-                Discount (%)
-              </label>
+    {/* Discount */}
+    <div>
+      <label className="mb-2 block font-semibold text-yellow-700">
+        Discount (%)
+      </label>
 
-              <input
-  type="number"
-  value={discount}
-  onChange={(e) => setDiscount(e.target.value)}
-  className="w-full rounded-xl border p-3 text-black"
-/>
-            </div>
+      <input
+        type="number"
+        min="0"
+        max="100"
+        value={discount}
+        onChange={(e) => setDiscount(e.target.value)}
+        placeholder="20"
+        className="w-full rounded-xl border p-3 text-black"
+      />
+    </div>
 
-          </div>
-        </div>
+    {/* Final Price */}
+    <div>
+      <label className="mb-2 block font-semibold text-green-700">
+        Final Price
+      </label>
+
+      <input
+        type="number"
+        value={finalPrice}
+        readOnly
+        className="w-full rounded-xl border bg-gray-100 p-3 font-bold text-green-700"
+      />
+
+      <p className="mt-2 text-sm font-medium text-red-600">
+        You Save: ৳{originalPrice - finalPrice}
+      </p>
+    </div>
+
+  </div>
+</div>
 <div>
   <label className="mb-2 block font-semibold text-yellow-700">
     Rating
