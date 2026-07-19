@@ -80,23 +80,35 @@ export default function FeaturedProducts({
                   )}
 
                   <button
-                    onClick={() => {
-                      if (isWishlisted(product.id)) {
-                        removeFromWishlist(product.id);
-                      } else {
-                        addToWishlist(product);
-                      }
-                    }}
-                    className="absolute right-3 top-3 rounded-full border border-white bg-pink-200 p-2.5 backdrop-blur-md shadow-xl transition-all duration-300 hover:scale-110 hover:bg-red-400"
-                  >
-                    <Heart
-                      className={`h-5 w-5 transition-all duration-300 ${
-                        isWishlisted(product.id)
-                          ? "fill-red-500 text-red-500"
-                          : "text-gray-700"
-                      }`}
-                    />
-                  </button>
+  onClick={() => {
+    if (isWishlisted(product.id)) {
+      removeFromWishlist(product.id);
+    } else {
+      const discountedPrice =
+        product.discount > 0
+          ? Math.round(
+              product.price - (product.price * product.discount) / 100
+            )
+          : product.price;
+
+      addToWishlist({
+        id: product.id,
+        name: product.name,
+        price: discountedPrice,
+        images: product.images,
+      });
+    }
+  }}
+  className="absolute right-3 top-3 rounded-full border border-white bg-pink-200 p-2.5 backdrop-blur-md shadow-xl transition-all duration-300 hover:scale-110 hover:bg-red-400"
+>
+  <Heart
+    className={`h-5 w-5 transition-all duration-300 ${
+      isWishlisted(product.id)
+        ? "fill-red-500 text-red-500"
+        : "text-gray-700"
+    }`}
+  />
+</button>
                 </div>
 
                 <Link href={`/product/${product.id}`}>

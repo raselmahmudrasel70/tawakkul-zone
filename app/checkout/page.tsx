@@ -39,12 +39,15 @@ const [transactionId, setTransactionId] = useState("");
 
     const phoneRegex = /^01\d{9}$/;
 
-    if (!phoneRegex.test(phone)) {
-      Swal.fire({
-        icon: "warning",
-        title: "Enter a valid phone number",
-        text: "Phone number must start with 01 and contain exactly 11 digits.",
-      });
+    if (
+  (paymentMethod === "bKash" || paymentMethod === "Nagad") &&
+  !transactionId.trim()
+) {
+  Swal.fire({
+    icon: "warning",
+    title: "Payment তথ্য দিন",
+    text: "Transaction ID অথবা Sender Mobile Number লিখুন।",
+  });
       return;
     }
 
@@ -70,6 +73,7 @@ const [transactionId, setTransactionId] = useState("");
       delivery_fee: deliveryFee,
       total,
       payment_method: paymentMethod,
+      transaction_id: transactionId,
       status: "Pending",
     });
 

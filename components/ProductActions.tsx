@@ -7,6 +7,7 @@ interface Product {
   id: number;
   name: string;
   price: number;
+  discount: number;
   images: string;
 }
 
@@ -18,6 +19,11 @@ export default function ProductActions({
   const { addToCart } = useCart();
   const { addToWishlist } = useWishlist();
 
+  const discountedPrice =
+    product.discount > 0
+      ? Math.round(product.price - (product.price * product.discount) / 100)
+      : product.price;
+
   return (
     <div className="mt-8 flex gap-4">
       <button
@@ -25,7 +31,7 @@ export default function ProductActions({
           addToCart({
             id: product.id,
             name: product.name,
-            price: product.price,
+            price: discountedPrice,
             images: product.images,
           })
         }
@@ -35,18 +41,18 @@ export default function ProductActions({
       </button>
 
       <button
-        onClick={() =>
-          addToWishlist({
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            images: product.images,
-          })
-        }
-        className="rounded-xl border border-white px-8 py-4 text-lg font-bold text-white transition hover:bg-pink-600"
-      >
-        ❤️ Wishlist
-      </button>
+  onClick={() =>
+    addToWishlist({
+      id: product.id,
+      name: product.name,
+      price: discountedPrice,
+      images: product.images,
+    })
+  }
+  className="rounded-xl border border-white px-8 py-4 text-lg font-bold text-white transition hover:bg-pink-600"
+>
+  ❤️ Wishlist
+</button>
     </div>
   );
 }

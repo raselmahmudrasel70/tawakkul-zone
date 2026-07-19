@@ -1,6 +1,6 @@
 "use client";
+
 import ProductRow from "@/components/ProductRow";
-import Image from "next/image";
 import Link from "next/link";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
@@ -37,46 +37,44 @@ export default function WishlistPage() {
         </div>
       ) : (
         <div className="grid gap-8 lg:grid-cols-3">
-          {/* Left Side */}
           <div className="space-y-5 lg:col-span-2">
             {wishlist.map((item) => (
               <ProductRow
-  key={item.id}
-  images={item.images}
-  name={item.name}
-  price={item.price}
->
-  <button
-    onClick={() => addToCart(item)}
-    className="rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white hover:bg-green-800"
-  >
-    🛒 Add to Cart
-  </button>
+                key={item.id}
+                images={item.images}
+                name={item.name}
+                price={item.price}
+              >
+                <button
+                  onClick={() => addToCart(item)}
+                  className="rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white hover:bg-green-800"
+                >
+                  🛒 Add to Cart
+                </button>
 
-  <button
-    onClick={() => removeFromWishlist(item.id)}
-    className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
-  >
-    Remove
-  </button>
-</ProductRow>
+                <button
+                  onClick={() => removeFromWishlist(item.id)}
+                  className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
+                >
+                  Remove
+                </button>
+              </ProductRow>
             ))}
           </div>
 
-          {/* Right Side */}
           <SummaryCard title="Wishlist Summary">
-  <div className="mb-5 flex justify-between">
-    <span>Items</span>
-    <span>{wishlist.length}</span>
-  </div>
+            <div className="mb-5 flex justify-between">
+              <span>Items</span>
+              <span>{wishlist.length}</span>
+            </div>
 
-  <Link
-    href="/"
-    className="block w-full rounded-xl bg-pink-700 py-3 text-center font-semibold text-white transition hover:bg-green-800"
-  >
-    🛍 Continue Shopping
-  </Link>
-</SummaryCard>
+            <Link
+              href="/"
+              className="block w-full rounded-xl bg-pink-700 py-3 text-center font-semibold text-white transition hover:bg-green-800"
+            >
+              🛍 Continue Shopping
+            </Link>
+          </SummaryCard>
         </div>
       )}
     </main>
