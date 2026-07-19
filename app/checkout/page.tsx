@@ -163,13 +163,17 @@ const [transactionId, setTransactionId] = useState("");
       </button>
     </div>
 
-    <input
-      type="text"
-      placeholder="Enter Transaction ID"
-      value={transactionId}
-      onChange={(e) => setTransactionId(e.target.value)}
-      className="mt-4 w-full rounded-xl border p-3 text-pink-500"
-    />
+    <label className="mt-4 mb-2 block text-sm font-medium text-slate-700">
+  Transaction ID অথবা Sender Mobile Number দিন<span className="text-red-500">*</span>
+</label>
+
+<input
+  type="text"
+  placeholder="যেমন: 9ABCD12345 অথবা 01712345678"
+  value={transactionId}
+  onChange={(e) => setTransactionId(e.target.value)}
+  className="w-full rounded-xl border border-slate-300 p-3 focus:border-emerald-600 focus:outline-none text-red-600"
+/>
   </div>
 )}
 
@@ -195,13 +199,17 @@ const [transactionId, setTransactionId] = useState("");
       </button>
     </div>
 
-    <input
-      type="text"
-      placeholder="Enter Transaction ID"
-      value={transactionId}
-      onChange={(e) => setTransactionId(e.target.value)}
-      className="mt-4 w-full rounded-xl border p-3 text-orange-500"
-    />
+    <label className="mt-4 mb-2 block text-sm font-medium text-red-700">
+  Transaction ID অথবা Sender Mobile Number দিন<span className="text-red-500">*</span>
+</label>
+
+<input
+  type="text"
+  placeholder="যেমন: 9ABCD12345 অথবা 01712345678"
+  value={transactionId}
+  onChange={(e) => setTransactionId(e.target.value)}
+  className="w-full rounded-xl border border-slate-300 p-3 focus:border-emerald-600 focus:outline-none text-orange-600"
+/>
   </div>
 )}
         <div className="grid gap-4 sm:grid-cols-3">
