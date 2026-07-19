@@ -26,7 +26,6 @@ export default function LoginPage() {
         text: error.message,
         confirmButtonColor: "#dc2626",
       });
-
       return;
     }
 
@@ -40,11 +39,29 @@ export default function LoginPage() {
     router.push("/");
   }
 
+  async function loginWithGoogle() {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+
+    if (error) {
+      await Swal.fire({
+        icon: "error",
+        title: "Google Login Failed",
+        text: error.message,
+        confirmButtonColor: "#dc2626",
+      });
+    }
+  }
+
   return (
     <main className="flex min-h-screen items-center justify-center">
       <form
         onSubmit={login}
-        className="w-full max-w-md space-y-4 rounded-xl border p-6"
+        className="w-full max-w-md space-y-4 rounded-xl border bg-white p-6 shadow-lg"
       >
         <h1 className="text-center text-3xl font-bold">Login</h1>
 
@@ -68,9 +85,28 @@ export default function LoginPage() {
 
         <button
           type="submit"
-          className="w-full rounded bg-green-700 py-3 text-white hover:bg-green-800"
+          className="w-full rounded bg-green-700 py-3 text-white transition hover:bg-green-800"
         >
           Login
+        </button>
+
+        <div className="my-4 flex items-center">
+          <div className="h-px flex-1 bg-gray-300"></div>
+          <span className="mx-3 text-sm text-gray-500">OR</span>
+          <div className="h-px flex-1 bg-gray-300"></div>
+        </div>
+
+        <button
+          type="button"
+          onClick={loginWithGoogle}
+          className="flex w-full items-center justify-center gap-3 rounded border border-gray-300 bg-white py-3 font-medium transition hover:bg-gray-50"
+        >
+          <img
+            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+            alt="Google"
+            className="h-5 w-5"
+          />
+          Continue with Google
         </button>
       </form>
     </main>

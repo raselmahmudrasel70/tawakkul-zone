@@ -19,6 +19,22 @@ const [password, setPassword] = useState("");
 const [confirmPassword, setConfirmPassword] = useState("");
 const [loading, setLoading] = useState(false);
 const router = useRouter();
+const handleGoogleSignup = async () => {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${window.location.origin}/auth/callback`,
+    },
+  });
+
+  if (error) {
+    Swal.fire({
+      icon: "error",
+      title: "Google Sign Up Failed",
+      text: error.message,
+    });
+  }
+};
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 if (!fullName.trim()) {
@@ -220,7 +236,24 @@ setLoading(false);
 >
   {loading ? "Creating..." : "Create Account"}
 </button>
+<div className="my-6 flex items-center">
+  <div className="h-px flex-1 bg-gray-300"></div>
+  <span className="mx-3 text-sm text-gray-500">OR</span>
+  <div className="h-px flex-1 bg-gray-300"></div>
+</div>
 
+<button
+  type="button"
+  onClick={handleGoogleSignup}
+  className="w-full rounded-2xl border border-gray-300 bg-white py-4 font-semibold text-gray-700 transition hover:bg-gray-50 flex items-center justify-center gap-3"
+>
+  <img
+    src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+    alt="Google"
+    className="h-6 w-6"
+  />
+  Continue with Google
+</button>
         </form>
 
       </div>
