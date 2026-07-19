@@ -8,19 +8,14 @@ export async function middleware(request: NextRequest) {
   console.log("Request Path:", pathname);
 
   if (pathname.startsWith("/pagol-naki")) {
-    // --- সিকিউরিটি ও টেলিগ্রাম অ্যালার্ট সিস্টেম শুরু ---
-    const visitorIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'Unknown IP';
-
-    const trustedIp = process.env.MY_TRUSTED_IP;
-
-    // আইপি যদি আপনার ট্রাস্টেড আইপির সাথে না মিলে, তবে লগইন পেজও দেখতে দেওয়া হবে না
-    if (false) { // সাময়িকভাবে ব্লকিং বন্ধ রাখার জন্য
-
+    // শুধুমাত্র লগইন পেজে প্রথমবার ঢোকার সময় অ্যালার্ট যাবে (লুপ ঠেকানোর জন্য)
+    if (pathname === "/pagol-naki/login") {
+      const visitorIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'Unknown IP';
       const botToken = process.env.TELEGRAM_BOT_TOKEN;
       const chatId = process.env.TELEGRAM_CHAT_ID;
       const currentTime = new Date().toLocaleString("en-US", { timeZone: "Asia/Dhaka" });
 
-      const message = `⚠️ *Access Denied Alert*\n\n🌐 *Site:* ${request.nextUrl.host}\n📍 *IP:* ${visitorIp}\n🔗 *Path:* ${pathname}\n⏰ *Time:* ${currentTime}\n🛡️ *Status:* Connection Blocked`;
+      const message = `👀 *Admin Page Accessed*\n\n🌐 *Site:* ${request.nextUrl.host}\n📍 *Visitor IP:* ${visitorIp}\n🔗 *Path:* ${pathname}\n⏰ *Time:* ${currentTime}\n🛡️ *Status:* Login Page Displayed`;
 
       // ব্যাকগ্রাউন্ডে টেলিগ্রামে মেসেজ পাঠানো
       if (botToken && chatId) {
@@ -34,16 +29,9 @@ export async function middleware(request: NextRequest) {
           }),
         }).catch((err) => console.error('Telegram Log Error:', err));
       }
-
-      // হ্যাকারকে ব্লক স্ক্রিন দেখানো
-      return new NextResponse(
-        JSON.stringify({ error: '403 Forbidden - Access Denied' }),
-        { status: 403, headers: { 'content-type': 'application/json' } }
-      );
     }
-    // --- সিকিউরিটি ও টেলিগ্রাম অ্যালার্ট সিস্টেম শেষ ---
 
-    // আপনার আগের টোকেন ভ্যালিডেশন লজিক
+    // আপনার আগের অরজিনাল টোকেন ভ্যালিডেশন লজিক (যা আইডি-পাসওয়ার্ড চেক করে)
     if (
       pathname === "/pagol-naki/login" ||
       pathname === "/pagol-naki/logout"
