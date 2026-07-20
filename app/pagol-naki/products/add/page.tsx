@@ -118,7 +118,7 @@ const finalPrice =
   className="w-full rounded-xl border p-3"
 >
                 <option>Three Piece</option>
-                <option>Saree</option>
+                <option>Socks</option>
                 <option>Abaya</option>
                 <option>Hijab</option>
                 <option>Fabric</option>

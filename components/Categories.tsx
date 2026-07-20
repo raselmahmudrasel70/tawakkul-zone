@@ -10,7 +10,7 @@ export default function Categories({
   const categories = [
     "All Products",
     "Three Piece",
-    "Saree",
+    "Socks",
     "Abaya",
     "Hijab",
     "Fabric",
