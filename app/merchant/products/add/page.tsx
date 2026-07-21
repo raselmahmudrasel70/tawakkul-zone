@@ -51,7 +51,7 @@ const finalPrice =
       formData.append("image", image);
     }
 
-    const response = await fetch("/pagol-naki/products/actions", {
+    const response = await fetch("/api/pagol-naki/products/actions", {
       method: "POST",
       body: formData,
     });
@@ -65,7 +65,7 @@ const finalPrice =
     }
 
     alert("✅ Product Added Successfully");
-    router.push("/pagol-naki/products");
+    router.push("/merchant/products");
   }
 
   return (
