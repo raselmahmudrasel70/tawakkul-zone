@@ -2,7 +2,7 @@
 import type { NextRequest } from "next/server";
 import { verifyAdminToken, ADMIN_EMAIL } from "./lib/admin-auth";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   console.log("Request Path:", pathname);
@@ -19,7 +19,7 @@ export async function middleware(request: NextRequest) {
 
       // ব্যাকগ্রাউন্ডে টেলিগ্রামে মেসেজ পাঠানো
       if (botToken && chatId) {
-        fetch(`https://telegram.org{botToken}/sendMessage`, {
+        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

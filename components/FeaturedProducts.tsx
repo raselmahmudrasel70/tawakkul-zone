@@ -53,7 +53,7 @@ export default function FeaturedProducts({
           ⭐ Featured Products
         </h2>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           {filteredProducts.map((product) => {
             const discountedPrice =
               product.price - (product.price * (product.discount ?? 0)) / 100;
@@ -61,9 +61,9 @@ export default function FeaturedProducts({
             return (
               <div
                 key={product.id}
-                className="rounded-2xl bg-gray-300 p-6 shadow-lg transition duration-300 hover:-translate-y-2 hover:shadow-2xl"
+                className="rounded-2xl bg-gray-300 p-3 md:p-6 shadow-lg transition duration-300 hover:-translate-y-2 hover:shadow-2xl"
               >
-                <div className="relative mb-4 h-56 overflow-hidden rounded-xl">
+                <div className="relative mb-3 h-40 md:h-56 overflow-hidden rounded-xl">
                   <Link href={`/product/${product.id}`}>
                     <Image
                       src={product.images || "/products/product1.jpg"}
@@ -149,16 +149,6 @@ export default function FeaturedProducts({
                     <p className="mt-1 text-2xl font-extrabold text-green-700">
                       ৳ {product.price}
                     </p>
-                  )}
-                </div>
-
-                <div className="mt-2 text-sm">
-                  {product.freeDelivery ? (
-                    <span className="font-medium text-green-600">
-                      🚚 Free Delivery
-                    </span>
-                  ) : (
-                    <span className="text-gray-500">🚚 Delivery Available</span>
                   )}
                 </div>
 
