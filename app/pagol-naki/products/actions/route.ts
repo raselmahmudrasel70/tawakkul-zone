@@ -1,6 +1,6 @@
 ﻿import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
-import { verifyAdminToken, ADMIN_EMAIL } from "@/lib/admin-auth";
+import { verifyAuthToken, ADMIN_EMAIL } from "@/lib/auth";
 
 const COOKIE_NAME = "admin-auth";
 
@@ -11,7 +11,7 @@ async function verifyRequest(request: NextRequest) {
     return null;
   }
 
-  const payload = await verifyAdminToken(token);
+  const payload = await verifyAuthToken(token);
 
   if (!payload) {
     return null;

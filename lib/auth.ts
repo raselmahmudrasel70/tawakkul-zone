@@ -1,4 +1,4 @@
-﻿const ADMIN_AUTH_SECRET =
+﻿const AUTH_SECRET =
   process.env.ADMIN_AUTH_SECRET || "tawakkul-zone-admin-secret";
 
 export const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "";
@@ -8,11 +8,12 @@ const TOKEN_LIFETIME_MS = 1000 * 60 * 60 * 24;
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
-function requireAdminSecret() {
-  if (!ADMIN_AUTH_SECRET) {
+function requireAuthSecret() {
+  if (!AUTH_SECRET) {
     throw new Error("Missing ADMIN_AUTH_SECRET environment variable.");
   }
-  return ADMIN_AUTH_SECRET;
+
+  return AUTH_SECRET;
 }
 
 function base64UrlEncode(value: string) {
@@ -52,12 +53,12 @@ function base64UrlDecode(value: string) {
 
 async function computeHmac(payload: string) {
   if (!globalThis.crypto?.subtle) {
-    throw new Error("Web Crypto is required for admin auth token signing.");
+    throw new Error("Web Crypto is required for auth token signing.");
   }
 
-  const adminSecret = requireAdminSecret();
+  const authSecret = requireAuthSecret();
 
-  const keyData = encoder.encode(adminSecret);
+  const keyData = encoder.encode(authSecret);
   const payloadData = encoder.encode(payload);
 
   const key = await globalThis.crypto.subtle.importKey(
@@ -82,7 +83,7 @@ async function computeHmac(payload: string) {
     .join("");
 }
 
-export async function createAdminToken(
+export async function createAuthToken(
   id: string,
   email: string,
   role: string
@@ -100,7 +101,7 @@ export async function createAdminToken(
   return `${payloadBase64}.${signature}`;
 }
 
-export async function verifyAdminToken(token: string) {
+export async function verifyAuthToken(token: string) {
   try {
     const [payloadBase64, signature] = token.split(".");
 

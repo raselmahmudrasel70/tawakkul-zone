@@ -1,6 +1,6 @@
 ﻿import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { verifyAdminToken, ADMIN_EMAIL } from "./lib/admin-auth";
+import { verifyAuthToken, ADMIN_EMAIL } from "./lib/auth";
 
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -42,7 +42,7 @@ export async function proxy(request: NextRequest) {
     const token = request.cookies.get("admin-auth")?.value;
     console.log("Admin Token:", token);
 
-    const payload = token ? await verifyAdminToken(token) : null;
+    const payload = token ? await verifyAuthToken(token) : null;
     console.log("Token Payload:", payload);
     console.log("Expected Admin:", ADMIN_EMAIL);
 

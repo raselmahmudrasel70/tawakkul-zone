@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
-import { createAdminToken } from "@/lib/admin-auth";
+import { createAuthToken } from "@/lib/auth";
 
 const COOKIE_NAME = "admin-auth";
 const COOKIE_MAX_AGE = 60 * 60 * 24;
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const token = await createAdminToken(
+  const token = await createAuthToken(
   data.user.id,
   data.user.email!,
   profile.role

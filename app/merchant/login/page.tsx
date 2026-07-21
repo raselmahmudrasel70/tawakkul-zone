@@ -1,35 +1,65 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 export default function MerchantLoginPage() {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
 
-    const response = await fetch("/api/pagol-naki/login", {
-      method: "POST",
-      body: formData,
+    const email = String(formData.get("email") || "").trim();
+    const password = String(formData.get("password") || "");
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      alert(data.error || "Login failed");
+    if (error) {
+      alert(error.message);
       setLoading(false);
       return;
     }
 
-    if (data.role === "admin") {
-  window.location.href = "/pagol-naki";
-} else {
-  window.location.href = "/merchant/dashboard";
-}
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      alert("Login failed.");
+      setLoading(false);
+      return;
+    }
+
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (profileError || !profile) {
+      await supabase.auth.signOut();
+      alert("Profile not found.");
+      setLoading(false);
+      return;
+    }
+
+    if (profile.role !== "merchant") {
+      await supabase.auth.signOut();
+      alert("This account is not a merchant.");
+      setLoading(false);
+      return;
+    }
+
+    router.replace("/merchant/dashboard");
+    router.refresh();
   }
 
   return (
@@ -61,7 +91,7 @@ export default function MerchantLoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded bg-green-700 py-3 font-semibold text-white"
+          className="w-full rounded bg-green-700 py-3 font-semibold text-white disabled:opacity-60"
         >
           {loading ? "Logging in..." : "Login"}
         </button>
