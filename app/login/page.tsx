@@ -58,16 +58,18 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center">
+    <main className="flex min-h-screen items-center justify-center bg-black px-4 py-10">
       <form
         onSubmit={login}
-        className="w-full max-w-md space-y-4 rounded-xl border bg-white p-6 shadow-lg"
+        className="w-full max-w-md space-y-4 rounded-xl border border-gray-200 bg-white p-6 shadow-xl"
       >
-        <h1 className="text-center text-3xl font-bold">Login</h1>
+        <h1 className="text-center text-3xl font-bold text-slate-900">
+          Login
+        </h1>
 
         <input
           type="email"
-          className="w-full rounded border p-3"
+          className="w-full rounded-lg border border-gray-300 p-3 text-slate-900 placeholder:text-gray-500 focus:border-green-700 focus:outline-none"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -76,7 +78,7 @@ export default function LoginPage() {
 
         <input
           type="password"
-          className="w-full rounded border p-3"
+          className="w-full rounded-lg border border-gray-300 p-3 text-slate-900 placeholder:text-gray-500 focus:border-green-700 focus:outline-none"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -85,21 +87,21 @@ export default function LoginPage() {
 
         <button
           type="submit"
-          className="w-full rounded bg-green-700 py-3 text-white transition hover:bg-green-800"
+          className="w-full rounded-lg bg-green-700 py-3 font-semibold text-white transition hover:bg-green-800"
         >
           Login
         </button>
 
         <div className="my-4 flex items-center">
           <div className="h-px flex-1 bg-gray-300"></div>
-          <span className="mx-3 text-sm text-gray-500">OR</span>
+          <span className="mx-3 text-sm text-gray-600">OR</span>
           <div className="h-px flex-1 bg-gray-300"></div>
         </div>
 
         <button
           type="button"
           onClick={loginWithGoogle}
-          className="flex w-full items-center justify-center gap-3 rounded border border-gray-300 bg-white py-3 font-medium transition hover:bg-gray-50"
+          className="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-300 bg-white py-3 font-medium text-slate-900 transition hover:bg-gray-50"
         >
           <img
             src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"

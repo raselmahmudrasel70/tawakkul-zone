@@ -6,15 +6,29 @@ const COOKIE_NAME = "admin-auth";
 
 async function verifyRequest(request: NextRequest) {
   const token = request.cookies.get(COOKIE_NAME)?.value;
-  if (!token) return false;
+
+  if (!token) {
+    return null;
+  }
+
   const payload = await verifyAdminToken(token);
-  return payload?.email === ADMIN_EMAIL;
+
+  if (!payload) {
+    return null;
+  }
+
+  return payload;
 }
 
 export async function GET(request: NextRequest) {
-  if (!(await verifyRequest(request))) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const user = await verifyRequest(request);
+
+if (!user) {
+  return NextResponse.json(
+    { error: "Unauthorized" },
+    { status: 401 }
+  );
+}
 
   const url = new URL(request.url);
   const id = url.searchParams.get("id");
@@ -33,10 +47,16 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ product: data });
   }
 
-  const { data, error } = await supabaseAdmin
-    .from("products")
-    .select("*")
-    .order("id", { ascending: false });
+  let query = supabaseAdmin
+  .from("products")
+  .select("*")
+  .order("id", { ascending: false });
+
+if (user.role === "merchant") {
+  query = query.eq("created_by", user.id);
+}
+
+const { data, error } = await query;
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -46,9 +66,14 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  if (!(await verifyRequest(request))) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const user = await verifyRequest(request);
+
+if (!user) {
+  return NextResponse.json(
+    { error: "Unauthorized" },
+    { status: 401 }
+  );
+}
 
   const formData = await request.formData();
   const name = String(formData.get("name") || "").trim();
@@ -112,6 +137,7 @@ export async function POST(request: NextRequest) {
     free_delivery: freeDelivery,
     cash_on_delivery: cashOnDelivery,
     is_active: isActive,
+    created_by: user.id,
   });
 
   if (error) {
@@ -122,14 +148,46 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
-  if (!(await verifyRequest(request))) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const user = await verifyRequest(request);
+
+  if (!user) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
   }
 
   const url = new URL(request.url);
   const id = url.searchParams.get("id");
+
   if (!id) {
-    return NextResponse.json({ error: "Missing product id." }, { status: 400 });
+    return NextResponse.json(
+      { error: "Missing product id." },
+      { status: 400 }
+    );
+  }
+
+  const { data: product, error: productError } = await supabaseAdmin
+    .from("products")
+    .select("created_by")
+    .eq("id", Number(id))
+    .single();
+
+  if (productError || !product) {
+    return NextResponse.json(
+      { error: "Product not found." },
+      { status: 404 }
+    );
+  }
+
+  if (
+    user.role === "merchant" &&
+    product.created_by !== user.id
+  ) {
+    return NextResponse.json(
+      { error: "Forbidden." },
+      { status: 403 }
+    );
   }
 
   const formData = await request.formData();
@@ -158,18 +216,22 @@ export async function PATCH(request: NextRequest) {
   if (brand) updateData.brand = brand;
   if (sku) updateData.sku = sku;
   if (description) updateData.description = description;
+
   if (priceValue !== "") {
     const parsedPrice = Number(priceValue);
     if (!Number.isNaN(parsedPrice)) updateData.price = parsedPrice;
   }
+
   if (discountValue !== "") {
     const parsedDiscount = Number(discountValue);
     if (!Number.isNaN(parsedDiscount)) updateData.discount = parsedDiscount;
   }
+
   if (ratingValue !== "") {
     const parsedRating = Number(ratingValue);
     if (!Number.isNaN(parsedRating)) updateData.rating = parsedRating;
   }
+
   if (stockValue !== "") updateData.stock = stockValue === "true";
   if (featuredValue !== "") updateData.featured = featuredValue === "true";
   if (newArrivalValue !== "") updateData.new_arrival = newArrivalValue === "true";
@@ -189,7 +251,10 @@ export async function PATCH(request: NextRequest) {
       });
 
     if (uploadError) {
-      return NextResponse.json({ error: uploadError.message }, { status: 500 });
+      return NextResponse.json(
+        { error: uploadError.message },
+        { status: 500 }
+      );
     }
 
     const { data: publicUrlData } = supabaseAdmin.storage
@@ -200,7 +265,10 @@ export async function PATCH(request: NextRequest) {
   }
 
   if (Object.keys(updateData).length === 0) {
-    return NextResponse.json({ error: "Nothing to update." }, { status: 400 });
+    return NextResponse.json(
+      { error: "Nothing to update." },
+      { status: 400 }
+    );
   }
 
   const { error } = await supabaseAdmin
@@ -209,7 +277,10 @@ export async function PATCH(request: NextRequest) {
     .eq("id", Number(id));
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message },
+      { status: 500 }
+    );
   }
 
   return NextResponse.json({ success: true });
