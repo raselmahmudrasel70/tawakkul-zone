@@ -19,7 +19,7 @@ export default function MerchantProductsPage() {
   useEffect(() => {
     async function loadProducts() {
       try {
-        const res = await fetch("/api/pagol-naki/products/actions");
+        const res = await fetch("/api/merchant/products");
 
         if (!res.ok) {
           throw new Error("Failed to load products");
@@ -48,14 +48,14 @@ export default function MerchantProductsPage() {
 
         <Link
           href="/merchant/products/add"
-          className="rounded bg-green-700 px-4 py-2 text-white"
+          className="rounded bg-green-700 px-4 py-2 text-whitw"
         >
           + Add Product
         </Link>
       </div>
 
       <div className="overflow-x-auto rounded-lg bg-white shadow">
-        <table className="w-full">
+        <table className="w-full text-slate-900">
           <thead className="bg-slate-100">
             <tr>
               <th className="p-3 text-left">Name</th>
@@ -68,7 +68,7 @@ export default function MerchantProductsPage() {
 
           <tbody>
             {products.map((product) => (
-              <tr key={product.id} className="border-t">
+              <tr key={product.id} className="border-t border-yellow-700">
                 <td className="p-3">{product.name}</td>
                 <td className="p-3">{product.category}</td>
                 <td className="p-3">৳ {product.price}</td>
