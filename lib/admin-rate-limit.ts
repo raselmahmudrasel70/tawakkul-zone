@@ -16,9 +16,34 @@ export async function getLoginAttempt(ip: string) {
 export async function isIPBlocked(ip: string) {
   const record = await getLoginAttempt(ip);
 
-  if (!record?.blocked_until) return false;
+  if (!record) {
+    return {
+      blocked: false,
+      permanent: false,
+    };
+  }
 
-  return new Date(record.blocked_until) > new Date();
+  if (record.permanent_block) {
+    return {
+      blocked: true,
+      permanent: true,
+    };
+  }
+
+  if (
+    record.blocked_until &&
+    new Date(record.blocked_until) > new Date()
+  ) {
+    return {
+      blocked: true,
+      permanent: false,
+    };
+  }
+
+  return {
+    blocked: false,
+    permanent: false,
+  };
 }
 
 export async function recordFailedLogin(ip: string, email: string) {

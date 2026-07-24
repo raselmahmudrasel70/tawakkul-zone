@@ -70,7 +70,53 @@ const location = await getIPLocation(ip);
 const country = location?.country ?? "Unknown";
 const city = location?.city ?? "Unknown";
 const isp = location?.isp ?? "Unknown";
-if (await isIPBlocked(ip)) {
+
+// 🌍 Block foreign login only on live website
+if (
+  process.env.NODE_ENV === "production" &&
+  ip !== "::1" &&
+  ip !== "127.0.0.1" &&
+  country !== "Bangladesh"
+) {
+  await supabaseAdmin
+    .from("admin_login_attempts")
+    .upsert(
+      {
+        ip,
+        email,
+        permanent_block: true,
+      },
+      {
+        onConflict: "ip",
+      }
+    );
+
+  await sendTelegram(`🚨 FOREIGN ADMIN LOGIN BLOCKED
+
+📧 Email: ${email}
+
+🌍 IP: ${ip}
+
+🌎 Country: ${country}
+🏙 City: ${city}
+🏢 ISP: ${isp}
+
+🖥 User Agent:
+${ua}
+
+⛔ This IP has been permanently blocked.`);
+
+  return NextResponse.json(
+    {
+      error: "Admin login is allowed only from Bangladesh.",
+    },
+    { status: 403 }
+  );
+}
+
+const blockStatus = await isIPBlocked(ip);
+
+if (blockStatus.blocked) {
   await sendTelegram(`🚫 BLOCKED LOGIN ATTEMPT
 
 📧 Email: ${email}
@@ -87,12 +133,15 @@ ${ua}
 ⛔ This IP is temporarily blocked for 15 minutes.`);
 
   return NextResponse.json(
-    {
-      error:
-        "Too many failed login attempts. Please try again after 15 minutes.",
-    },
-    { status: 429 }
-  );
+  {
+    error: blockStatus.permanent
+      ? "This IP has been permanently blocked."
+      : "Too many failed login attempts. Please try again after 15 minutes.",
+  },
+  {
+    status: blockStatus.permanent ? 403 : 429,
+  }
+);
 }
 console.log("SERVICE ROLE EXISTS:", !!process.env.SUPABASE_SERVICE_ROLE_KEY);
   console.log(
