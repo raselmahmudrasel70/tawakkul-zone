@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { createAuthToken } from "@/lib/auth";
 import { getIPLocation } from "@/lib/ip-location";
-
+import {
+  isIPBlocked,
+  recordFailedLogin,
+  resetLoginAttempts,
+} from "@/lib/admin-rate-limit";
 const COOKIE_NAME = "admin-auth";
 const COOKIE_MAX_AGE = 60 * 60 * 24;
 
@@ -15,7 +19,6 @@ function getCookieOptions() {
     secure: process.env.NODE_ENV === "production",
   };
 }
-
 async function sendTelegram(text: string) {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
@@ -23,56 +26,52 @@ async function sendTelegram(text: string) {
   if (!token || !chatId) return;
 
   try {
-    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text,
-      }),
-    });
+    const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    chat_id: chatId,
+    text,
+  }),
+});
+
+console.log("Telegram Status:", res.status);
+
+if (!res.ok) {
+  console.log(await res.text());
+}
   } catch (err) {
     console.error("Telegram Error:", err);
   }
 }
-
 export async function POST(request: NextRequest) {
-  console.log("🚀 LOGIN API HIT", new Date().toISOString());
-
   const body = await request.json();
   const email = String(body.email || "").trim();
   const password = String(body.password || "");
 
-  if (!email || !password) {
-    return NextResponse.json(
-      { error: "Email and password are required." },
-      { status: 400 }
-    );
-  }
+ if (!email || !password) {
+  return NextResponse.json(
+    { error: "Email and password are required." },
+    { status: 400 }
+  );
+}
 
-  const ip =
-    request.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
-    request.headers.get("x-real-ip") ||
-    "Unknown";
+const ip =
+  request.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
+  request.headers.get("x-real-ip") ||
+  "Unknown";
 
-  const ua = request.headers.get("user-agent") || "Unknown";
+const ua = request.headers.get("user-agent") || "Unknown";
 
-  const location = await getIPLocation(ip);
+const location = await getIPLocation(ip);
 
-  const country = location?.country ?? "Unknown";
-  const city = location?.city ?? "Unknown";
-  const isp = location?.isp ?? "Unknown";
-
-  const { data, error } = await supabaseAdmin.auth.signInWithPassword({
-    email,
-    password,
-  });
-
-  // ❌ Failed Login
-  if (error || !data.user) {
-    await sendTelegram(`🚨 FAILED ADMIN LOGIN
+const country = location?.country ?? "Unknown";
+const city = location?.city ?? "Unknown";
+const isp = location?.isp ?? "Unknown";
+if (await isIPBlocked(ip)) {
+  await sendTelegram(`🚫 BLOCKED LOGIN ATTEMPT
 
 📧 Email: ${email}
 
@@ -83,15 +82,67 @@ export async function POST(request: NextRequest) {
 🏢 ISP: ${isp}
 
 🖥 User Agent:
-${ua}`);
+${ua}
 
-    return NextResponse.json(
-      {
-        error: error?.message ?? "Invalid credentials.",
-      },
-      { status: 401 }
-    );
+⛔ This IP is temporarily blocked for 15 minutes.`);
+
+  return NextResponse.json(
+    {
+      error:
+        "Too many failed login attempts. Please try again after 15 minutes.",
+    },
+    { status: 429 }
+  );
+}
+console.log("SERVICE ROLE EXISTS:", !!process.env.SUPABASE_SERVICE_ROLE_KEY);
+  console.log(
+    "SERVICE ROLE PREFIX:",
+    process.env.SUPABASE_SERVICE_ROLE_KEY?.slice(0, 20)
+  );
+
+  const { data, error } = await supabaseAdmin.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  console.log("Supabase Login Error:", error);
+  console.log("Supabase User:", data?.user);
+
+  if (error || !data.user) {
+  const result = await recordFailedLogin(ip, email);
+
+  let message = `🚨 FAILED ADMIN LOGIN
+
+📧 Email: ${email}
+
+🌍 IP: ${ip}
+
+🌎 Country: ${country}
+🏙 City: ${city}
+🏢 ISP: ${isp}
+
+🔢 Failed Attempts: ${result.attempts}/3
+
+🖥 User Agent:
+${ua}`;
+
+  if (result.blocked) {
+    message += `
+
+🚫 IP BLOCKED
+
+⏳ Block Duration: 15 Minutes`;
   }
+
+  await sendTelegram(message);
+
+  return NextResponse.json(
+    {
+      error: error?.message ?? "Invalid credentials.",
+    },
+    { status: 401 }
+  );
+}
 
   const { data: profile, error: profileError } = await supabaseAdmin
     .from("profiles")
@@ -106,6 +157,9 @@ ${ua}`);
     );
   }
 
+  console.log("Profile:", profile);
+console.log("Role:", profile.role);
+
   if (!["admin", "merchant"].includes(profile.role)) {
     return NextResponse.json(
       { error: "Unauthorized." },
@@ -113,13 +167,12 @@ ${ua}`);
     );
   }
 
-  const authToken = await createAuthToken(
-    data.user.id,
-    data.user.email!,
-    profile.role
-  );
+  const token = await createAuthToken(
+  data.user.id,
+  data.user.email!,
+  profile.role
+);
 
-  // ✅ Successful Login
   await sendTelegram(`✅ ADMIN LOGIN SUCCESS
 
 📧 Email: ${email}
@@ -135,12 +188,14 @@ ${ua}`);
 🖥 User Agent:
 ${ua}`);
 
-  const response = NextResponse.json({
-    success: true,
-    role: profile.role,
-  });
+await resetLoginAttempts(ip);
 
-  response.cookies.set(COOKIE_NAME, authToken, getCookieOptions());
+const response = NextResponse.json({
+  success: true,
+  role: profile.role,
+});
 
-  return response;
+response.cookies.set(COOKIE_NAME, token, getCookieOptions());
+
+return response;
 }
