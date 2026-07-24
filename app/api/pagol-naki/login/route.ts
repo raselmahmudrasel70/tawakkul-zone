@@ -39,8 +39,9 @@ async function sendTelegram(text: string) {
 }
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
+  console.log("🚀 LOGIN API HIT", new Date().toISOString());
 
+  const body = await request.json();
   const email = String(body.email || "").trim();
   const password = String(body.password || "");
 
