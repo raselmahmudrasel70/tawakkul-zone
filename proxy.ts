@@ -1,37 +1,72 @@
 ﻿import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { verifyAuthToken, ADMIN_EMAIL } from "./lib/auth";
+import { getIPLocation } from "./lib/ip-location";
 
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   console.log("Request Path:", pathname);
 
-  if (pathname.startsWith("/pagol-naki")) {
-    // শুধুমাত্র লগইন পেজে প্রথমবার ঢোকার সময় অ্যালার্ট যাবে (লুপ ঠেকানোর জন্য)
-    if (pathname === "/pagol-naki/login") {
-      const visitorIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'Unknown IP';
-      const botToken = process.env.TELEGRAM_BOT_TOKEN;
-      const chatId = process.env.TELEGRAM_CHAT_ID;
-      const currentTime = new Date().toLocaleString("en-US", { timeZone: "Asia/Dhaka" });
+  // ==========================
+  // Telegram Alert
+  // ==========================
+  if (pathname === "/pagol-naki/login") {
+    const visitorIp =
+      request.headers
+        .get("x-forwarded-for")
+        ?.split(",")[0]
+        ?.trim() ??
+      request.headers.get("x-real-ip") ??
+      "Unknown IP";
+const location = await getIPLocation(visitorIp);
+    const userAgent =
+      request.headers.get("user-agent") || "Unknown";
 
-      const message = `👀 *Admin Page Accessed*\n\n🌐 *Site:* ${request.nextUrl.host}\n📍 *Visitor IP:* ${visitorIp}\n🔗 *Path:* ${pathname}\n⏰ *Time:* ${currentTime}\n🛡️ *Status:* Login Page Displayed`;
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
 
-      // ব্যাকগ্রাউন্ডে টেলিগ্রামে মেসেজ পাঠানো
-      if (botToken && chatId) {
-        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: chatId,
-            text: message,
-            parse_mode: 'Markdown',
-          }),
-        }).catch((err) => console.error('Telegram Log Error:', err));
-      }
+    const currentTime = new Date().toLocaleString("en-US", {
+      timeZone: "Asia/Dhaka",
+    });
+
+   const message = `🚨 Admin Page Access
+
+🌐 Site: ${request.nextUrl.host}
+📍 Route: ${pathname}
+
+🌍 IP: ${visitorIp}
+
+🌎 Country: ${location?.country ?? "Unknown"}
+🏙 City: ${location?.city ?? "Unknown"}
+📌 Region: ${location?.region ?? "Unknown"}
+🏢 ISP: ${location?.isp ?? "Unknown"}
+
+🖥 User Agent:
+${userAgent}
+
+⏰ ${currentTime}`;
+
+    if (botToken && chatId) {
+      fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: message,
+        }),
+      }).catch((err) =>
+        console.error("Telegram Error:", err)
+      );
     }
+  }
 
-    // আপনার আগের অরজিনাল টোকেন ভ্যালিডেশন লজিক (যা আইডি-পাসওয়ার্ড চেক করে)
+  // ==========================
+  // Admin Protection
+  // ==========================
+  if (pathname.startsWith("/pagol-naki")) {
     if (
       pathname === "/pagol-naki/login" ||
       pathname === "/pagol-naki/logout"
@@ -40,20 +75,16 @@ export async function proxy(request: NextRequest) {
     }
 
     const token = request.cookies.get("admin-auth")?.value;
-    console.log("Admin Token:", token);
 
-    const payload = token ? await verifyAuthToken(token) : null;
-    console.log("Token Payload:", payload);
-    console.log("Expected Admin:", ADMIN_EMAIL);
+    const payload = token
+      ? await verifyAuthToken(token)
+      : null;
 
     if (!payload || payload.email !== ADMIN_EMAIL) {
-      console.log("❌ Unauthorized - Redirecting to login");
       return NextResponse.redirect(
         new URL("/pagol-naki/login", request.url)
       );
     }
-
-    console.log("✅ Admin authenticated");
   }
 
   return NextResponse.next();

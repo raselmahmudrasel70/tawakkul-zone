@@ -1,5 +1,5 @@
 "use client";
-
+import SecurityReporter from "@/components/SecurityReporter";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -34,7 +34,8 @@ export default function AdminLoginPage() {
 
   return (
     <main className="flex min-h-screen items-center justify-center">
-      <form
+     <SecurityReporter />
+     <form
         onSubmit={handleLogin}
         className="w-full max-w-md rounded-xl border p-6 space-y-4"
       >
