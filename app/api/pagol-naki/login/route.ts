@@ -108,7 +108,7 @@ ${ua}
 
   return NextResponse.json(
     {
-      error: "Admin login is allowed only from Bangladesh.",
+      error: "Vpn off kor... Shaalaaa.🤣🤣",
     },
     { status: 403 }
   );
