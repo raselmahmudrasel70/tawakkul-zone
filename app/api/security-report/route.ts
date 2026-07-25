@@ -1,8 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
+import { headers } from "next/headers";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+
+    const headersList = await headers();
+
+const ip =
+  headersList.get("cf-connecting-ip") ||
+  headersList.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+  headersList.get("x-real-ip") ||
+  "Unknown IP";
 
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
@@ -20,6 +29,9 @@ export async function POST(req: NextRequest) {
     const message = `🛡️ Client Security Report
 
 ━━━━━━━━━━━━━━━━━━
+
+🌍 IP Address
+${ip}
 
 🖥 Platform
 ${body.platform}
