@@ -19,7 +19,22 @@ const [password, setPassword] = useState("");
 const [confirmPassword, setConfirmPassword] = useState("");
 const [loading, setLoading] = useState(false);
 const router = useRouter();
-const handleGoogleSignup = async () => {
+const [phone,setPhone] = useState("");
+
+
+// এখানে বসবে ✅
+const isValidGmail = (email: string) => {
+  const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+  return gmailRegex.test(email);
+};
+
+const isValidBDPhone = (phone: string) => {
+  const bdPhoneRegex = /^(013|014|015|016|017|018|019)\d{8}$/;
+  return bdPhoneRegex.test(phone);
+};
+
+const loginWithGoogle = async () => {
+
   const { error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
@@ -27,27 +42,76 @@ const handleGoogleSignup = async () => {
     },
   });
 
+
   if (error) {
     Swal.fire({
       icon: "error",
       title: "Google Sign Up Failed",
       text: error.message,
+      confirmButtonColor: "#dc2626",
     });
   }
+
 };
+
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
-if (!fullName.trim()) {
-  alert("Please enter your full name");
+
+
+  if (!fullName.trim()) {
+    Swal.fire({
+      icon:"warning",
+      title:"Name Required",
+      text:"Please enter your full name"
+    });
+    return;
+  }
+if (!isValidGmail(email)) {
+  Swal.fire({
+    icon: "warning",
+    title: "‼️Invalid Email‼️",
+    html: `
+      <p style="color:#dc2626;font-weight:600;">
+        Please enter a valid Gmail address
+      </p>
+    `,
+    confirmButtonColor: "#16a34a",
+  });
   return;
 }
-  if (password !== confirmPassword) {
-    alert("Passwords do not match");
+
+  if (!isValidBDPhone(phone)) {
+    Swal.fire({
+  icon: "warning",
+  title: "‼️Invalid Phone Number‼️",
+  html: `
+    <p style="color:#dc2626; font-weight:600;">
+      Please enter a valid Bangladesh mobile number
+    </p>
+  `,
+  confirmButtonColor: "#16a34a",
+});
     return;
   }
 
+
+  if(password !== confirmPassword){
+    Swal.fire({
+      icon:"warning",
+      title:"Password mismatch",
+      text:"Passwords do not match"
+    });
+    return;
+  }
+
+
   setLoading(true);
-setLoading(true);
+
+
+  // Supabase signup code এখানে থাকবে
+
+
+
 
 const username =
   "TZ" +
@@ -107,156 +171,451 @@ setLoading(false);
   }*/
 
 };
-    return (
-    <main className="min-h-screen pt-24 pb-16 px-4 flex items-center justify-center">
+   return (
+<main className="
+relative 
+min-h-screen 
+overflow-hidden
+px-4 
+pt-24 
+pb-16 
+flex 
+items-center 
+justify-center
+bg-gradient-to-br 
+from-cyan-50 
+via-pink-50
+to-green-50
+">
+{/* Animated Background */}
 
-<div className="absolute left-0 top-0 h-80 w-80 rounded-full bg-green-700/10 blur-3xl"></div>
+<div className="
+absolute
+-top-20
+-left-20
+h-96
+w-96
+rounded-full
+bg-cyan-300/30
+blur-3xl
+animate-pulse
+"/>
 
-<div className="absolute bottom-0 right-0 h-80 w-80 rounded-full bg-yellow-400/20 blur-3xl"></div>
-      <div
-  className="
+
+<div className="
+absolute
+top-40
+right-10
+h-72
+w-72
+rounded-full
+bg-emerald-300/20
+blur-3xl
+animate-bounce
+[animation-duration:8s]
+"/>
+
+
+<div className="
+absolute
+bottom-0
+left-20
+h-80
+w-80
+rounded-full
+bg-blue-300/20
+blur-3xl
+animate-pulse
+[animation-duration:6s]
+"/>
+
+
+<div className="
+absolute
+bottom-20
+right-0
+h-96
+w-96
+rounded-full
+bg-yellow-200/30
+blur-3xl
+animate-bounce
+[animation-duration:10s]
+"/>
+
+  {/* Background Glow */}
+  <div className="absolute -top-20 -left-20 h-96 w-96 rounded-full bg-cyan-100/30 blur-3xl" />
+  <div className="absolute -bottom-20 -right-20 h-96 w-96 rounded-full bg-green-100/30 blur-3xl" />
+
+
+  <div
+    className="
     relative z-10
     w-full
     max-w-md
-    md:max-w-lg
-    lg:max-w-xl
-    rounded-[32px]
-    border border-white/60
-    bg-white/90
-    p-6
-    md:p-8
-    lg:p-10
+    bg-white
+    rounded-sm
     shadow-2xl
-    backdrop-blur-xl
-  "
->
-       <div className="mb-6 flex justify-center">
-  <img
-    src="/logo.png"
-    alt="Tawakkul Zone"
-    className="h-20 w-auto"
-  />
-</div>
-        <h1 className="text-center text-4xl font-extrabold text-green-900">
-          Create Account
-        </h1>
+    px-8
+    py-10
+    "
+  >
 
-        <p className="mb-8 mt-2 text-center text-gray-600">
-          Join Tawakkul Zone
-        </p>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+    {/* Brand */}
 
-          <div>
-  <label className="mb-2 block font-semibold text-blue-600">
-    Enter Your Full Name
-  </label>
-<div className="flex items-center rounded-2xl border border-gray-200 bg-white px-4 transition focus-within:border-green-700 focus-within:ring-4 focus-within:ring-green-100">
-  <User className="h-5 w-5 text-green-700" />
-
-  <input
-    type="text"
-    value={fullName}
-    onChange={(e) => setFullName(e.target.value)}
-    placeholder="Enter your full name"
-    className="w-full bg-transparent px-3 py-4 text-gray-900 placeholder:text-gray-500 outline-none"
-  />
-  </div>
-</div>
-          <div>
-  <label className="mb-2 block font-semibold text-blue-600">
-    Email Address
-  </label>
-
-  <div className="flex items-center rounded-2xl border border-gray-200 bg-white px-4 transition focus-within:border-blue-600 focus-within:ring-4 focus-within:ring-blue-100">
-    <Mail className="h-5 w-5 text-blue-600" />
-
-    <input
-      type="email"
-      value={email}
-      onChange={(e) => setEmail(e.target.value)}
-      placeholder="Enter your email"
-      className="w-full bg-transparent px-3 py-4 text-gray-900 placeholder:text-gray-500 outline-none"
-    />
-  </div>
-</div>
-
-          <div>
-  <label className="mb-2 block font-semibold text-blue-600">
-    Password
-  </label>
-
-  <div className="flex items-center rounded-2xl border border-gray-200 bg-white px-4 transition focus-within:border-blue-600 focus-within:ring-4 focus-within:ring-blue-100">
-    <Lock className="h-5 w-5 text-blue-600" />
-
-    <input
-      type={showPassword ? "text" : "password"}
-      value={password}
-      onChange={(e) => setPassword(e.target.value)}
-      placeholder="Enter your password"
-      className="w-full bg-transparent px-3 py-4 text-gray-900 placeholder:text-gray-500 outline-none"
-    />
-
-    <button
-      type="button"
-      onClick={() => setShowPassword(!showPassword)}
-      className="text-blue-600"
+    <h1
+    className="
+    text-center
+    text-3xl
+    font-bold
+    text-gray-900
+    "
     >
-      {showPassword ? (
-        <EyeOff className="h-5 w-5" />
-      ) : (
-        <Eye className="h-5 w-5" />
-      )}
-    </button>
-  </div>
+      Create Your Account
+    </h1>
+
+
+    <p className="
+    text-center
+    text-gray-500
+    mt-2
+    mb-8
+    ">
+      Join Tawakkul Zone
+    </p>
+
+
+
+<form onSubmit={handleSubmit} className="space-y-5">
+
+
+
+{/* Full Name */}
+
+<div>
+
+<label className="text-sm text-gray-600">
+* Name
+</label>
+
+<div className="
+flex items-center
+border-b-2
+border-cyan-300
+">
+
+<User className="h-5 w-5 text-cyan-600"/>
+
+<input
+type="text"
+value={fullName}
+onChange={(e)=>setFullName(e.target.value)}
+placeholder="Enter your full name"
+className="
+w-full
+px-3
+py-3
+outline-none
+bg-transparent
+text-black
+"
+/>
+
 </div>
 
-          <div>
-  <label className="mb-2 block font-semibold text-blue-600">
-    Confirm Password
-  </label>
-
-  <div className="flex items-center rounded-2xl border border-gray-200 bg-white px-4 transition focus-within:border-blue-600 focus-within:ring-4 focus-within:ring-blue-100">
-    <Lock className="h-5 w-5 text-blue-600" />
-
-    <input
-      type="password"
-      value={confirmPassword}
-      onChange={(e) => setConfirmPassword(e.target.value)}
-      placeholder="Confirm your password"
-      className="w-full bg-transparent px-3 py-4 text-gray-900 placeholder:text-gray-500 outline-none"
-    />
-  </div>
 </div>
 
-          <button
-  type="submit"
-  disabled={loading}
-  className="mt-2 w-full rounded-2xl bg-emerald-600 py-4 text-lg font-bold text-white transition duration-300 hover:bg-emerald-700"
->
-  {loading ? "Creating..." : "Create Account"}
-</button>
-<div className="my-6 flex items-center">
-  <div className="h-px flex-1 bg-gray-300"></div>
-  <span className="mx-3 text-sm text-gray-500">OR</span>
-  <div className="h-px flex-1 bg-gray-300"></div>
+
+
+
+{/* Email */}
+
+<div>
+
+<label className="text-sm text-gray-600">
+* Email Address
+</label>
+
+
+<div className="
+flex items-center
+border-b-2
+border-cyan-300
+">
+
+<Mail className="h-5 w-5 text-cyan-600"/>
+
+
+<input
+type="email"
+value={email}
+onChange={(e)=>setEmail(e.target.value)}
+placeholder="Enter your email"
+className="
+w-full
+px-3
+py-3
+outline-none
+bg-transparent
+text-black
+"
+/>
+
+
 </div>
+
+</div>
+
+{/* Phone */}
+
+<div>
+
+<label className="text-sm text-gray-600">
+* Phone
+</label>
+
+
+<div className="
+border-b-2
+border-cyan-300
+">
+
+
+<input
+  type="tel"
+  inputMode="numeric"
+  maxLength={11}
+  className="w-full rounded-2xl border border-slate-200 bg-white p-4 text-slate-900 shadow-sm focus:border-emerald-600 focus:outline-none"
+  placeholder="01XXXXXXXXX"
+  value={phone}
+  onChange={(e) => {
+    const value = e.target.value.replace(/\D/g, "");
+
+    // সর্বোচ্চ 11 digit
+    if (value.length <= 11) {
+      setPhone(value);
+    }
+  }}
+/>
+
+
+</div>
+
+</div>
+
+
+
+
+
+{/* Password */}
+
+<div>
+
+<label className="text-sm text-gray-600">
+* Password
+</label>
+
+
+<div className="
+flex items-center
+border-b-2
+border-cyan-300
+">
+
+
+<Lock className="h-5 w-5 text-cyan-600"/>
+
+
+<input
+type={showPassword ? "text":"password"}
+value={password}
+onChange={(e)=>setPassword(e.target.value)}
+placeholder="Enter password"
+className="
+w-full
+px-3
+py-3
+outline-none
+bg-transparent
+text-black
+"
+/>
+
 
 <button
-  type="button"
-  onClick={handleGoogleSignup}
-  className="w-full rounded-2xl border border-gray-300 bg-white py-4 font-semibold text-gray-700 transition hover:bg-gray-50 flex items-center justify-center gap-3"
+type="button"
+onClick={()=>setShowPassword(!showPassword)}
 >
-  <img
-    src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-    alt="Google"
-    className="h-6 w-6"
-  />
-  Continue with Google
-</button>
-        </form>
 
-      </div>
-    </main>
+{
+showPassword ?
+<EyeOff className="h-5 w-5 text-blue-600"/>
+:
+<Eye className="h-5 w-5 text-blue-600"/>
+}
+
+</button>
+
+
+</div>
+
+</div>
+
+
+
+
+
+{/* Confirm Password */}
+
+<div>
+
+<label className="text-sm text-gray-600">
+* Confirm Password
+</label>
+
+
+<div className="
+border-b-2
+border-cyan-300
+">
+
+
+<input
+type="password"
+value={confirmPassword}
+onChange={(e)=>setConfirmPassword(e.target.value)}
+placeholder="Confirm password"
+className="
+w-full
+py-3
+outline-none
+bg-transparent
+text-black
+"
+/>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+<button
+type="submit"
+disabled={loading}
+className="
+w-full
+mt-5
+py-4
+rounded-sm
+font-bold
+text-white
+bg-gradient-to-r
+from-blue-600
+to-cyan-400
+hover:scale-[1.02]
+transition
+shadow-lg
+"
+>
+
+{
+loading ? "Creating..." : "CREATE ACCOUNT"
+}
+
+</button>
+
+
+
+
+
+<div className="flex items-center my-6">
+
+<div className="flex-1 h-px bg-gray-300"/>
+
+<span className="px-3 text-gray-400 text-sm">
+OR
+</span>
+
+<div className="flex-1 h-px bg-gray-300"/>
+
+</div>
+
+
+
+
+
+<button
+type="button"
+onClick={loginWithGoogle}
+className="
+w-full
+py-3
+border
+rounded-sm
+flex
+justify-center
+items-center
+gap-3
+font-semibold
+text-gray-700
+hover:bg-gray-50
+"
+>
+
+
+<img
+src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+className="h-5 w-5"
+/>
+
+
+Continue with Google
+
+
+</button>
+
+
+
+
+
+<p className="
+text-center
+mt-6
+text-sm
+text-gray-600
+">
+
+Already have an account?
+
+<a
+href="/login"
+className="
+text-cyan-600
+font-semibold
+ml-1
+"
+>
+Sign In
+</a>
+
+</p>
+
+
+
+</form>
+
+
+</div>
+
+
+</main>
   );
+
 }
