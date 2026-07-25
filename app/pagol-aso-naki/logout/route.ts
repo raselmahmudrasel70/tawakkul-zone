@@ -7,11 +7,11 @@ function logoutResponse(request: NextRequest) {
     process.env.NEXT_URL ||
     "http://localhost:3000";
 
-  const response = NextResponse.redirect(new URL("/pagol-naki/login", redirectOrigin));
+  const response = NextResponse.redirect(new URL("/pagol-aso-naki/login", redirectOrigin));
   response.cookies.set("admin-auth", "", {
     httpOnly: true,
     sameSite: "lax",
-    path: "/pagol-naki",
+    path: "/pagol-aso-naki",
     maxAge: 0,
     secure: process.env.NODE_ENV === "production",
   });

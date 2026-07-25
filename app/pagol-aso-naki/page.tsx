@@ -26,13 +26,13 @@ export default async function AdminPage() {
 
         <div className="flex flex-col gap-3 sm:flex-row">
           <Link
-            href="/pagol-naki/logout"
+            href="/pagol-aso-naki/logout"
             className="inline-flex rounded bg-red-600 px-5 py-3 text-white transition hover:bg-red-700"
           >
             Logout
           </Link>
           <Link
-            href="/pagol-naki/products"
+            href="/pagol-aso-naki/products"
             className="inline-flex rounded bg-green-700 px-5 py-3 text-white transition hover:bg-green-800"
           >
             Manage Products
@@ -62,7 +62,7 @@ export default async function AdminPage() {
 
       <div className="mt-10 grid gap-6 md:grid-cols-2">
         <Link
-          href="/pagol-naki/products"
+          href="/pagol-aso-naki/products"
           className="rounded-3xl bg-green-700 p-8 text-left text-white shadow-lg transition hover:bg-green-800"
         >
           <p className="text-sm uppercase tracking-[0.2em]">Products</p>
@@ -71,7 +71,7 @@ export default async function AdminPage() {
         </Link>
 
         <Link
-          href="/pagol-naki/orders"
+          href="/pagol-aso-naki/orders"
           className="rounded-3xl bg-blue-700 p-8 text-left text-white shadow-lg transition hover:bg-blue-800"
         >
           <p className="text-sm uppercase tracking-[0.2em]">Orders</p>

@@ -11,7 +11,7 @@ export async function proxy(request: NextRequest) {
   // ==========================
   // Telegram Alert
   // ==========================
-  if (pathname === "/pagol-naki/login") {
+  if (pathname === "/pagol-aso-naki/login") {
     const visitorIp =
       request.headers
         .get("x-forwarded-for")
@@ -66,10 +66,10 @@ ${userAgent}
   // ==========================
   // Admin Protection
   // ==========================
-  if (pathname.startsWith("/pagol-naki")) {
+  if (pathname.startsWith("/pagol-aso-naki")) {
     if (
-      pathname === "/pagol-naki/login" ||
-      pathname === "/pagol-naki/logout"
+      pathname === "/pagol-aso-naki/login" ||
+      pathname === "/pagol-aso-naki/logout"
     ) {
       return NextResponse.next();
     }
@@ -82,7 +82,7 @@ ${userAgent}
 
     if (!payload || payload.email !== ADMIN_EMAIL) {
       return NextResponse.redirect(
-        new URL("/pagol-naki/login", request.url)
+        new URL("/pagol-aso-naki/login", request.url)
       );
     }
   }
@@ -91,5 +91,5 @@ ${userAgent}
 }
 
 export const config = {
-  matcher: ["/pagol-naki/:path*"],
+  matcher: ["/pagol-aso-naki/:path*"],
 };

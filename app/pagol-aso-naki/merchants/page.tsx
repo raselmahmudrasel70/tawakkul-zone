@@ -16,7 +16,7 @@ export default function MerchantsPage() {
   useEffect(() => {
     async function loadMerchants() {
       try {
-        const res = await fetch("/api/pagol-naki/merchants");
+        const res = await fetch("/api/pagol-aso-naki/merchants");
 
         if (!res.ok) {
           throw new Error("Failed to load merchants");
@@ -44,7 +44,7 @@ export default function MerchantsPage() {
         </h1>
 
         <Link
-          href="/pagol-naki/merchants/add"
+          href="/pagol-aso-naki/merchants/add"
           className="rounded bg-green-700 px-4 py-2 text-white"
         >
           + Add Merchant

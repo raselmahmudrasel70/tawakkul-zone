@@ -54,7 +54,7 @@ const { data: orders, error } = await supabase
                 >
                   <td className="p-4 font-semibold">
   <Link
-    href={`/pagol-naki/orders/${order.id}`}
+    href={`/pagol-aso-naki/orders/${order.id}`}
     className="text-green-700 hover:underline"
   >
     #{order.id}

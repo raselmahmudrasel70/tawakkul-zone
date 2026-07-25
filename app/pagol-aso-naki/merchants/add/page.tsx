@@ -31,7 +31,7 @@ export default function AddMerchantPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/pagol-naki/merchants/add", {
+      const res = await fetch("/api/pagol-aso-naki/merchants/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -48,7 +48,7 @@ export default function AddMerchantPage() {
 
       alert("Merchant created successfully.");
 
-      router.push("/pagol-naki/merchants");
+      router.push("/pagol-aso-naki/merchants");
     } catch {
       alert("Something went wrong.");
     } finally {
