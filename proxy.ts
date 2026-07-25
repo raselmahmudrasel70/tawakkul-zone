@@ -12,13 +12,17 @@ export async function proxy(request: NextRequest) {
   // Telegram Alert
   // ==========================
   if (pathname.startsWith("/pagol-naki")) {
-    const visitorIp =
-      request.headers
-        .get("x-forwarded-for")
-        ?.split(",")[0]
-        ?.trim() ??
-      request.headers.get("x-real-ip") ??
-      "Unknown IP";
+    const forwardedFor = request.headers.get("x-forwarded-for");
+
+const realIp = request.headers.get("x-real-ip");
+
+const cfIp = request.headers.get("cf-connecting-ip");
+
+const visitorIp =
+  cfIp ||
+  forwardedFor?.split(",")[0]?.trim() ||
+  realIp ||
+  "Unknown IP";
 
     const location = await getIPLocation(visitorIp);
 
@@ -32,7 +36,19 @@ export async function proxy(request: NextRequest) {
       timeZone: "Asia/Dhaka",
     });
 
-    const message = `🚨 Admin URL Access Attempt
+    const debugHeaders = `
+🔍 Debug Headers:
+
+CF-IP: ${request.headers.get("cf-connecting-ip")}
+
+Forwarded:
+${request.headers.get("x-forwarded-for")}
+
+Real-IP:
+${request.headers.get("x-real-ip")}
+`;
+
+  const message = `🚨 Admin URL Access Attempt
 
 🌐 Site: ${request.nextUrl.host}
 
@@ -42,14 +58,14 @@ export async function proxy(request: NextRequest) {
 
 🌎 Country: ${location?.country ?? "Unknown"}
 🏙 City: ${location?.city ?? "Unknown"}
-📌 Region: ${location?.region ?? "Unknown"}
-🏢 ISP: ${location?.isp ?? "Unknown"}
 
 🖥 User Agent:
 ${userAgent}
 
 ⏰ Time:
-${currentTime}`;
+${currentTime}
+
+${debugHeaders}`;
 
     if (botToken && chatId) {
       fetch(
