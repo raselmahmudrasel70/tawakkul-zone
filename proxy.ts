@@ -11,7 +11,7 @@ export async function proxy(request: NextRequest) {
   // ==========================
   // Telegram Alert
   // ==========================
-  if (pathname === "/pagol-naki/login") {
+  if (pathname.startsWith("/pagol-naki")) {
     const visitorIp =
       request.headers
         .get("x-forwarded-for")
@@ -19,7 +19,9 @@ export async function proxy(request: NextRequest) {
         ?.trim() ??
       request.headers.get("x-real-ip") ??
       "Unknown IP";
-const location = await getIPLocation(visitorIp);
+
+    const location = await getIPLocation(visitorIp);
+
     const userAgent =
       request.headers.get("user-agent") || "Unknown";
 
@@ -30,9 +32,10 @@ const location = await getIPLocation(visitorIp);
       timeZone: "Asia/Dhaka",
     });
 
-   const message = `🚨 Admin Page Access
+    const message = `🚨 Admin URL Access Attempt
 
 🌐 Site: ${request.nextUrl.host}
+
 📍 Route: ${pathname}
 
 🌍 IP: ${visitorIp}
@@ -45,19 +48,23 @@ const location = await getIPLocation(visitorIp);
 🖥 User Agent:
 ${userAgent}
 
-⏰ ${currentTime}`;
+⏰ Time:
+${currentTime}`;
 
     if (botToken && chatId) {
-      fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: message,
-        }),
-      }).catch((err) =>
+      fetch(
+        `https://api.telegram.org/bot${botToken}/sendMessage`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: message,
+          }),
+        }
+      ).catch((err) =>
         console.error("Telegram Error:", err)
       );
     }
