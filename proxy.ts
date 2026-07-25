@@ -58,6 +58,8 @@ ${request.headers.get("x-real-ip")}
 
 🌎 Country: ${location?.country ?? "Unknown"}
 🏙 City: ${location?.city ?? "Unknown"}
+📌 Region: ${location?.region ?? "Unknown"}
+🏢 ISP: ${location?.isp ?? "Unknown"}
 
 🖥 User Agent:
 ${userAgent}

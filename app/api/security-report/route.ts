@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
+import { getIPLocation } from "@/lib/ip-location";
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,6 +14,7 @@ const ip =
   headersList.get("x-real-ip") ||
   "Unknown IP";
 
+    const location = await getIPLocation(ip);
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
 
@@ -32,15 +34,23 @@ const ip =
 
 🌍 IP Address
 ${ip}
+🌎 Country
+${location?.country ?? "Unknown"}
+
+🏙 City
+${location?.city ?? "Unknown"}
+
+📌 Region
+${location?.region ?? "Unknown"}
+
+🏢 ISP
+${location?.isp ?? "Unknown"}
 
 🖥 Platform
 ${body.platform}
 
 🌐 Language
 ${body.language}
-
-🌍 Timezone
-${body.timezone}
 
 ━━━━━━━━━━━━━━━━━━
 
@@ -88,6 +98,9 @@ ${body.touch ? "Yes" : "No"}
 
 🌐 Online
 ${body.online ? "Yes" : "No"}
+
+🌍 Timezone
+${body.timezone}
 
 ━━━━━━━━━━━━━━━━━━
 
