@@ -5,7 +5,7 @@ const SETUP_SECRET = process.env.ADMIN_SETUP_SECRET;
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 
 export async function POST(request: NextRequest) {
-  const secret = request.headers.get("x-admin-setup-secret");
+  const secret = request.headers.get("x-pagol-naki-setup-secret");
   if (!SETUP_SECRET || secret !== SETUP_SECRET) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }

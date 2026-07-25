@@ -21,12 +21,12 @@ export default function EditProductPage() {
 
   useEffect(() => {
     async function loadProduct() {
-      const response = await fetch(`/admin/products/actions?id=${id}`);
+      const response = await fetch(`/pagol-naki/products/actions?id=${id}`);
       const result = await response.json();
 
       if (!response.ok || !result.product) {
         alert(result.error || "Failed to load product.");
-        router.push("/admin/products");
+        router.push("/pagol-naki/products");
         return;
       }
 
@@ -57,7 +57,7 @@ export default function EditProductPage() {
       formData.append("image", image);
     }
 
-    const response = await fetch(`/admin/products/actions?id=${id}`, {
+    const response = await fetch(`/pagol-naki/products/actions?id=${id}`, {
       method: "PATCH",
       body: formData,
     });
@@ -71,7 +71,7 @@ export default function EditProductPage() {
     }
 
     alert("✅ Product Updated Successfully");
-    router.push("/admin/products");
+    router.push("/pagol-naki/products");
     router.refresh();
   }
 

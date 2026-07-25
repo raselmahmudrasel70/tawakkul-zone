@@ -18,7 +18,7 @@ export default async function ProductsPage() {
         </h1>
 
         <Link
-          href="/admin/products/add"
+          href="/pagol-naki/products/add"
           className="rounded-xl bg-green-700 px-6 py-3 font-semibold text-white transition hover:bg-green-800"
         >
           ➕ Add Product
@@ -94,7 +94,7 @@ export default async function ProductsPage() {
 
                 <div className="mt-4 flex justify-end gap-2">
                   <Link
-  href={`/admin/products/edit/${product.id}`}
+  href={`/pagol-naki/products/edit/${product.id}`}
   className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
 >
   ✏️ Edit

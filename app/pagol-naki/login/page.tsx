@@ -13,7 +13,7 @@ export default function AdminLoginPage() {
     e.preventDefault();
     setLoading(true);
 
-    const response = await fetch("/api/admin/login", {
+    const response = await fetch("/api/pagol-naki/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -29,7 +29,8 @@ export default function AdminLoginPage() {
       return;
     }
 
-    router.push("/admin");
+    router.push("/pagol-naki");
+    router.refresh();
   }
 
   return (
