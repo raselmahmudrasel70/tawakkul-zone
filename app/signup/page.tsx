@@ -103,7 +103,7 @@ setLoading(false);
 
     alert("Account created successfully!");
 
-    router.push("/pagol-aso-naki");
+    router.push("/admin");
   }*/
 
 };

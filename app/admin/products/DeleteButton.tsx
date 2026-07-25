@@ -20,7 +20,7 @@ export default function DeleteButton({ id, onDelete }: DeleteButtonProps) {
 
     setLoading(true);
 
-    const response = await fetch(`/pagol-aso-naki/products/actions?id=${id}`, {
+    const response = await fetch(`/admin/products/actions?id=${id}`, {
       method: "DELETE",
     });
     setLoading(false);

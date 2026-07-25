@@ -51,7 +51,7 @@ const finalPrice =
       formData.append("image", image);
     }
 
-    const response = await fetch("/api/pagol-aso-naki/products/actions", {
+    const response = await fetch("/api/admin/products/actions", {
       method: "POST",
       body: formData,
     });

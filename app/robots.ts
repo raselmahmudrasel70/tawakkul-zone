@@ -8,8 +8,8 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
       disallow: [
-        "/pagol-aso-naki",
-        "/pagol-aso-naki/*",
+        "/admin",
+        "/admin/*",
       ],
     },
     sitemap: `${baseUrl}/sitemap.xml`,

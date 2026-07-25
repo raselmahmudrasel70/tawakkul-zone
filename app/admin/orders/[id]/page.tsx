@@ -172,7 +172,7 @@ export default async function OrderDetailsPage({
           </form>
 
           <Link
-            href="/pagol-aso-naki/orders"
+            href="/admin/orders"
             className="rounded-xl bg-gray-700 px-6 py-3 font-bold text-white hover:bg-gray-800"
           >
             ⬅ Back

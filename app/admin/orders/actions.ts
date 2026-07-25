@@ -18,8 +18,8 @@ export async function updateOrderStatus(
     throw new Error(error.message);
   }
 
-  revalidatePath("/pagol-aso-naki/orders");
-  revalidatePath(`/pagol-aso-naki/orders/${id}`);
+  revalidatePath("/admin/orders");
+  revalidatePath(`/admin/orders/${id}`);
 }
 
 export async function deleteOrder(id: number) {
@@ -32,5 +32,5 @@ export async function deleteOrder(id: number) {
     throw new Error(error.message);
   }
 
-  revalidatePath("/pagol-aso-naki/orders");
+  revalidatePath("/admin/orders");
 }
