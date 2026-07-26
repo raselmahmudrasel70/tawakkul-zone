@@ -69,7 +69,12 @@ export default async function OrderDetailsPage({
                 <span className="font-bold text-yellow-400">Payment:</span>{" "}
                 {order.payment_method}
               </p>
-
+<p>
+  <span className="font-bold text-yellow-400">
+    Transaction ID:
+  </span>{" "}
+  {order.transaction_id || "N/A"}
+</p>
               <p>
                 <span className="font-bold text-yellow-400">Order date:</span>{" "}
                 <span className="text-white">
