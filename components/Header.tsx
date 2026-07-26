@@ -19,18 +19,13 @@ import {
 export default function Header() {
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const { cart } = useCart();
-  const { wishlist } = useWishlist();
+ const { cart, hydrated: cartHydrated } = useCart();
+const { wishlist, hydrated: wishlistHydrated } = useWishlist();
 
-  const [mounted, setMounted] = useState(false);
   const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
   const [showSearch, setShowSearch] = useState(false);
   const [search, setSearch] = useState("");
   const [showMenu, setShowMenu] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -96,7 +91,7 @@ export default function Header() {
             <Link href="/wishlist" className="relative">
               <Heart className="hover:text-pink-400 transition" />
 
-              {mounted && wishlist.length > 0 && (
+              {wishlistHydrated && wishlist.length > 0 && (
                 <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
                   {wishlist.length}
                 </span>
@@ -106,7 +101,7 @@ export default function Header() {
             <Link href="/cart" className="relative">
               <ShoppingCart className="hover:text-yellow-400 transition" />
 
-              {mounted && cart.length > 0 && (
+              {cartHydrated && cart.length > 0 && (
                 <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
                   {cart.length}
                 </span>
@@ -151,33 +146,38 @@ export default function Header() {
 
       {/* Mobile */}
             <div className="lg:hidden">
-        <div className="mx-auto max-w-7xl px-2 py-3">
+  <div className="mx-auto max-w-7xl px-2 py-3">
 
-          {showSearch && (
-            <div className="border-t border-white/10 bg-green-950 p-3">
+    {showSearch && (
+      <div className="border-t border-white/10 bg-green-950 p-3">
 
-              <div className="flex items-center rounded-full bg-white px-4">
+        <div className="flex items-center rounded-full bg-white px-4">
 
-                <Search size={18} className="text-gray-500" />
+          <Search size={18} className="text-gray-500" />
 
-                <input
-                  autoFocus
-                  type="text"
-                  placeholder="Search products..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="flex-1 bg-transparent px-3 py-3 text-black outline-none"
-                />
+          <input
+            id="mobile-search"
+            name="search"
+            autoFocus
+            type="text"
+            placeholder="Search products..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="flex-1 bg-transparent px-3 py-3 text-black outline-none"
+          />
 
-                <button onClick={() => setShowSearch(false)}>
-                  <X size={20} className="text-gray-500" />
-                </button>
+          <button
+            type="button"
+            onClick={() => setShowSearch(false)}
+          >
+            <X size={20} className="text-gray-500" />
+          </button>
 
-              </div>
+        </div>
 
-              <SearchResults search={search} />
+        <SearchResults search={search} />
 
-            </div>
+      </div>
           )}
 
           <div className="flex items-center justify-between">
@@ -205,7 +205,7 @@ export default function Header() {
               <Link href="/wishlist" className="relative">
                 <Heart size={22} />
 
-                {mounted && wishlist.length > 0 && (
+                {wishlistHydrated && wishlist.length > 0 && (
                   <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs">
                     {wishlist.length}
                   </span>
@@ -215,7 +215,7 @@ export default function Header() {
               <Link href="/cart" className="relative">
                 <ShoppingCart size={22} />
 
-                {mounted && cart.length > 0 && (
+                {cartHydrated && cart.length > 0 && (
                   <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs">
                     {cart.length}
                   </span>

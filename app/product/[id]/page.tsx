@@ -108,11 +108,7 @@ export default async function ProductPage({
           <p className="text-gray-400">
             Category: {product.category}
           </p>
-
-          <p className="mt-2">
-            ⭐ {product.rating}/5
-          </p>
-
+          
           <div className="mt-6 flex items-center gap-4">
             {product.discount > 0 && (
               <span className="text-2xl text-gray-500 line-through">

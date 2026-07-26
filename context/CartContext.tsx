@@ -18,6 +18,7 @@ export type CartItem = {
 
 type CartContextType = {
   cart: CartItem[];
+  hydrated: boolean;
   addToCart: (product: Omit<CartItem, "quantity">) => void;
   increaseQuantity: (id: number) => void;
   decreaseQuantity: (id: number) => void;
@@ -32,23 +33,30 @@ export function CartProvider({
 }: {
   children: ReactNode;
 }) {
-  const [cart, setCart] = useState<CartItem[]>(() => {
-    if (typeof window === "undefined") return [];
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [hydrated, setHydrated] = useState(false);
 
+  // Load cart from localStorage after hydration
+  useEffect(() => {
     try {
       const savedCart = localStorage.getItem("cart");
-      return savedCart ? JSON.parse(savedCart) : [];
-    } catch {
-      return [];
+
+      if (savedCart) {
+        setCart(JSON.parse(savedCart));
+      }
+    } catch (error) {
+      console.error("Failed to load cart:", error);
     }
-  });
+
+    setHydrated(true);
+  }, []);
 
   // Save cart to localStorage
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (!hydrated) return;
 
     localStorage.setItem("cart", JSON.stringify(cart));
-  }, [cart]);
+  }, [cart, hydrated]);
 
   // Add Product
   const addToCart = (product: Omit<CartItem, "quantity">) => {
@@ -67,7 +75,7 @@ export function CartProvider({
     });
   };
 
-  // Increase
+  // Increase Quantity
   const increaseQuantity = (id: number) => {
     setCart((prev) =>
       prev.map((item) =>
@@ -78,7 +86,7 @@ export function CartProvider({
     );
   };
 
-  // Decrease
+  // Decrease Quantity
   const decreaseQuantity = (id: number) => {
     setCart((prev) =>
       prev
@@ -91,7 +99,7 @@ export function CartProvider({
     );
   };
 
-  // Remove
+  // Remove Item
   const removeFromCart = (id: number) => {
     setCart((prev) => prev.filter((item) => item.id !== id));
   };
@@ -105,6 +113,7 @@ export function CartProvider({
     <CartContext.Provider
       value={{
         cart,
+        hydrated,
         addToCart,
         increaseQuantity,
         decreaseQuantity,

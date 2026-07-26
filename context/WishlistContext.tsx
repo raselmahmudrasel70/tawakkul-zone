@@ -17,6 +17,7 @@ export type WishlistItem = {
 
 type WishlistContextType = {
   wishlist: WishlistItem[];
+  hydrated: boolean;
   addToWishlist: (product: WishlistItem) => void;
   removeFromWishlist: (id: number) => void;
   clearWishlist: () => void;
@@ -31,41 +32,36 @@ export function WishlistProvider({
 }: {
   children: ReactNode;
 }) {
-  const [wishlist, setWishlist] = useState<WishlistItem[]>(() => {
-    if (typeof window === "undefined") return [];
+  const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
+  const [hydrated, setHydrated] = useState(false);
 
+  useEffect(() => {
     try {
       const saved = localStorage.getItem("wishlist");
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
+      if (saved) {
+        setWishlist(JSON.parse(saved));
+      }
+    } catch {}
 
-  // Save wishlist to localStorage
+    setHydrated(true);
+  }, []);
+
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
+    if (!hydrated) return;
     localStorage.setItem("wishlist", JSON.stringify(wishlist));
-  }, [wishlist]);
+  }, [wishlist, hydrated]);
 
-  // Add Wishlist
   const addToWishlist = (product: WishlistItem) => {
     setWishlist((prev) => {
-      const exists = prev.find((item) => item.id === product.id);
-
-      if (exists) return prev;
-
+      if (prev.some((item) => item.id === product.id)) return prev;
       return [...prev, product];
     });
   };
 
-  // Remove Wishlist
   const removeFromWishlist = (id: number) => {
     setWishlist((prev) => prev.filter((item) => item.id !== id));
   };
 
-  // Clear Wishlist
   const clearWishlist = () => {
     setWishlist([]);
   };
@@ -74,6 +70,7 @@ export function WishlistProvider({
     <WishlistContext.Provider
       value={{
         wishlist,
+        hydrated,
         addToWishlist,
         removeFromWishlist,
         clearWishlist,
@@ -88,9 +85,7 @@ export function useWishlist() {
   const context = useContext(WishlistContext);
 
   if (!context) {
-    throw new Error(
-      "useWishlist must be used inside WishlistProvider"
-    );
+    throw new Error("useWishlist must be used inside WishlistProvider");
   }
 
   return context;

@@ -63,15 +63,19 @@ export default function FeaturedProducts({
                 key={product.id}
                 className="rounded-2xl bg-gray-300 p-3 md:p-6 shadow-lg transition duration-300 hover:-translate-y-2 hover:shadow-2xl"
               >
-                <div className="relative mb-3 h-40 md:h-56 overflow-hidden rounded-xl">
-                  <Link href={`/product/${product.id}`}>
-                    <Image
-                      src={product.images || "/products/product1.jpg"}
-                      alt={product.name}
-                      fill
-                      className="object-cover transition duration-300 hover:scale-110"
-                    />
-                  </Link>
+                <div className="relative mb-3 h-40 overflow-hidden rounded-xl md:h-56">
+  <Link
+    href={`/product/${product.id}`}
+    className="relative block h-full w-full"
+  >
+    <Image
+      src={product.images || "/products/product1.jpg"}
+      alt={product.name}
+      fill
+      sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+      className="object-cover transition duration-300 hover:scale-110"
+    />
+  </Link>
 
                   {product.discount > 0 && (
                     <span className="absolute left-3 top-3 rounded-full bg-white px-3 py-1 text-xs font-bold text-red-600 shadow-lg">
@@ -116,11 +120,6 @@ export default function FeaturedProducts({
                     {product.name}
                   </h3>
                 </Link>
-
-                <div className="mt-2 flex items-center gap-2">
-                  <span className="text-yellow-500">★★★★★</span>
-                  <span className="text-sm text-gray-500">{product.rating}</span>
-                </div>
 
                 <div className="mt-1">
                   {product.stock ? (

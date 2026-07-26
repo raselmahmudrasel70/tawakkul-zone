@@ -44,16 +44,6 @@ const discountedPrice =
             {product.name}
           </h1>
 
-          <div className="mt-4 flex items-center gap-2">
-            <span className="text-2xl text-yellow-400">
-              ★★★★★
-            </span>
-
-            <span className="font-medium text-gray-300">
-              {product.rating} / 5
-            </span>
-          </div>
-
           <div className="mt-6">
 
   {product.discount > 0 ? (

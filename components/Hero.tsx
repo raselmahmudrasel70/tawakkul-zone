@@ -24,23 +24,23 @@ useEffect(() => {
     <section className="relative h-[35vh] md:h-screen w-full overflow-hidden">
       {/* Desktop */}
       <Image
-        src="/banner-desktop.jpg"
-        alt="Desktop Banner"
-        fill
-        priority
-        sizes="100vw"
-        className="hidden md:block object-cover"
-      />
+  src="/banner-desktop.jpg"
+  alt="Desktop Banner"
+  fill
+  priority
+  sizes="(max-width: 768px) 0vw, 100vw"
+  className="hidden object-cover md:block"
+/>
 
       {/* Mobile */}
       <Image
-        src="/banner-desktop.jpg"
-        alt="Mobile Banner"
-        fill
-        priority
-        sizes="100vw"
-        className="block md:hidden object-cover"
-      />
+  src="/banner-desktop.jpg"
+  alt="Mobile Banner"
+  fill
+  priority
+  sizes="(max-width: 768px) 100vw, 0vw"
+  className="block object-cover md:hidden"
+/>
 
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/60" />
