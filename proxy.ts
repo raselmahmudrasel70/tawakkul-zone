@@ -2,6 +2,7 @@
 import type { NextRequest } from "next/server";
 import { verifyAuthToken, ADMIN_EMAIL } from "./lib/auth";
 import { getIPLocation } from "./lib/ip-location";
+import { UAParser } from "ua-parser-js";
 
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -11,23 +12,36 @@ export async function proxy(request: NextRequest) {
   // ==========================
   // Telegram Alert
   // ==========================
-  if (pathname.startsWith("/pagol-naki")) {
+  const adminRoutes = [
+    "/pagol-naki",
+    "/pagol-naki/products",
+    "/pagol-naki/orders",
+    "/pagol-naki/login",
+    "/pagol-naki/logout",
+  ];
+
+  if (adminRoutes.includes(pathname)) {
     const forwardedFor = request.headers.get("x-forwarded-for");
+    const realIp = request.headers.get("x-real-ip");
+    const cfIp = request.headers.get("cf-connecting-ip");
 
-const realIp = request.headers.get("x-real-ip");
-
-const cfIp = request.headers.get("cf-connecting-ip");
-
-const visitorIp =
-  cfIp ||
-  forwardedFor?.split(",")[0]?.trim() ||
-  realIp ||
-  "Unknown IP";
+    const visitorIp =
+      cfIp ||
+      forwardedFor?.split(",")[0]?.trim() ||
+      realIp ||
+      "Unknown IP";
 
     const location = await getIPLocation(visitorIp);
 
     const userAgent =
-      request.headers.get("user-agent") || "Unknown";
+  request.headers.get("user-agent") || "Unknown";
+
+const parser = new UAParser(userAgent);
+const result = parser.getResult();
+
+const device = result.device;
+const browser = result.browser;
+const os = result.os;
 
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
@@ -48,7 +62,7 @@ Real-IP:
 ${request.headers.get("x-real-ip")}
 `;
 
-  const message = `🚨 Admin URL Access Attempt
+    const message = `🚨 Admin URL Access Attempt
 
 🌐 Site: ${request.nextUrl.host}
 
@@ -60,6 +74,17 @@ ${request.headers.get("x-real-ip")}
 🏙 City: ${location?.city ?? "Unknown"}
 📌 Region: ${location?.region ?? "Unknown"}
 🏢 ISP: ${location?.isp ?? "Unknown"}
+
+📱 Device:
+Vendor: ${device.vendor ?? "Unknown"}
+Model: ${device.model ?? "Unknown"}
+Type: ${device.type ?? "Unknown"}
+
+🌐 Browser:
+${browser.name ?? "Unknown"} ${browser.version ?? ""}
+
+💻 OS:
+${os.name ?? "Unknown"} ${os.version ?? ""}
 
 🖥 User Agent:
 ${userAgent}

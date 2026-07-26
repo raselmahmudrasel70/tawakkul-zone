@@ -6,12 +6,30 @@ export async function collectSecurityInfo() {
       downlink?: number;
       rtt?: number;
     };
+    getBattery?: () => Promise<any>;
   };
 
-  // GPU (যদি পাওয়া যায়)
+  // Battery
+  let battery = "Unknown";
+  let charging = "Unknown";
+
+  if (nav.getBattery) {
+    try {
+      const batteryManager = await nav.getBattery();
+
+      battery = `${Math.round(batteryManager.level * 100)}%`;
+      charging = batteryManager.charging ? "Yes" : "No";
+    } catch (e) {
+      console.error("Battery Error:", e);
+    }
+  }
+
+  // GPU
   let gpu = "Unknown";
+
   try {
     const canvas = document.createElement("canvas");
+
     const gl =
       canvas.getContext("webgl") ||
       canvas.getContext("experimental-webgl");
@@ -31,7 +49,9 @@ export async function collectSecurityInfo() {
 
   return {
     userAgent: navigator.userAgent,
+
     language: navigator.language,
+
     languages: navigator.languages,
 
     platform: navigator.platform,
@@ -56,6 +76,10 @@ export async function collectSecurityInfo() {
 
     gpu,
 
+    battery,
+
+    charging,
+
     cookiesEnabled: navigator.cookieEnabled,
 
     online: navigator.onLine,
@@ -66,10 +90,8 @@ export async function collectSecurityInfo() {
 
     rtt: nav.connection?.rtt ?? "Unknown",
 
-    touch:
-      navigator.maxTouchPoints > 0,
+    touch: navigator.maxTouchPoints > 0,
 
-    darkMode:
-      window.matchMedia("(prefers-color-scheme: dark)").matches,
+    darkMode: window.matchMedia("(prefers-color-scheme: dark)").matches,
   };
 }

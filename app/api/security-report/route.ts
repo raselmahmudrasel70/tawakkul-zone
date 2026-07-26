@@ -101,7 +101,13 @@ ${body.online ? "Yes" : "No"}
 
 🌍 Timezone
 ${body.timezone}
+━━━━━━━━━━━━━━━━━━
 
+🔋 Battery
+${body.battery ?? "Unknown"}
+
+🔌 Charging
+${body.charging ?? "Unknown"}
 ━━━━━━━━━━━━━━━━━━
 
 🖥 User Agent
