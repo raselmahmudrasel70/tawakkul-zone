@@ -22,10 +22,15 @@ export default function Header() {
   const { cart } = useCart();
   const { wishlist } = useWishlist();
 
+  const [mounted, setMounted] = useState(false);
   const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
   const [showSearch, setShowSearch] = useState(false);
   const [search, setSearch] = useState("");
   const [showMenu, setShowMenu] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -91,7 +96,7 @@ export default function Header() {
             <Link href="/wishlist" className="relative">
               <Heart className="hover:text-pink-400 transition" />
 
-              {wishlist.length > 0 && (
+              {mounted && wishlist.length > 0 && (
                 <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
                   {wishlist.length}
                 </span>
@@ -101,7 +106,7 @@ export default function Header() {
             <Link href="/cart" className="relative">
               <ShoppingCart className="hover:text-yellow-400 transition" />
 
-              {cart.length > 0 && (
+              {mounted && cart.length > 0 && (
                 <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
                   {cart.length}
                 </span>
@@ -200,7 +205,7 @@ export default function Header() {
               <Link href="/wishlist" className="relative">
                 <Heart size={22} />
 
-                {wishlist.length > 0 && (
+                {mounted && wishlist.length > 0 && (
                   <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs">
                     {wishlist.length}
                   </span>
@@ -210,7 +215,7 @@ export default function Header() {
               <Link href="/cart" className="relative">
                 <ShoppingCart size={22} />
 
-                {cart.length > 0 && (
+                {mounted && cart.length > 0 && (
                   <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs">
                     {cart.length}
                   </span>

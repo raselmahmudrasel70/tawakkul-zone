@@ -40,8 +40,8 @@ export default async function ProductsPage() {
           </h2>
 
           <p className="mt-2 text-gray-500">
-            Click "Add Product" to create your first product.
-          </p>
+  Click &quot;Add Product&quot; to create your first product.
+</p>
         </div>
       ) : (
         <div className="space-y-5">

@@ -32,32 +32,23 @@ export function CartProvider({
 }: {
   children: ReactNode;
 }) {
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [loaded, setLoaded] = useState(false);
-
-  // Load cart from localStorage
-  useEffect(() => {
-    if (typeof window === "undefined") return;
+  const [cart, setCart] = useState<CartItem[]>(() => {
+    if (typeof window === "undefined") return [];
 
     try {
       const savedCart = localStorage.getItem("cart");
-
-      if (savedCart) {
-        setCart(JSON.parse(savedCart));
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoaded(true);
+      return savedCart ? JSON.parse(savedCart) : [];
+    } catch {
+      return [];
     }
-  }, []);
+  });
 
   // Save cart to localStorage
   useEffect(() => {
-    if (typeof window === "undefined" || !loaded) return;
+    if (typeof window === "undefined") return;
 
     localStorage.setItem("cart", JSON.stringify(cart));
-  }, [cart, loaded]);
+  }, [cart]);
 
   // Add Product
   const addToCart = (product: Omit<CartItem, "quantity">) => {
