@@ -1,4 +1,4 @@
-﻿"use client";
+﻿﻿"use client";
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -62,7 +62,15 @@ const [transactionId, setTransactionId] = useState("");
       });
       return;
     }
+const bdPhoneRegex = /^01[3-9]\d{8}$/;
 
+if (!bdPhoneRegex.test(phone)) {
+  Swal.fire({
+    icon: "warning",
+    title: "সঠিক ১১ ডিজিটের বাংলাদেশি নাম্বার দিন",
+  });
+  return;
+}
     const insertResult = await supabase.from("orders").insert({
       user_id: user.id,
       customer_name: name,
@@ -122,14 +130,25 @@ const [transactionId, setTransactionId] = useState("");
         />
 
         <input
-          type="tel"
-          inputMode="numeric"
-          maxLength={11}
-          className="w-full rounded-2xl border border-slate-200 bg-white p-4 text-slate-900 shadow-sm focus:border-emerald-600 focus:outline-none"
-          placeholder="Phone Number"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
-        />
+  type="tel"
+  inputMode="numeric"
+  maxLength={11}
+  className="w-full rounded-2xl border border-slate-200 bg-white p-4 text-slate-900 shadow-sm focus:border-emerald-600 focus:outline-none"
+  placeholder="01XXXXXXXXX"
+  value={phone}
+  onChange={(e) => {
+    const value = e.target.value.replace(/\D/g, "");
+
+    if (
+      value === "" ||
+      value === "0" ||
+      value === "01" ||
+      /^01[3-9]\d{0,8}$/.test(value)
+    ) {
+      setPhone(value);
+    }
+  }}
+/>
 
         <textarea
           rows={4}
