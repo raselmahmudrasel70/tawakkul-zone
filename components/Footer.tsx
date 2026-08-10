@@ -55,7 +55,7 @@ export default function Footer() {
       <div className="space-y-2 text-sm">
         <div className="flex items-center gap-2">
           <Phone size={16} />
-          01637133488
+          01**********
         </div>
 
         <div className="flex items-center gap-2 break-all">
