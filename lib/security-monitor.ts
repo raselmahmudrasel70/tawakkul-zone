@@ -1,13 +1,20 @@
-export async function collectSecurityInfo() {
-  const nav = navigator as Navigator & {
-    deviceMemory?: number;
-    connection?: {
-      effectiveType?: string;
-      downlink?: number;
-      rtt?: number;
-    };
-    getBattery?: () => Promise<any>;
+interface BatteryManager {
+  level: number;
+  charging: boolean;
+}
+
+interface NavigatorWithSecurityInfo extends Navigator {
+  deviceMemory?: number;
+  connection?: {
+    effectiveType?: string;
+    downlink?: number;
+    rtt?: number;
   };
+  getBattery?: () => Promise<BatteryManager>;
+}
+
+export async function collectSecurityInfo() {
+  const nav = navigator as NavigatorWithSecurityInfo;
 
   // Battery
   let battery = "Unknown";
@@ -19,8 +26,8 @@ export async function collectSecurityInfo() {
 
       battery = `${Math.round(batteryManager.level * 100)}%`;
       charging = batteryManager.charging ? "Yes" : "No";
-    } catch (e) {
-      console.error("Battery Error:", e);
+    } catch (error) {
+      console.error("Battery Error:", error);
     }
   }
 
@@ -35,17 +42,17 @@ export async function collectSecurityInfo() {
       canvas.getContext("experimental-webgl");
 
     if (gl && "getParameter" in gl) {
-      const ext = (gl as WebGLRenderingContext).getExtension(
-        "WEBGL_debug_renderer_info"
-      );
+      const webgl = gl as WebGLRenderingContext;
+
+      const ext = webgl.getExtension("WEBGL_debug_renderer_info");
 
       if (ext) {
-        gpu = (gl as WebGLRenderingContext).getParameter(
-          ext.UNMASKED_RENDERER_WEBGL
-        );
+        gpu = webgl.getParameter(ext.UNMASKED_RENDERER_WEBGL);
       }
     }
-  } catch {}
+  } catch {
+    // GPU information unavailable
+  }
 
   return {
     userAgent: navigator.userAgent,
@@ -92,6 +99,8 @@ export async function collectSecurityInfo() {
 
     touch: navigator.maxTouchPoints > 0,
 
-    darkMode: window.matchMedia("(prefers-color-scheme: dark)").matches,
+    darkMode: window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    ).matches,
   };
 }

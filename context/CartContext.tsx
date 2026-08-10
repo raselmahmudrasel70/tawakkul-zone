@@ -36,19 +36,26 @@ export function CartProvider({
   const [cart, setCart] = useState<CartItem[]>([]);
   const [hydrated, setHydrated] = useState(false);
 
-  // Load cart from localStorage after hydration
+  // Load cart from localStorage after mount
   useEffect(() => {
-    try {
-      const savedCart = localStorage.getItem("cart");
+    const timer = window.setTimeout(() => {
+      try {
+        const savedCart = localStorage.getItem("cart");
 
-      if (savedCart) {
-        setCart(JSON.parse(savedCart));
+        if (savedCart) {
+          const parsedCart: CartItem[] = JSON.parse(savedCart);
+          setCart(parsedCart);
+        }
+      } catch (error) {
+        console.error("Failed to load cart:", error);
+      } finally {
+        setHydrated(true);
       }
-    } catch (error) {
-      console.error("Failed to load cart:", error);
-    }
+    }, 0);
 
-    setHydrated(true);
+    return () => {
+      window.clearTimeout(timer);
+    };
   }, []);
 
   // Save cart to localStorage

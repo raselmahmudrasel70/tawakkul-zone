@@ -17,26 +17,40 @@ export default function MerchantProductsPage() {
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
-  async function loadProducts() {
-    try {
-      const res = await fetch("/api/merchant/products");
-
-      if (!res.ok) {
-        throw new Error("Failed to load products");
-      }
-
-      const data = await res.json();
-      setProducts(data);
-    } catch (error) {
-      console.error(error);
-      alert("Products load করা যায়নি");
-    } finally {
-      setLoading(false);
-    }
-  }
-
   useEffect(() => {
-    loadProducts();
+    let cancelled = false;
+
+    async function fetchProducts() {
+      try {
+        const res = await fetch("/api/merchant/products");
+
+        if (!res.ok) {
+          throw new Error("Failed to load products");
+        }
+
+        const data = await res.json();
+
+        if (!cancelled) {
+          setProducts(data.products ?? []);
+        }
+      } catch (error) {
+        console.error("Products load error:", error);
+
+        if (!cancelled) {
+          alert("Products load করা যায়নি");
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+
+    fetchProducts();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   async function handleDelete(id: number, name: string) {
@@ -86,11 +100,9 @@ export default function MerchantProductsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-black p-6">
+    <main className="min-h-screen bg-black p-8 text-white">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-white">
-          My Products
-        </h1>
+        <h1 className="text-3xl font-bold">My Products</h1>
 
         <Link
           href="/merchant/products/add"
@@ -121,13 +133,9 @@ export default function MerchantProductsPage() {
               >
                 <td className="p-3">{product.name}</td>
 
-                <td className="p-3">
-                  {product.category}
-                </td>
+                <td className="p-3">{product.category}</td>
 
-                <td className="p-3">
-                  ৳ {product.price}
-                </td>
+                <td className="p-3">৳ {product.price}</td>
 
                 <td className="p-3">
                   {product.stock ? (
@@ -178,6 +186,17 @@ export default function MerchantProductsPage() {
                 </td>
               </tr>
             ))}
+
+            {products.length === 0 && (
+              <tr>
+                <td
+                  colSpan={6}
+                  className="p-8 text-center text-gray-500"
+                >
+                  No products found.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
