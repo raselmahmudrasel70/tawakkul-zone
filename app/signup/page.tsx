@@ -417,7 +417,7 @@ export default function SignupPage() {
             0 0 35px rgba(255, 229, 116, 0.95),
             0 0 110px rgba(255, 214, 79, 0.7);
 
-          animation: sunset 18s ease-in-out infinite;
+          animation: none;
         }
 
         .sun-glow {
@@ -485,148 +485,177 @@ export default function SignupPage() {
           animation-delay: 2.2s;
         }
 
-        /* Clouds */
+        /* =========================
+           REALISTIC FLOATING CLOUDS
+           ========================= */
+
         .cloud {
           position: absolute;
-          width: 230px;
-          height: 55px;
+          width: 280px;
+          height: 85px;
           border-radius: 9999px;
-          opacity: 0.82;
-          filter: blur(0.2px);
+          opacity: 0.92;
+          filter: blur(0.15px);
 
-          animation:
-            cloudDrift 42s linear infinite;
+          background:
+            radial-gradient(
+              ellipse at 50% 85%,
+              rgba(255, 255, 255, 0.96) 0%,
+              rgba(255, 255, 255, 0.82) 42%,
+              rgba(255, 255, 255, 0) 75%
+            );
+
+          animation: cloudDrift 55s linear infinite;
+
+          box-shadow:
+            0 18px 35px rgba(90, 130, 145, 0.10),
+            0 4px 12px rgba(255, 255, 255, 0.35);
+        }
+
+        .cloud::before,
+        .cloud::after {
+          content: "";
+          position: absolute;
+          border-radius: 9999px;
+          pointer-events: none;
+        }
+
+        .cloud::before {
+          width: 150px;
+          height: 105px;
+          left: 48px;
+          bottom: 12px;
+
+          background:
+            radial-gradient(
+              ellipse at 45% 40%,
+              rgba(255, 255, 255, 1) 0%,
+              rgba(249, 253, 254, 0.96) 42%,
+              rgba(228, 242, 246, 0.78) 72%,
+              rgba(210, 230, 235, 0) 100%
+            );
+
+          filter: blur(0.4px);
+        }
+
+        .cloud::after {
+          width: 115px;
+          height: 78px;
+          right: 28px;
+          bottom: 18px;
+
+          background:
+            radial-gradient(
+              ellipse at 50% 35%,
+              rgba(255, 255, 255, 0.98) 0%,
+              rgba(245, 251, 253, 0.92) 48%,
+              rgba(215, 233, 238, 0) 100%
+            );
+
+          filter: blur(0.5px);
         }
 
         .cloud span {
           position: absolute;
-          bottom: 0;
           display: block;
           border-radius: 9999px;
+          bottom: 0;
 
           background:
-            linear-gradient(
-              180deg,
-              rgba(255, 255, 255, 0.98),
-              rgba(238, 249, 250, 0.86)
+            radial-gradient(
+              ellipse at 50% 25%,
+              rgba(255, 255, 255, 0.98) 0%,
+              rgba(247, 252, 253, 0.94) 45%,
+              rgba(221, 238, 242, 0.72) 72%,
+              rgba(200, 224, 231, 0.05) 100%
             );
 
           box-shadow:
-            0 10px 22px rgba(83, 139, 156, 0.12);
+            inset 0 8px 18px rgba(255, 255, 255, 0.45),
+            0 10px 24px rgba(83, 139, 156, 0.08);
+
+          filter: blur(0.35px);
         }
 
         .cloud span:nth-child(1) {
-          left: 8px;
-          width: 85px;
-          height: 48px;
+          left: 0;
+          width: 92px;
+          height: 58px;
         }
 
         .cloud span:nth-child(2) {
-          left: 55px;
-          width: 90px;
-          height: 70px;
+          left: 48px;
+          width: 105px;
+          height: 82px;
         }
 
         .cloud span:nth-child(3) {
-          left: 112px;
-          width: 76px;
-          height: 52px;
+          left: 118px;
+          width: 92px;
+          height: 65px;
         }
 
         .cloud span:nth-child(4) {
-          left: 166px;
-          width: 55px;
-          height: 39px;
+          left: 188px;
+          width: 70px;
+          height: 50px;
         }
 
         .cloud-1 {
-          top: 18%;
-          left: -260px;
-          animation-duration: 46s;
+          top: 15%;
+          left: -320px;
+          transform: scale(1);
+          animation-duration: 58s;
         }
 
         .cloud-2 {
-          top: 34%;
-          left: -330px;
+          top: 31%;
+          left: -380px;
           transform: scale(0.72);
-          animation-duration: 58s;
-          animation-delay: -19s;
-          opacity: 0.58;
-        }
-
-        .cloud-3 {
-          top: 55%;
-          left: -280px;
-          transform: scale(1.08);
-          animation-duration: 52s;
-          animation-delay: -35s;
+          animation-duration: 72s;
+          animation-delay: -24s;
           opacity: 0.68;
         }
 
+        .cloud-3 {
+          top: 53%;
+          left: -330px;
+          transform: scale(1.15);
+          animation-duration: 66s;
+          animation-delay: -41s;
+          opacity: 0.76;
+        }
+
         .cloud-4 {
-          top: 70%;
-          left: -250px;
-          transform: scale(0.6);
-          animation-duration: 64s;
-          animation-delay: -8s;
-          opacity: 0.5;
+          top: 69%;
+          left: -300px;
+          transform: scale(0.62);
+          animation-duration: 78s;
+          animation-delay: -13s;
+          opacity: 0.54;
         }
 
         @keyframes cloudDrift {
-          from {
+          0% {
             margin-left: 0;
+            transform: translate3d(0, 0, 0);
           }
 
-          to {
-            margin-left: calc(100vw + 520px);
-          }
-        }
-
-        @keyframes sunset {
-          0%,
-          12% {
-            transform: translateY(0) scale(1);
-            opacity: 1;
-          }
-
-          48% {
-            transform: translateY(36vh) scale(0.88);
-            opacity: 0.95;
-          }
-
-          62% {
-            transform: translateY(52vh) scale(0.72);
-            opacity: 0.55;
-          }
-
-          70%,
-          100% {
-            transform: translateY(-10vh) scale(1);
-            opacity: 0;
-          }
-        }
-
-        @keyframes glowPulse {
-          0%,
-          100% {
-            opacity: 0.72;
-            transform: scale(0.95);
+          25% {
+            transform: translate3d(0, -5px, 0);
           }
 
           50% {
-            opacity: 1;
-            transform: scale(1.08);
+            transform: translate3d(0, 3px, 0);
           }
-        }
 
-        @keyframes rayPulse {
-          0%,
+          75% {
+            transform: translate3d(0, -4px, 0);
+          }
+
           100% {
-            opacity: 0.28;
-          }
-
-          50% {
-            opacity: 0.82;
+            margin-left: calc(100vw + 650px);
+            transform: translate3d(0, 0, 0);
           }
         }
 
