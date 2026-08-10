@@ -96,7 +96,6 @@ export async function POST(request: NextRequest) {
 
   const price = Number(formData.get("price") || 0);
   const discount = Number(formData.get("discount") || 0);
-  const rating = Number(formData.get("rating") || 5);
 
   const stock =
     String(formData.get("stock")) === "true";
@@ -181,7 +180,6 @@ export async function POST(request: NextRequest) {
         price,
         discount,
         description,
-        rating,
         stock,
         featured,
         new_arrival: newArrival,
@@ -268,7 +266,6 @@ export async function PATCH(request: NextRequest) {
   const description = String(formData.get("description") || "").trim();
   const priceValue = String(formData.get("price") || "").trim();
   const discountValue = String(formData.get("discount") || "").trim();
-  const ratingValue = String(formData.get("rating") || "").trim();
   const stockValue = String(formData.get("stock") || "").trim();
   const featuredValue = String(formData.get("featured") || "").trim();
   const newArrivalValue = String(formData.get("newArrival") || "").trim();
@@ -292,11 +289,6 @@ export async function PATCH(request: NextRequest) {
   if (discountValue !== "") {
     const parsedDiscount = Number(discountValue);
     if (!Number.isNaN(parsedDiscount)) updateData.discount = parsedDiscount;
-  }
-
-  if (ratingValue !== "") {
-    const parsedRating = Number(ratingValue);
-    if (!Number.isNaN(parsedRating)) updateData.rating = parsedRating;
   }
 
   if (stockValue !== "") updateData.stock = stockValue === "true";

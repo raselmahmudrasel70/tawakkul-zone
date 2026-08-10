@@ -53,8 +53,6 @@ export async function POST(request: Request) {
       formData.get("description") || ""
     );
 
-    const rating = Number(formData.get("rating") || 5);
-
     const stock =
       String(formData.get("stock")) === "true";
 
@@ -203,7 +201,6 @@ export async function POST(request: Request) {
         price,
         discount,
         description,
-        rating,
         stock,
         featured,
         cash_on_delivery: cashOnDelivery,

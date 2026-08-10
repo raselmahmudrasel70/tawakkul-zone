@@ -10,7 +10,6 @@ type Product = {
   discount: number;
   images: string;
   category: string;
-  rating: number;
   stock: boolean;
   description: string;
 };

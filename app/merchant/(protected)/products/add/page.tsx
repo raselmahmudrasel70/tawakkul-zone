@@ -13,7 +13,6 @@ export default function AddProductPage() {
   const [description, setDescription] = useState("");
   const [stock, setStock] = useState(true);
   const [slug, setSlug] = useState("");
-  const [rating, setRating] = useState("5");
   const [sku, setSku] = useState("");
   const [isActive, setIsActive] = useState(true);
   const [featured, setFeatured] = useState(true);
@@ -42,7 +41,6 @@ export default function AddProductPage() {
       formData.append("price", price);
       formData.append("discount", discount);
       formData.append("description", description);
-      formData.append("rating", rating);
       formData.append("stock", String(stock));
       formData.append("featured", String(featured));
       formData.append("newArrival", String(newArrival));
@@ -239,19 +237,8 @@ export default function AddProductPage() {
         </div>
 
         <div>
-          <label className="mb-2 block font-semibold text-yellow-700">
-            Rating
-          </label>
 
-          <input
-            type="number"
-            min="1"
-            max="5"
-            step="0.1"
-            value={rating}
-            onChange={(e) => setRating(e.target.value)}
-            className="w-full rounded-xl border p-3 text-black"
-          />
+          
         </div>
 
         {/* Product */}

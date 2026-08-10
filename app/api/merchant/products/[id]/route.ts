@@ -81,7 +81,7 @@ export async function GET(
     const { data: product, error } = await supabaseAdmin
       .from("products")
       .select(
-        "id, name, price, category, discount, images, created_by, stock, featured, cash_on_delivery, is_active, brand, sku, description, rating"
+        "id, name, price, category, discount, images, created_by, stock, featured, cash_on_delivery, is_active, brand, sku, description"
       )
       .eq("id", productId)
       .eq("created_by", user.id)
