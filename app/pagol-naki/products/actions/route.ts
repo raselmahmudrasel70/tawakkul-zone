@@ -1,6 +1,6 @@
 ﻿import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
-import { verifyAuthToken, ADMIN_EMAIL } from "@/lib/auth";
+import { verifyAuthToken } from "@/lib/auth";
 
 const COOKIE_NAME = "admin-auth";
 
@@ -23,12 +23,12 @@ async function verifyRequest(request: NextRequest) {
 export async function GET(request: NextRequest) {
   const user = await verifyRequest(request);
 
-if (!user) {
-  return NextResponse.json(
-    { error: "Unauthorized" },
-    { status: 401 }
-  );
-}
+  if (!user) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
 
   const url = new URL(request.url);
   const id = url.searchParams.get("id");
@@ -41,110 +41,177 @@ if (!user) {
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json(
+        { error: error.message },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ product: data });
   }
 
   let query = supabaseAdmin
-  .from("products")
-  .select("*")
-  .order("id", { ascending: false });
+    .from("products")
+    .select("*")
+    .order("id", { ascending: false });
 
-if (user.role === "merchant") {
-  query = query.eq("created_by", user.id);
-}
-
-const { data, error } = await query;
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  if (user.role === "merchant") {
+    query = query.eq("created_by", user.id);
   }
 
-  return NextResponse.json({ products: data });
+  const { data, error } = await query;
+
+  if (error) {
+    return NextResponse.json(
+      { error: error.message },
+      { status: 500 }
+    );
+  }
+
+  return NextResponse.json({
+    products: data,
+  });
 }
 
 export async function POST(request: NextRequest) {
   const user = await verifyRequest(request);
 
-if (!user) {
-  return NextResponse.json(
-    { error: "Unauthorized" },
-    { status: 401 }
-  );
-}
+  if (!user) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
 
   const formData = await request.formData();
+
   const name = String(formData.get("name") || "").trim();
   const slug = String(formData.get("slug") || "").trim();
   const category = String(formData.get("category") || "").trim();
   const brand = String(formData.get("brand") || "").trim();
   const sku = String(formData.get("sku") || "").trim();
-  const description = String(formData.get("description") || "").trim();
-  const price = Number(formData.get("price"));
-  const discount = Number(formData.get("discount"));
-  const rating = Number(formData.get("rating"));
-  const stock = String(formData.get("stock")) === "true";
-  const featured = String(formData.get("featured")) === "true";
-  const newArrival = String(formData.get("newArrival")) === "true";
-  const freeDelivery = String(formData.get("freeDelivery")) === "true";
-  const cashOnDelivery = String(formData.get("cashOnDelivery")) === "true";
-  const isActive = String(formData.get("isActive")) === "true";
+  const description = String(
+    formData.get("description") || ""
+  ).trim();
+
+  const price = Number(formData.get("price") || 0);
+  const discount = Number(formData.get("discount") || 0);
+  const rating = Number(formData.get("rating") || 5);
+
+  const stock =
+    String(formData.get("stock")) === "true";
+
+  const featured =
+    String(formData.get("featured")) === "true";
+
+  const newArrival =
+    String(formData.get("newArrival")) === "true";
+
+  const freeDelivery =
+    String(formData.get("freeDelivery")) === "true";
+
+  const cashOnDelivery =
+    String(formData.get("cashOnDelivery")) === "true";
+
+  const isActive =
+    String(formData.get("isActive")) === "true";
+
   const imageFile = formData.get("image");
 
   if (!name || !slug || !category || !brand || !price) {
-    return NextResponse.json({ error: "Missing required product fields." }, { status: 400 });
+    return NextResponse.json(
+      {
+        error:
+          "Missing required product fields.",
+      },
+      { status: 400 }
+    );
   }
 
   let imageUrl = "";
-  if (imageFile instanceof File && imageFile.size > 0) {
+
+  // Upload product image
+  if (
+    imageFile instanceof File &&
+    imageFile.size > 0
+  ) {
     const fileName = `${Date.now()}-${imageFile.name}`;
+
     const fileData = await imageFile.arrayBuffer();
 
-    const { error: uploadError } = await supabaseAdmin.storage
-      .from("products")
-      .upload(fileName, new Uint8Array(fileData), {
-        cacheControl: "3600",
-        upsert: false,
-      });
+    const { error: uploadError } =
+      await supabaseAdmin.storage
+        .from("products")
+        .upload(
+          fileName,
+          new Uint8Array(fileData),
+          {
+            cacheControl: "3600",
+            upsert: false,
+          }
+        );
 
     if (uploadError) {
-      return NextResponse.json({ error: uploadError.message }, { status: 500 });
+      return NextResponse.json(
+        { error: uploadError.message },
+        { status: 500 }
+      );
     }
 
-    const { data: publicUrlData } = supabaseAdmin.storage
-      .from("products")
-      .getPublicUrl(fileName);
+    const { data: publicUrlData } =
+      supabaseAdmin.storage
+        .from("products")
+        .getPublicUrl(fileName);
 
-    imageUrl = publicUrlData.publicUrl;
+    imageUrl =
+      publicUrlData.publicUrl;
   }
 
-  const { error } = await supabaseAdmin.from("products").insert({
-    name,
-    slug,
-    category,
-    brand,
-    sku,
-    images: imageUrl,
-    price,
-    discount,
-    description,
-    rating,
-    stock,
-    featured,
-    new_arrival: newArrival,
-    free_delivery: freeDelivery,
-    cash_on_delivery: cashOnDelivery,
-    is_active: isActive,
-    created_by: user.id,
-  });
+  // Create product
+  const { data, error } =
+    await supabaseAdmin
+      .from("products")
+      .insert({
+        name,
+        slug,
+        category,
+        brand,
+        sku: sku || null,
+        images: imageUrl || null,
+        price,
+        discount,
+        description,
+        rating,
+        stock,
+        featured,
+        new_arrival: newArrival,
+        free_delivery: freeDelivery,
+        cash_on_delivery: cashOnDelivery,
+        is_active: isActive,
+
+        // ⭐ IMPORTANT
+        // Save the merchant who created this product
+        created_by: user.id,
+      })
+      .select()
+      .single();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error(
+      "Product insert error:",
+      error
+    );
+
+    return NextResponse.json(
+      { error: error.message },
+      { status: 500 }
+    );
   }
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({
+    success: true,
+    product: data,
+  });
 }
 
 export async function PATCH(request: NextRequest) {

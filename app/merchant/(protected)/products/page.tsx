@@ -15,40 +15,86 @@ type Product = {
 export default function MerchantProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+
+  async function loadProducts() {
+    try {
+      const res = await fetch("/api/merchant/products");
+
+      if (!res.ok) {
+        throw new Error("Failed to load products");
+      }
+
+      const data = await res.json();
+      setProducts(data);
+    } catch (error) {
+      console.error(error);
+      alert("Products load করা যায়নি");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-    async function loadProducts() {
-      try {
-        const res = await fetch("/api/merchant/products");
-
-        if (!res.ok) {
-          throw new Error("Failed to load products");
-        }
-
-        const data = await res.json();
-        setProducts(data);
-      } finally {
-        setLoading(false);
-      }
-    }
-
     loadProducts();
   }, []);
 
+  async function handleDelete(id: number, name: string) {
+    const confirmed = window.confirm(
+      `"${name}" product টি কি delete করতে চান?`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setDeletingId(id);
+
+      const res = await fetch(`/api/merchant/products/${id}`, {
+        method: "DELETE",
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result.error || "Delete failed");
+      }
+
+      setProducts((current) =>
+        current.filter((product) => product.id !== id)
+      );
+
+      alert("✅ Product deleted successfully");
+    } catch (error) {
+      console.error("Delete error:", error);
+
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Product delete করা যায়নি"
+      );
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+      <main className="min-h-screen bg-black p-8 text-white">
+        Loading...
+      </main>
+    );
   }
 
   return (
-    <main>
+    <main className="min-h-screen bg-black p-6">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-3xl font-bold">
+        <h1 className="text-3xl font-bold text-white">
           My Products
         </h1>
 
         <Link
           href="/merchant/products/add"
-          className="rounded bg-green-700 px-4 py-2 text-whitw"
+          className="rounded bg-green-700 px-5 py-3 font-semibold text-white hover:bg-green-800"
         >
           + Add Product
         </Link>
@@ -63,20 +109,72 @@ export default function MerchantProductsPage() {
               <th className="p-3 text-left">Price</th>
               <th className="p-3 text-left">Stock</th>
               <th className="p-3 text-left">Status</th>
+              <th className="p-3 text-left">Actions</th>
             </tr>
           </thead>
 
           <tbody>
             {products.map((product) => (
-              <tr key={product.id} className="border-t border-yellow-700">
+              <tr
+                key={product.id}
+                className="border-t border-yellow-700"
+              >
                 <td className="p-3">{product.name}</td>
-                <td className="p-3">{product.category}</td>
-                <td className="p-3">৳ {product.price}</td>
+
                 <td className="p-3">
-                  {product.stock ? "In Stock" : "Out of Stock"}
+                  {product.category}
                 </td>
+
                 <td className="p-3">
-                  {product.is_active ? "Active" : "Inactive"}
+                  ৳ {product.price}
+                </td>
+
+                <td className="p-3">
+                  {product.stock ? (
+                    <span className="font-semibold text-green-700">
+                      In Stock
+                    </span>
+                  ) : (
+                    <span className="font-semibold text-red-600">
+                      Out of Stock
+                    </span>
+                  )}
+                </td>
+
+                <td className="p-3">
+                  {product.is_active ? (
+                    <span className="font-semibold text-green-700">
+                      Active
+                    </span>
+                  ) : (
+                    <span className="font-semibold text-gray-500">
+                      Inactive
+                    </span>
+                  )}
+                </td>
+
+                <td className="p-3">
+                  <div className="flex gap-2">
+                    <Link
+                      href={`/merchant/products/edit/${product.id}`}
+                      className="rounded bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-700"
+                    >
+                      ✏️ Edit
+                    </Link>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleDelete(product.id, product.name)
+                      }
+                      disabled={deletingId === product.id}
+                      className="rounded bg-red-600 px-4 py-2 font-semibold text-white hover:bg-red-700 disabled:bg-gray-400"
+                    >
+                      {deletingId === product.id
+                        ? "Deleting..."
+                        : "🗑️ Delete"}
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
