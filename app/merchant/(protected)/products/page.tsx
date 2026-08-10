@@ -31,7 +31,7 @@ export default function MerchantProductsPage() {
         const data = await res.json();
 
         if (!cancelled) {
-          setProducts(data.products ?? []);
+          setProducts(Array.isArray(data) ? data : data.products ?? []);
         }
       } catch (error) {
         console.error("Products load error:", error);
