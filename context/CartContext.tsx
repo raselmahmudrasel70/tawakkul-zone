@@ -8,47 +8,78 @@ import {
   ReactNode,
 } from "react";
 
-type CartItem = {
+export type CartItem = {
   id: number;
   name: string;
+
+  // Original price
   price: number;
+
+  // Discounted/current price
   discountedPrice?: number;
+
   images: string;
+
+  // Product category
+  category: string;
+
   quantity: number;
 };
 
 type CartContextType = {
   cart: CartItem[];
   hydrated: boolean;
-  addToCart: (product: Omit<CartItem, "quantity">) => void;
+
+  addToCart: (
+    product: Omit<CartItem, "quantity">
+  ) => void;
+
   increaseQuantity: (id: number) => void;
   decreaseQuantity: (id: number) => void;
   removeFromCart: (id: number) => void;
   clearCart: () => void;
 };
 
-const CartContext = createContext<CartContextType | undefined>(undefined);
+const CartContext =
+  createContext<CartContextType | undefined>(
+    undefined
+  );
 
 export function CartProvider({
   children,
 }: {
   children: ReactNode;
 }) {
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [hydrated, setHydrated] = useState(false);
+  const [cart, setCart] = useState<CartItem[]>(
+    []
+  );
 
-  // Load cart from localStorage after mount
+  const [hydrated, setHydrated] =
+    useState(false);
+
+  /* =====================================
+     LOAD CART
+  ===================================== */
+
   useEffect(() => {
     const timer = window.setTimeout(() => {
       try {
-        const savedCart = localStorage.getItem("cart");
+        const savedCart =
+          localStorage.getItem("cart");
 
         if (savedCart) {
-          const parsedCart: CartItem[] = JSON.parse(savedCart);
-          setCart(parsedCart);
+          const parsedCart =
+            JSON.parse(savedCart);
+
+          if (Array.isArray(parsedCart)) {
+            setCart(parsedCart);
+          }
         }
       } catch (error) {
-        console.error("Failed to load cart:", error);
+        console.error(
+          "Failed to load cart:",
+          error
+        );
       } finally {
         setHydrated(true);
       }
@@ -59,60 +90,121 @@ export function CartProvider({
     };
   }, []);
 
-  // Save cart to localStorage
+  /* =====================================
+     SAVE CART
+  ===================================== */
+
   useEffect(() => {
     if (!hydrated) return;
 
-    localStorage.setItem("cart", JSON.stringify(cart));
+    localStorage.setItem(
+      "cart",
+      JSON.stringify(cart)
+    );
   }, [cart, hydrated]);
 
-  // Add Product
-  const addToCart = (product: Omit<CartItem, "quantity">) => {
+  /* =====================================
+     ADD TO CART
+  ===================================== */
+
+  const addToCart = (
+    product: Omit<CartItem, "quantity">
+  ) => {
     setCart((prev) => {
-      const existing = prev.find((item) => item.id === product.id);
+      const existing = prev.find(
+        (item) => item.id === product.id
+      );
 
       if (existing) {
         return prev.map((item) =>
           item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
+            ? {
+                ...item,
+                name: product.name,
+                price: product.price,
+                discountedPrice:
+                  product.discountedPrice,
+                images: product.images,
+                category: product.category,
+                quantity:
+                  item.quantity + 1,
+              }
             : item
         );
       }
 
-      return [...prev, { ...product, quantity: 1 }];
+      return [
+        ...prev,
+        {
+          ...product,
+          quantity: 1,
+        },
+      ];
     });
   };
 
-  // Increase Quantity
-  const increaseQuantity = (id: number) => {
+  /* =====================================
+     INCREASE
+  ===================================== */
+
+  const increaseQuantity = (
+    id: number
+  ) => {
     setCart((prev) =>
       prev.map((item) =>
         item.id === id
-          ? { ...item, quantity: item.quantity + 1 }
+          ? {
+              ...item,
+              quantity:
+                item.quantity + 1,
+            }
           : item
       )
     );
   };
 
-  // Decrease Quantity
-  const decreaseQuantity = (id: number) => {
+  /* =====================================
+     DECREASE
+
+     Minimum = 1
+  ===================================== */
+
+  const decreaseQuantity = (
+    id: number
+  ) => {
     setCart((prev) =>
-      prev
-        .map((item) =>
-          item.id === id
-            ? { ...item, quantity: item.quantity - 1 }
-            : item
-        )
-        .filter((item) => item.quantity > 0)
+      prev.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              quantity: Math.max(
+                1,
+                item.quantity - 1
+              ),
+            }
+          : item
+      )
     );
   };
 
-  // Remove Item
-  const removeFromCart = (id: number) => {
-    setCart((prev) => prev.filter((item) => item.id !== id));
+  /* =====================================
+     REMOVE
+  ===================================== */
+
+  const removeFromCart = (
+    id: number
+  ) => {
+    setCart((prev) =>
+      prev.filter(
+        (item) => item.id !== id
+      )
+    );
   };
 
-  // Clear Cart
+  /* =====================================
+     CLEAR
+  ===================================== */
+
   const clearCart = () => {
     setCart([]);
   };
@@ -134,11 +226,18 @@ export function CartProvider({
   );
 }
 
+/* =====================================
+   USE CART
+===================================== */
+
 export function useCart() {
-  const context = useContext(CartContext);
+  const context =
+    useContext(CartContext);
 
   if (!context) {
-    throw new Error("useCart must be used inside CartProvider");
+    throw new Error(
+      "useCart must be used inside CartProvider"
+    );
   }
 
   return context;

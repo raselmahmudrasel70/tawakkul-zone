@@ -15,15 +15,28 @@ export default function FeaturedProducts({
   selectedCategory: string;
 }) {
   const { addToCart } = useCart();
-  const { wishlist, addToWishlist, removeFromWishlist } = useWishlist();
-  const [products, setProducts] = useState<Product[]>([]);
+
+  const {
+    wishlist,
+    addToWishlist,
+    removeFromWishlist,
+  } = useWishlist();
+
+  const [products, setProducts] =
+    useState<Product[]>([]);
+
+  /* =====================================
+     LOAD PRODUCTS
+  ===================================== */
 
   useEffect(() => {
     async function loadProducts() {
       const { data, error } = await supabase
         .from("products")
         .select("*")
-        .order("id", { ascending: false });
+        .order("id", {
+          ascending: false,
+        });
 
       if (error) {
         console.error(error);
@@ -38,141 +51,258 @@ export default function FeaturedProducts({
     loadProducts();
   }, []);
 
+  /* =====================================
+     FILTER PRODUCTS
+  ===================================== */
+
   const filteredProducts =
     selectedCategory === "All Products"
       ? products
-      : products.filter((product) => product.category === selectedCategory);
+      : products.filter(
+          (product) =>
+            product.category ===
+            selectedCategory
+        );
+
+  /* =====================================
+     CHECK WISHLIST
+  ===================================== */
 
   const isWishlisted = (id: number) =>
-    wishlist.some((item) => item.id === id);
+    wishlist.some(
+      (item) => item.id === id
+    );
 
   return (
     <section className="bg-gray-50 py-10">
+
       <div className="mx-auto max-w-7xl px-6">
+
+        {/* TITLE */}
+
         <h2 className="mb-10 text-center text-4xl font-bold text-red-900">
           ⭐ Featured Products
         </h2>
 
+        {/* PRODUCTS */}
+
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          {filteredProducts.map((product) => {
-            const discountedPrice =
-              product.price - (product.price * (product.discount ?? 0)) / 100;
 
-            return (
-              <div
-                key={product.id}
-                className="rounded-2xl bg-gray-300 p-3 md:p-6 shadow-lg transition duration-300 hover:-translate-y-2 hover:shadow-2xl"
-              >
-                <div className="relative mb-3 h-40 overflow-hidden rounded-xl md:h-56">
-  <Link
-    href={`/product/${product.id}`}
-    className="relative block h-full w-full"
-  >
-    <Image
-      src={product.images || "/products/product1.jpg"}
-      alt={product.name}
-      fill
-      sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-      className="object-cover transition duration-300 hover:scale-110"
-    />
-  </Link>
+          {filteredProducts.map(
+            (product) => {
 
-                  {product.discount > 0 && (
-                    <span className="absolute left-3 top-3 rounded-full bg-white px-3 py-1 text-xs font-bold text-red-600 shadow-lg">
-                      -{product.discount}%
-                    </span>
-                  )}
+              /* =========================
+                 DISCOUNTED PRICE
+              ========================= */
+
+              const discountedPrice =
+                product.discount > 0
+                  ? Math.round(
+                      product.price -
+                        (product.price *
+                          product.discount) /
+                          100
+                    )
+                  : product.price;
+
+              return (
+                <div
+                  key={product.id}
+                  className="rounded-2xl bg-gray-300 p-3 shadow-lg transition duration-300 hover:-translate-y-2 hover:shadow-2xl md:p-6"
+                >
+
+                  {/* =======================
+                      IMAGE
+                  ======================= */}
+
+                  <div className="relative mb-3 h-40 overflow-hidden rounded-xl md:h-56">
+
+                    <Link
+                      href={`/product/${product.id}`}
+                      className="relative block h-full w-full"
+                    >
+                      <Image
+                        src={
+                          product.images ||
+                          "/products/product1.jpg"
+                        }
+                        alt={product.name}
+                        fill
+                        sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                        className="object-cover transition duration-300 hover:scale-110"
+                      />
+                    </Link>
+
+                    {/* DISCOUNT BADGE */}
+
+                    {product.discount > 0 && (
+                      <span className="absolute left-3 top-3 rounded-full bg-white px-3 py-1 text-xs font-bold text-red-600 shadow-lg">
+                        -{product.discount}%
+                      </span>
+                    )}
+
+                    {/* =======================
+                        WISHLIST
+                    ======================= */}
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (
+                          isWishlisted(
+                            product.id
+                          )
+                        ) {
+                          removeFromWishlist(
+                            product.id
+                          );
+                        } else {
+                          addToWishlist({
+                            id: product.id,
+                            name: product.name,
+
+                            /* ORIGINAL PRICE */
+                            price:
+                              product.price,
+
+                            /* DISCOUNTED PRICE */
+                            discountedPrice:
+                              discountedPrice,
+
+                            images:
+                              product.images,
+
+                            /* CATEGORY */
+                            category:
+                              product.category,
+                          });
+                        }
+                      }}
+                      className="absolute right-3 top-3 rounded-full border border-white bg-pink-200 p-2.5 shadow-xl backdrop-blur-md transition-all duration-300 hover:scale-110 hover:bg-red-400"
+                      aria-label={
+                        isWishlisted(
+                          product.id
+                        )
+                          ? "Remove from Wishlist"
+                          : "Add to Wishlist"
+                      }
+                    >
+                      <Heart
+                        className={`h-5 w-5 transition-all duration-300 ${
+                          isWishlisted(
+                            product.id
+                          )
+                            ? "fill-red-500 text-red-500"
+                            : "text-gray-700"
+                        }`}
+                      />
+                    </button>
+
+                  </div>
+
+                  {/* =======================
+                      PRODUCT NAME
+                  ======================= */}
+
+                  <Link
+                    href={`/product/${product.id}`}
+                  >
+                    <h3 className="mt-4 text-lg font-semibold text-gray-700 hover:text-green-700">
+                      {product.name}
+                    </h3>
+                  </Link>
+
+                  {/* =======================
+                      STOCK
+                  ======================= */}
+
+                  <div className="mt-1">
+                    {product.stock ? (
+                      <span className="text-sm text-green-600">
+                        ✔ In Stock
+                      </span>
+                    ) : (
+                      <span className="text-sm text-red-600">
+                        ✖ Out of Stock
+                      </span>
+                    )}
+                  </div>
+
+                  {/* =======================
+                      PRICE
+                  ======================= */}
+
+                  <div className="mt-3">
+
+                    {product.discount > 0 ? (
+                      <>
+                        <div className="flex items-center gap-2">
+
+                          {/* ORIGINAL PRICE */}
+
+                          <span className="text-sm font-semibold text-red-500 line-through">
+                            ৳ {product.price}
+                          </span>
+
+                          {/* DISCOUNT */}
+
+                          <span className="rounded-full bg-red-600 px-2 py-0.5 text-xs font-bold text-white">
+                            -{product.discount}%
+                          </span>
+
+                        </div>
+
+                        {/* DISCOUNTED PRICE */}
+
+                        <p className="mt-1 text-2xl font-extrabold text-green-700">
+                          ৳{" "}
+                          {discountedPrice}
+                        </p>
+                      </>
+                    ) : (
+                      <p className="mt-1 text-2xl font-extrabold text-green-700">
+                        ৳ {product.price}
+                      </p>
+                    )}
+
+                  </div>
+
+                  {/* =======================
+                      ADD TO CART
+                  ======================= */}
 
                   <button
+  type="button"
   onClick={() => {
-    if (isWishlisted(product.id)) {
-      removeFromWishlist(product.id);
-    } else {
-      const discountedPrice =
-        product.discount > 0
-          ? Math.round(
-              product.price - (product.price * product.discount) / 100
-            )
-          : product.price;
+    addToCart({
+      id: product.id,
+      name: product.name,
 
-      addToWishlist({
-        id: product.id,
-        name: product.name,
-        price: discountedPrice,
-        images: product.images,
-      });
-    }
+      // Original price
+      price: product.price,
+
+      // Discounted price
+      discountedPrice:
+        discountedPrice,
+
+      // Product image
+      images: product.images,
+
+      // Product category
+      category:
+        product.category,
+    });
   }}
-  className="absolute right-3 top-3 rounded-full border border-white bg-pink-200 p-2.5 backdrop-blur-md shadow-xl transition-all duration-300 hover:scale-110 hover:bg-red-400"
+  className="mt-5 w-full rounded-xl bg-green-700 py-2 font-semibold text-white transition hover:bg-green-800"
 >
-  <Heart
-    className={`h-5 w-5 transition-all duration-300 ${
-      isWishlisted(product.id)
-        ? "fill-red-500 text-red-500"
-        : "text-gray-700"
-    }`}
-  />
+  Add to Cart
 </button>
+
                 </div>
+              );
+            }
+          )}
 
-                <Link href={`/product/${product.id}`}>
-                  <h3 className="mt-4 text-lg font-semibold text-gray-700 hover:text-green-700">
-                    {product.name}
-                  </h3>
-                </Link>
-
-                <div className="mt-1">
-                  {product.stock ? (
-                    <span className="text-sm text-green-600">✔ In Stock</span>
-                  ) : (
-                    <span className="text-sm text-red-600">✖ Out of Stock</span>
-                  )}
-                </div>
-
-                <div className="mt-3">
-                  {product.discount > 0 ? (
-                    <>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-red-500 line-through">
-                          ৳ {product.price}
-                        </span>
-                        <span className="rounded-full bg-red-600 px-2 py-0.5 text-xs font-bold text-white">
-                          -{product.discount}%
-                        </span>
-                      </div>
-                      <p className="mt-1 text-2xl font-extrabold text-green-700">
-                        ৳ {discountedPrice.toFixed(0)}
-                      </p>
-                    </>
-                  ) : (
-                    <p className="mt-1 text-2xl font-extrabold text-green-700">
-                      ৳ {product.price}
-                    </p>
-                  )}
-                </div>
-
-                <button
-                  onClick={() => {
-  const discountedPrice =
-    product.discount > 0
-      ? Math.round(product.price - (product.price * product.discount) / 100)
-      : product.price;
-
-  addToCart({
-    id: product.id,
-    name: product.name,
-    price: discountedPrice,
-    images: product.images,
-  });
-}
-                  }
-                  className="mt-5 w-full rounded-xl bg-green-700 py-2 font-semibold text-white transition hover:bg-green-800"
-                >
-                  Add to Cart
-                </button>
-              </div>
-            );
-          })}
         </div>
       </div>
     </section>
