@@ -1,4 +1,4 @@
- "use client";
+"use client";
 
 import {
   Mail,
@@ -74,6 +74,8 @@ export default function LoginPage() {
 
   return (
     <main className="relative min-h-screen overflow-hidden px-4 pt-24 pb-16 flex items-center justify-center sky-background">
+
+      {/* Animated sky background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="sun" />
         <div className="sun-glow" />
@@ -84,6 +86,7 @@ export default function LoginPage() {
         <div className="sun-ray ray-4" />
         <div className="sun-ray ray-5" />
 
+        {/* Floating clouds */}
         <div className="cloud cloud-1">
           <span />
           <span />
@@ -115,25 +118,34 @@ export default function LoginPage() {
         <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-emerald-900/20 to-transparent" />
       </div>
 
-      <div className="relative z-10 w-full max-w-md bg-white/90 backdrop-blur-xl rounded-2xl border border-white/70 shadow-2xl px-8 py-10">
+
+      {/* Login Card */}
+      <div className="relative z-10 w-full max-w-md bg-transparent backdrop-blur-xl rounded-2xl border border-white/70 shadow-2xl px-8 py-10">
+
+        {/* Brand */}
         <div className="mb-7 text-center">
+
           <h1 className="text-3xl font-bold leading-none">
-            <span className="text-cyan-300">Tawakkul</span>{" "}
-            <span className="text-amber-300">Zone</span>
+            <span className="text-cyan-700">Tawakkul</span>{" "}
+            <span className="text-amber-500">Zone</span>
           </h1>
 
-          <p className="text-center text-gray-500 mt-3">
+          <p className="text-center text-blue-500 mt-3">
             Welcome Back
           </p>
+
         </div>
 
         <form onSubmit={login} className="space-y-5">
+
+          {/* Email */}
           <div>
             <label className="text-sm text-gray-600">
               * Email Address
             </label>
 
             <div className="flex items-center border-b-2 border-cyan-300">
+
               <Mail className="h-5 w-5 text-cyan-600" />
 
               <input
@@ -141,18 +153,22 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
+                autoComplete="off"
                 className="w-full px-3 py-3 outline-none bg-transparent text-black"
                 required
               />
+
             </div>
           </div>
 
+          {/* Password */}
           <div>
             <label className="text-sm text-gray-600">
               * Password
             </label>
 
             <div className="flex items-center border-b-2 border-cyan-300">
+
               <Lock className="h-5 w-5 text-cyan-600" />
 
               <input
@@ -160,6 +176,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password"
+                autoComplete="new-password"
                 className="w-full px-3 py-3 outline-none bg-transparent text-black"
                 required
               />
@@ -168,7 +185,9 @@ export default function LoginPage() {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 aria-label={
-                  showPassword ? "Hide password" : "Show password"
+                  showPassword
+                    ? "Hide password"
+                    : "Show password"
                 }
               >
                 {showPassword ? (
@@ -177,9 +196,11 @@ export default function LoginPage() {
                   <Eye className="h-5 w-5 text-blue-600" />
                 )}
               </button>
+
             </div>
           </div>
 
+          {/* Login */}
           <button
             type="submit"
             disabled={loading}
@@ -188,17 +209,26 @@ export default function LoginPage() {
             {loading ? "Logging in..." : "LOGIN"}
           </button>
 
+          {/* OR */}
           <div className="flex items-center my-6">
+
             <div className="flex-1 h-px bg-gray-300" />
-            <span className="px-3 text-gray-400 text-sm">OR</span>
+
+            <span className="px-3 text-gray-400 text-sm">
+              OR
+            </span>
+
             <div className="flex-1 h-px bg-gray-300" />
+
           </div>
 
+          {/* Google */}
           <button
             type="button"
             onClick={loginWithGoogle}
             className="w-full py-3 border rounded-sm flex justify-center items-center gap-3 font-semibold text-gray-700 hover:bg-gray-50"
           >
+
             <img
               src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
               className="h-5 w-5"
@@ -206,9 +236,12 @@ export default function LoginPage() {
             />
 
             Continue with Google
+
           </button>
 
+          {/* Signup */}
           <p className="text-center mt-6 text-sm text-gray-600">
+
             Don&apos;t have an account?
 
             <a
@@ -217,8 +250,11 @@ export default function LoginPage() {
             >
               Sign Up
             </a>
+
           </p>
+
         </form>
+
       </div>
 
       <style jsx>{`
@@ -233,6 +269,7 @@ export default function LoginPage() {
             );
         }
 
+        /* Bright moving sun */
         .sun {
           position: absolute;
           width: 118px;
@@ -275,6 +312,7 @@ export default function LoginPage() {
           animation: glowPulse 4s ease-in-out infinite;
         }
 
+        /* Sun rays */
         .sun-ray {
           position: absolute;
           right: 16%;
@@ -293,7 +331,8 @@ export default function LoginPage() {
           transform-origin: right center;
           filter: blur(3px);
 
-          animation: rayPulse 3.5s ease-in-out infinite;
+          animation:
+            rayPulse 3.5s ease-in-out infinite;
         }
 
         .ray-1 {
@@ -320,173 +359,124 @@ export default function LoginPage() {
           animation-delay: 2.2s;
         }
 
+        /* Clouds */
         .cloud {
           position: absolute;
-          width: 280px;
-          height: 85px;
+          width: 230px;
+          height: 55px;
           border-radius: 9999px;
-          opacity: 0.92;
-          filter: blur(0.15px);
+          opacity: 0.82;
+          filter: blur(0.2px);
 
-          background:
-            radial-gradient(
-              ellipse at 50% 85%,
-              rgba(255, 255, 255, 0.96) 0%,
-              rgba(255, 255, 255, 0.82) 42%,
-              rgba(255, 255, 255, 0) 75%
-            );
-
-          animation: cloudDrift 55s linear infinite;
-
-          box-shadow:
-            0 18px 35px rgba(90, 130, 145, 0.10),
-            0 4px 12px rgba(255, 255, 255, 0.35);
-        }
-
-        .cloud::before,
-        .cloud::after {
-          content: "";
-          position: absolute;
-          border-radius: 9999px;
-          pointer-events: none;
-        }
-
-        .cloud::before {
-          width: 150px;
-          height: 105px;
-          left: 48px;
-          bottom: 12px;
-
-          background:
-            radial-gradient(
-              ellipse at 45% 40%,
-              rgba(255, 255, 255, 1) 0%,
-              rgba(249, 253, 254, 0.96) 42%,
-              rgba(228, 242, 246, 0.78) 72%,
-              rgba(210, 230, 235, 0) 100%
-            );
-
-          filter: blur(0.4px);
-        }
-
-        .cloud::after {
-          width: 115px;
-          height: 78px;
-          right: 28px;
-          bottom: 18px;
-
-          background:
-            radial-gradient(
-              ellipse at 50% 35%,
-              rgba(255, 255, 255, 0.98) 0%,
-              rgba(245, 251, 253, 0.92) 48%,
-              rgba(215, 233, 238, 0) 100%
-            );
-
-          filter: blur(0.5px);
+          animation:
+            cloudDrift 42s linear infinite;
         }
 
         .cloud span {
           position: absolute;
+          bottom: 0;
           display: block;
           border-radius: 9999px;
-          bottom: 0;
 
           background:
-            radial-gradient(
-              ellipse at 50% 25%,
-              rgba(255, 255, 255, 0.98) 0%,
-              rgba(247, 252, 253, 0.94) 45%,
-              rgba(221, 238, 242, 0.72) 72%,
-              rgba(200, 224, 231, 0.05) 100%
+            linear-gradient(
+              180deg,
+              rgba(255, 255, 255, 0.98),
+              rgba(238, 249, 250, 0.86)
             );
 
           box-shadow:
-            inset 0 8px 18px rgba(255, 255, 255, 0.45),
-            0 10px 24px rgba(83, 139, 156, 0.08);
-
-          filter: blur(0.35px);
+            0 10px 22px rgba(83, 139, 156, 0.12);
         }
 
         .cloud span:nth-child(1) {
-          left: 0;
-          width: 92px;
-          height: 58px;
+          left: 8px;
+          width: 85px;
+          height: 48px;
         }
 
         .cloud span:nth-child(2) {
-          left: 48px;
-          width: 105px;
-          height: 82px;
+          left: 55px;
+          width: 90px;
+          height: 70px;
         }
 
         .cloud span:nth-child(3) {
-          left: 118px;
-          width: 92px;
-          height: 65px;
+          left: 112px;
+          width: 76px;
+          height: 52px;
         }
 
         .cloud span:nth-child(4) {
-          left: 188px;
-          width: 70px;
-          height: 50px;
+          left: 166px;
+          width: 55px;
+          height: 39px;
         }
 
         .cloud-1 {
-          top: 15%;
-          left: -320px;
-          transform: scale(1);
-          animation-duration: 58s;
+          top: 18%;
+          left: -260px;
+          animation-duration: 46s;
         }
 
         .cloud-2 {
-          top: 31%;
-          left: -380px;
+          top: 34%;
+          left: -330px;
           transform: scale(0.72);
-          animation-duration: 72s;
-          animation-delay: -24s;
-          opacity: 0.68;
+          animation-duration: 58s;
+          animation-delay: -19s;
+          opacity: 0.58;
         }
 
         .cloud-3 {
-          top: 53%;
-          left: -330px;
-          transform: scale(1.15);
-          animation-duration: 66s;
-          animation-delay: -41s;
-          opacity: 0.76;
+          top: 55%;
+          left: -280px;
+          transform: scale(1.08);
+          animation-duration: 52s;
+          animation-delay: -35s;
+          opacity: 0.68;
         }
 
         .cloud-4 {
-          top: 69%;
-          left: -300px;
-          transform: scale(0.62);
-          animation-duration: 78s;
-          animation-delay: -13s;
-          opacity: 0.54;
+          top: 70%;
+          left: -250px;
+          transform: scale(0.6);
+          animation-duration: 64s;
+          animation-delay: -8s;
+          opacity: 0.5;
         }
 
         @keyframes cloudDrift {
-          0% {
+          from {
             margin-left: 0;
-            transform: translate3d(0, 0, 0);
           }
 
-          25% {
-            transform: translate3d(0, -5px, 0);
+          to {
+            margin-left: calc(100vw + 520px);
+          }
+        }
+
+        @keyframes sunset {
+          0%,
+          12% {
+            transform: translateY(0) scale(1);
+            opacity: 1;
           }
 
-          50% {
-            transform: translate3d(0, 3px, 0);
+          48% {
+            transform: translateY(36vh) scale(0.88);
+            opacity: 0.95;
           }
 
-          75% {
-            transform: translate3d(0, -4px, 0);
+          62% {
+            transform: translateY(52vh) scale(0.72);
+            opacity: 0.55;
           }
 
+          70%,
           100% {
-            margin-left: calc(100vw + 650px);
-            transform: translate3d(0, 0, 0);
+            transform: translateY(-10vh) scale(1);
+            opacity: 0;
           }
         }
 
@@ -523,6 +513,7 @@ export default function LoginPage() {
           }
         }
       `}</style>
+
     </main>
   );
 }

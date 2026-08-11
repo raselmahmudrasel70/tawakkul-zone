@@ -384,18 +384,7 @@ export default function SignupPage() {
       </div>
 
       <style jsx>{`
-  input:-webkit-autofill,
-  input:-webkit-autofill:hover,
-  input:-webkit-autofill:focus,
-  input:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
-    box-shadow: 0 0 0 1000px transparent inset !important;
-    -webkit-text-fill-color: #000 !important;
-    background-color: transparent !important;
-    transition: background-color 9999s ease-in-out 0s;
-  }
-
-  .sky-background {
+        .sky-background {
           background:
             linear-gradient(
               180deg,
@@ -496,177 +485,148 @@ export default function SignupPage() {
           animation-delay: 2.2s;
         }
 
-        /* =========================
-           REALISTIC FLOATING CLOUDS
-           ========================= */
-
+        /* Clouds */
         .cloud {
           position: absolute;
-          width: 280px;
-          height: 85px;
+          width: 230px;
+          height: 55px;
           border-radius: 9999px;
-          opacity: 0.92;
-          filter: blur(0.15px);
+          opacity: 0.82;
+          filter: blur(0.2px);
 
-          background:
-            radial-gradient(
-              ellipse at 50% 85%,
-              rgba(255, 255, 255, 0.96) 0%,
-              rgba(255, 255, 255, 0.82) 42%,
-              rgba(255, 255, 255, 0) 75%
-            );
-
-          animation: cloudDrift 55s linear infinite;
-
-          box-shadow:
-            0 18px 35px rgba(90, 130, 145, 0.10),
-            0 4px 12px rgba(255, 255, 255, 0.35);
-        }
-
-        .cloud::before,
-        .cloud::after {
-          content: "";
-          position: absolute;
-          border-radius: 9999px;
-          pointer-events: none;
-        }
-
-        .cloud::before {
-          width: 150px;
-          height: 105px;
-          left: 48px;
-          bottom: 12px;
-
-          background:
-            radial-gradient(
-              ellipse at 45% 40%,
-              rgba(255, 255, 255, 1) 0%,
-              rgba(249, 253, 254, 0.96) 42%,
-              rgba(228, 242, 246, 0.78) 72%,
-              rgba(210, 230, 235, 0) 100%
-            );
-
-          filter: blur(0.4px);
-        }
-
-        .cloud::after {
-          width: 115px;
-          height: 78px;
-          right: 28px;
-          bottom: 18px;
-
-          background:
-            radial-gradient(
-              ellipse at 50% 35%,
-              rgba(255, 255, 255, 0.98) 0%,
-              rgba(245, 251, 253, 0.92) 48%,
-              rgba(215, 233, 238, 0) 100%
-            );
-
-          filter: blur(0.5px);
+          animation:
+            cloudDrift 42s linear infinite;
         }
 
         .cloud span {
           position: absolute;
+          bottom: 0;
           display: block;
           border-radius: 9999px;
-          bottom: 0;
 
           background:
-            radial-gradient(
-              ellipse at 50% 25%,
-              rgba(255, 255, 255, 0.98) 0%,
-              rgba(247, 252, 253, 0.94) 45%,
-              rgba(221, 238, 242, 0.72) 72%,
-              rgba(200, 224, 231, 0.05) 100%
+            linear-gradient(
+              180deg,
+              rgba(255, 255, 255, 0.98),
+              rgba(238, 249, 250, 0.86)
             );
 
           box-shadow:
-            inset 0 8px 18px rgba(255, 255, 255, 0.45),
-            0 10px 24px rgba(83, 139, 156, 0.08);
-
-          filter: blur(0.35px);
+            0 10px 22px rgba(83, 139, 156, 0.12);
         }
 
         .cloud span:nth-child(1) {
-          left: 0;
-          width: 92px;
-          height: 58px;
+          left: 8px;
+          width: 85px;
+          height: 48px;
         }
 
         .cloud span:nth-child(2) {
-          left: 48px;
-          width: 105px;
-          height: 82px;
+          left: 55px;
+          width: 90px;
+          height: 70px;
         }
 
         .cloud span:nth-child(3) {
-          left: 118px;
-          width: 92px;
-          height: 65px;
+          left: 112px;
+          width: 76px;
+          height: 52px;
         }
 
         .cloud span:nth-child(4) {
-          left: 188px;
-          width: 70px;
-          height: 50px;
+          left: 166px;
+          width: 55px;
+          height: 39px;
         }
 
         .cloud-1 {
-          top: 15%;
-          left: -320px;
-          transform: scale(1);
-          animation-duration: 58s;
+          top: 18%;
+          left: -260px;
+          animation-duration: 46s;
         }
 
         .cloud-2 {
-          top: 31%;
-          left: -380px;
+          top: 34%;
+          left: -330px;
           transform: scale(0.72);
-          animation-duration: 72s;
-          animation-delay: -24s;
-          opacity: 0.68;
+          animation-duration: 58s;
+          animation-delay: -19s;
+          opacity: 0.58;
         }
 
         .cloud-3 {
-          top: 53%;
-          left: -330px;
-          transform: scale(1.15);
-          animation-duration: 66s;
-          animation-delay: -41s;
-          opacity: 0.76;
+          top: 55%;
+          left: -280px;
+          transform: scale(1.08);
+          animation-duration: 52s;
+          animation-delay: -35s;
+          opacity: 0.68;
         }
 
         .cloud-4 {
-          top: 69%;
-          left: -300px;
-          transform: scale(0.62);
-          animation-duration: 78s;
-          animation-delay: -13s;
-          opacity: 0.54;
+          top: 70%;
+          left: -250px;
+          transform: scale(0.6);
+          animation-duration: 64s;
+          animation-delay: -8s;
+          opacity: 0.5;
         }
 
         @keyframes cloudDrift {
-          0% {
+          from {
             margin-left: 0;
-            transform: translate3d(0, 0, 0);
           }
 
-          25% {
-            transform: translate3d(0, -5px, 0);
+          to {
+            margin-left: calc(100vw + 520px);
+          }
+        }
+
+        @keyframes sunset {
+          0%,
+          12% {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+          }
+
+          48% {
+            transform: translateY(36vh) scale(0.88);
+            opacity: 0.95;
+          }
+
+          62% {
+            transform: translateY(52vh) scale(0.72);
+            opacity: 0.55;
+          }
+
+          70%,
+          100% {
+            transform: translateY(-10vh) scale(1);
+            opacity: 0;
+          }
+        }
+
+        @keyframes glowPulse {
+          0%,
+          100% {
+            opacity: 0.72;
+            transform: scale(0.95);
           }
 
           50% {
-            transform: translate3d(0, 3px, 0);
+            opacity: 1;
+            transform: scale(1.08);
           }
+        }
 
-          75% {
-            transform: translate3d(0, -4px, 0);
-          }
-
+        @keyframes rayPulse {
+          0%,
           100% {
-            margin-left: calc(100vw + 650px);
-            transform: translate3d(0, 0, 0);
+            opacity: 0.28;
+          }
+
+          50% {
+            opacity: 0.82;
           }
         }
 
