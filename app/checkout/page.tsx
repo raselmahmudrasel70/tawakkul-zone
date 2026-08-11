@@ -1,18 +1,19 @@
 ﻿﻿"use client";
 
 import Image from "next/image";
-import { useCart } from "@/context/CartContext";
 import {
+  Suspense,
   useMemo,
   useState,
   useSyncExternalStore,
 } from "react";
-import { supabase } from "@/lib/supabase";
-import Swal from "sweetalert2";
 import {
   useRouter,
   useSearchParams,
 } from "next/navigation";
+import { useCart } from "@/context/CartContext";
+import { supabase } from "@/lib/supabase";
+import Swal from "sweetalert2";
 
 type CheckoutItem = {
   id: number;
@@ -22,9 +23,10 @@ type CheckoutItem = {
   images: string;
   quantity: number;
   stock?: number;
+  category?: string;
 };
 
-export default function CheckoutPage() {
+function CheckoutContent() {
   const router = useRouter();
 
   const {
@@ -33,26 +35,14 @@ export default function CheckoutPage() {
     hydrated,
   } = useCart();
 
-  /* =========================================
-     URL
-  ========================================= */
-
   const searchParams = useSearchParams();
 
   const isBuyNow =
     searchParams.get("buyNow") === "true";
 
-  /* =========================================
+  /* =====================================
      BUY NOW PRODUCT
-     
-     sessionStorage থেকে product নেওয়া হচ্ছে।
-     
-     Buy Now হলে:
-     শুধু সেই product
-
-     Cart হলে:
-     cart-এর সব product
-  ========================================= */
+  ===================================== */
 
   const buyNowStorage =
     useSyncExternalStore(
@@ -90,20 +80,18 @@ export default function CheckoutPage() {
       buyNowStorage,
     ]);
 
-  /* =========================================
+  /* =====================================
      BUY NOW QUANTITY
-     
-     Minimum = 1
-  ========================================= */
+  ===================================== */
 
   const [
     buyNowQuantity,
     setBuyNowQuantity,
   ] = useState(1);
 
-  /* =========================================
-     CUSTOMER INFO
-  ========================================= */
+  /* =====================================
+     CUSTOMER
+  ===================================== */
 
   const [name, setName] =
     useState("");
@@ -114,9 +102,9 @@ export default function CheckoutPage() {
   const [address, setAddress] =
     useState("");
 
-  /* =========================================
+  /* =====================================
      PAYMENT
-  ========================================= */
+  ===================================== */
 
   const [
     paymentMethod,
@@ -130,15 +118,9 @@ export default function CheckoutPage() {
     setTransactionId,
   ] = useState("");
 
-  /* =========================================
+  /* =====================================
      CHECKOUT ITEMS
-     
-     Buy Now:
-     শুধু buyNowItem
-
-     Cart:
-     পুরো cart
-  ========================================= */
+  ===================================== */
 
   const checkoutItems: CheckoutItem[] =
     useMemo(() => {
@@ -163,9 +145,9 @@ export default function CheckoutPage() {
       cart,
     ]);
 
-  /* =========================================
+  /* =====================================
      PRICE
-  ========================================= */
+  ===================================== */
 
   const getItemPrice = (
     item: CheckoutItem
@@ -176,19 +158,16 @@ export default function CheckoutPage() {
     );
   };
 
-  /* =========================================
-     SUBTOTAL
-  ========================================= */
+  /* =====================================
+     TOTAL
+  ===================================== */
 
   const subtotal =
     checkoutItems.reduce(
-      (sum, item) => {
-        return (
-          sum +
-          getItemPrice(item) *
-            item.quantity
-        );
-      },
+      (sum, item) =>
+        sum +
+        getItemPrice(item) *
+          item.quantity,
       0
     );
 
@@ -197,12 +176,9 @@ export default function CheckoutPage() {
   const total =
     subtotal + deliveryFee;
 
-  /* =========================================
+  /* =====================================
      BUY NOW +
-     
-     কোনো stock restriction নেই।
-     যত খুশি quantity বাড়ানো যাবে।
-  ========================================= */
+  ===================================== */
 
   const increaseBuyNowQuantity =
     () => {
@@ -215,23 +191,26 @@ export default function CheckoutPage() {
       );
     };
 
-  /* =========================================
+  /* =====================================
      BUY NOW -
      
      Minimum = 1
-  ========================================= */
+  ===================================== */
 
   const decreaseBuyNowQuantity =
     () => {
       setBuyNowQuantity(
         (prev) =>
-          Math.max(1, prev - 1)
+          Math.max(
+            1,
+            prev - 1
+          )
       );
     };
 
-  /* =========================================
+  /* =====================================
      PLACE ORDER
-  ========================================= */
+  ===================================== */
 
   async function placeOrder() {
     if (
@@ -245,7 +224,6 @@ export default function CheckoutPage() {
       return;
     }
 
-    /* Customer Info */
     if (
       !name ||
       !phone ||
@@ -253,13 +231,13 @@ export default function CheckoutPage() {
     ) {
       Swal.fire({
         icon: "warning",
-        title: "সব তথ্য পূরণ করুন",
+        title:
+          "সব তথ্য পূরণ করুন",
       });
 
       return;
     }
 
-    /* Bangladesh Phone */
     const bdPhoneRegex =
       /^01[3-9]\d{8}$/;
 
@@ -275,7 +253,6 @@ export default function CheckoutPage() {
       return;
     }
 
-    /* bKash / Nagad */
     if (
       (
         paymentMethod ===
@@ -287,7 +264,8 @@ export default function CheckoutPage() {
     ) {
       Swal.fire({
         icon: "warning",
-        title: "Payment তথ্য দিন",
+        title:
+          "Payment তথ্য দিন",
         text:
           "Transaction ID অথবা Sender Mobile Number লিখুন।",
       });
@@ -295,7 +273,6 @@ export default function CheckoutPage() {
       return;
     }
 
-    /* Current User */
     const {
       data: { user },
     } =
@@ -304,21 +281,12 @@ export default function CheckoutPage() {
     if (!user) {
       Swal.fire({
         icon: "error",
-        title: "Please login first",
+        title:
+          "Please login first",
       });
 
       return;
     }
-
-    /* =====================================
-       ORDER PRODUCTS
-
-       Buy Now:
-       শুধু একটি product
-
-       Cart:
-       সব cart product
-    ===================================== */
 
     const orderProducts =
       checkoutItems.map(
@@ -331,12 +299,10 @@ export default function CheckoutPage() {
             item.price,
           images: item.images,
           quantity: item.quantity,
+          category:
+            item.category,
         })
       );
-
-    /* =====================================
-       INSERT ORDER
-    ===================================== */
 
     const insertResult =
       await supabase
@@ -362,7 +328,8 @@ export default function CheckoutPage() {
     if (insertResult.error) {
       Swal.fire({
         icon: "error",
-        title: "Order Failed",
+        title:
+          "Order Failed",
         text:
           insertResult.error
             .message,
@@ -371,25 +338,15 @@ export default function CheckoutPage() {
       return;
     }
 
-    /* Success */
     await Swal.fire({
       icon: "success",
-      title: "Order Placed 🎉",
+      title:
+        "Order Placed 🎉",
       text:
         "Your order has been placed successfully. We will call you for the order confirmation.",
       confirmButtonColor:
         "#15803d",
     });
-
-    /* =====================================
-       IMPORTANT
-
-       Buy Now:
-       Cart clear হবে না
-
-       Cart Checkout:
-       Cart clear হবে
-    ===================================== */
 
     if (isBuyNow) {
       sessionStorage.removeItem(
@@ -399,7 +356,6 @@ export default function CheckoutPage() {
       clearCart();
     }
 
-    /* Reset */
     setName("");
     setPhone("");
     setAddress("");
@@ -411,9 +367,9 @@ export default function CheckoutPage() {
     router.push("/dashboard");
   }
 
-  /* =========================================
+  /* =====================================
      HYDRATION
-  ========================================= */
+  ===================================== */
 
   if (!hydrated) {
     return (
@@ -427,11 +383,9 @@ export default function CheckoutPage() {
     );
   }
 
-  /* =========================================
-     CART EMPTY
-     
-     Buy Now না হলে শুধু এই check হবে
-  ========================================= */
+  /* =====================================
+     EMPTY CART
+  ===================================== */
 
   if (
     !isBuyNow &&
@@ -460,9 +414,9 @@ export default function CheckoutPage() {
     );
   }
 
-  /* =========================================
-     BUY NOW PRODUCT LOAD CHECK
-  ========================================= */
+  /* =====================================
+     BUY NOW LOADING
+  ===================================== */
 
   if (
     isBuyNow &&
@@ -471,11 +425,9 @@ export default function CheckoutPage() {
     return (
       <main className="mx-auto max-w-5xl px-6 py-10">
         <div className="rounded-2xl bg-slate-100 p-10 text-center">
-
           <p className="text-lg font-semibold text-slate-700">
             Loading product...
           </p>
-
         </div>
       </main>
     );
@@ -487,19 +439,13 @@ export default function CheckoutPage() {
       className="mx-auto max-w-5xl bg-slate-50 px-6 py-10"
     >
 
-      {/* =====================================
-          PAGE TITLE
-      ===================================== */}
-
       <h1 className="mb-8 text-4xl font-bold text-slate-900">
         Checkout
       </h1>
 
       <div className="space-y-6 rounded-2xl bg-cyan-100 p-8 shadow-xl shadow-slate-200/40">
 
-        {/* =====================================
-            PRODUCTS
-        ===================================== */}
+        {/* PRODUCTS */}
 
         <div className="rounded-3xl border border-slate-200 bg-white p-5">
 
@@ -529,6 +475,7 @@ export default function CheckoutPage() {
                   >
 
                     {/* IMAGE */}
+
                     <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl">
 
                       <Image
@@ -544,7 +491,8 @@ export default function CheckoutPage() {
 
                     </div>
 
-                    {/* PRODUCT INFO */}
+                    {/* INFO */}
+
                     <div className="flex-1">
 
                       <h3 className="font-bold text-slate-900">
@@ -571,13 +519,10 @@ export default function CheckoutPage() {
 
                     </div>
 
-                    {/* =================================
-                        QUANTITY
-                    ================================= */}
+                    {/* QUANTITY */}
 
                     <div className="flex items-center gap-3">
 
-                      {/* MINUS */}
                       <button
                         type="button"
                         onClick={
@@ -594,14 +539,12 @@ export default function CheckoutPage() {
                         −
                       </button>
 
-                      {/* NUMBER */}
                       <span className="min-w-8 text-center text-lg font-bold text-slate-900">
                         {isBuyNow
                           ? buyNowQuantity
                           : item.quantity}
                       </span>
 
-                      {/* PLUS */}
                       <button
                         type="button"
                         onClick={
@@ -620,6 +563,7 @@ export default function CheckoutPage() {
                     </div>
 
                     {/* ITEM TOTAL */}
+
                     <div className="min-w-24 text-right">
 
                       <p className="text-sm text-slate-500">
@@ -641,15 +585,12 @@ export default function CheckoutPage() {
 
           </div>
 
-          {/* BUY NOW NOTICE */}
           {isBuyNow && (
             <p className="mt-4 text-sm font-medium text-blue-700">
-              ℹ️ আপনি Buy It Now করেছেন।
-              শুধু এই product-টিই checkout হবে।
+              ℹ️ আপনি Buy It Now করেছেন। শুধু এই product-টিই checkout হবে।
             </p>
           )}
 
-          {/* CART NOTICE */}
           {!isBuyNow && (
             <p className="mt-4 text-sm font-medium text-green-700">
               🛒 Cart-এর সব product এই order-এর সাথে যাবে।
@@ -658,25 +599,19 @@ export default function CheckoutPage() {
 
         </div>
 
-        {/* =====================================
-            CUSTOMER INFORMATION
-        ===================================== */}
+        {/* CUSTOMER INFO */}
 
         <div className="space-y-4">
 
-          {/* NAME */}
           <input
             className="w-full rounded-2xl border border-slate-200 bg-white p-4 text-slate-900 shadow-sm focus:border-emerald-600 focus:outline-none"
             placeholder="Full Name"
             value={name}
             onChange={(e) =>
-              setName(
-                e.target.value
-              )
+              setName(e.target.value)
             }
           />
 
-          {/* PHONE */}
           <input
             type="tel"
             inputMode="numeric"
@@ -704,7 +639,6 @@ export default function CheckoutPage() {
             }}
           />
 
-          {/* ADDRESS */}
           <textarea
             rows={4}
             className="w-full rounded-2xl border border-slate-200 bg-white p-4 text-slate-900 shadow-sm focus:border-emerald-600 focus:outline-none"
@@ -719,19 +653,13 @@ export default function CheckoutPage() {
 
         </div>
 
-        {/* =====================================
-            PAYMENT
-        ===================================== */}
+        {/* PAYMENT */}
 
         <div className="rounded-3xl border border-slate-200 bg-white p-5">
 
           <h3 className="mb-4 text-lg font-bold text-slate-900">
             Payment Method
           </h3>
-
-          {/* =================================
-              BKASH DETAILS
-          ================================= */}
 
           {paymentMethod ===
             "bKash" && (
@@ -789,10 +717,6 @@ export default function CheckoutPage() {
             </div>
           )}
 
-          {/* =================================
-              NAGAD DETAILS
-          ================================= */}
-
           {paymentMethod ===
             "Nagad" && (
             <div className="mb-6 rounded-2xl border border-orange-300 bg-orange-50 p-5">
@@ -849,13 +773,8 @@ export default function CheckoutPage() {
             </div>
           )}
 
-          {/* =================================
-              PAYMENT BUTTONS
-          ================================= */}
-
           <div className="grid gap-4 sm:grid-cols-3">
 
-            {/* COD */}
             <button
               type="button"
               onClick={() =>
@@ -870,7 +789,6 @@ export default function CheckoutPage() {
                   : "border-slate-200 bg-white hover:border-emerald-400"
               }`}
             >
-
               <div className="text-4xl">
                 📦
               </div>
@@ -882,10 +800,8 @@ export default function CheckoutPage() {
               <p className="text-sm text-slate-500">
                 Pay after delivery
               </p>
-
             </button>
 
-            {/* BKASH */}
             <button
               type="button"
               onClick={() =>
@@ -900,7 +816,6 @@ export default function CheckoutPage() {
                   : "border-slate-200 bg-white hover:border-pink-400"
               }`}
             >
-
               <Image
                 src="/bkash.png"
                 alt="bKash"
@@ -916,10 +831,8 @@ export default function CheckoutPage() {
               <p className="text-sm text-slate-500">
                 Send Money
               </p>
-
             </button>
 
-            {/* NAGAD */}
             <button
               type="button"
               onClick={() =>
@@ -934,7 +847,6 @@ export default function CheckoutPage() {
                   : "border-slate-200 bg-white hover:border-orange-400"
               }`}
             >
-
               <Image
                 src="/nagad.png"
                 alt="Nagad"
@@ -950,22 +862,17 @@ export default function CheckoutPage() {
               <p className="text-sm text-slate-500">
                 Cash In
               </p>
-
             </button>
 
           </div>
 
         </div>
 
-        {/* =====================================
-            SUMMARY
-        ===================================== */}
+        {/* SUMMARY */}
 
         <div className="rounded-3xl border border-slate-200 bg-white p-5">
 
-          {/* ITEMS */}
           <div className="flex justify-between text-black">
-
             <span>
               Items
             </span>
@@ -978,12 +885,9 @@ export default function CheckoutPage() {
                 0
               )}
             </span>
-
           </div>
 
-          {/* SUBTOTAL */}
           <div className="mt-2 flex justify-between text-black">
-
             <span>
               Subtotal
             </span>
@@ -991,12 +895,9 @@ export default function CheckoutPage() {
             <span>
               ৳{subtotal}
             </span>
-
           </div>
 
-          {/* DELIVERY */}
           <div className="flex justify-between text-black">
-
             <span>
               Delivery Fee
             </span>
@@ -1004,14 +905,11 @@ export default function CheckoutPage() {
             <span>
               ৳{deliveryFee}
             </span>
-
           </div>
 
           <hr className="my-4" />
 
-          {/* TOTAL */}
           <div className="flex justify-between text-lg font-bold text-yellow-700">
-
             <span>
               Total
             </span>
@@ -1019,14 +917,11 @@ export default function CheckoutPage() {
             <span>
               ৳{total}
             </span>
-
           </div>
 
         </div>
 
-        {/* =====================================
-            PLACE ORDER
-        ===================================== */}
+        {/* PLACE ORDER */}
 
         <button
           type="button"
@@ -1038,5 +933,28 @@ export default function CheckoutPage() {
 
       </div>
     </main>
+  );
+}
+
+/* =========================================
+   PAGE
+   Suspense fixes the Next.js 16 build error
+========================================= */
+
+export default function CheckoutPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="mx-auto max-w-5xl px-6 py-10">
+          <div className="rounded-2xl bg-slate-100 p-10 text-center">
+            <p className="text-lg font-semibold text-slate-700">
+              Loading checkout...
+            </p>
+          </div>
+        </main>
+      }
+    >
+      <CheckoutContent />
+    </Suspense>
   );
 }
