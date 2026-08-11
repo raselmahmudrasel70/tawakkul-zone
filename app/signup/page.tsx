@@ -189,15 +189,15 @@ export default function SignupPage() {
       </div>
 
       {/* Signup Card */}
-      <div className="relative z-10 w-full max-w-md bg-white/90 backdrop-blur-xl rounded-2xl border border-white/70 shadow-2xl px-8 py-10">
+      <div className="relative z-10 w-full max-w-md bg-transparent backdrop-blur-xl rounded-2xl border border-white/70 shadow-2xl px-8 py-10">
         {/* Brand */}
         <div className="mb-7 text-center">
           <h1 className="text-3xl font-bold leading-none">
-            <span className="text-cyan-300">Tawakkul</span>{" "}
-            <span className="text-amber-300">Zone</span>
+            <span className="text-cyan-700">Tawakkul</span>{" "}
+            <span className="text-amber-500">Zone</span>
           </h1>
 
-          <p className="text-center text-gray-500 mt-3">
+          <p className="text-center text-blue-500 mt-3">
             Create Your Account
           </p>
         </div>
@@ -205,7 +205,7 @@ export default function SignupPage() {
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Full Name */}
           <div>
-            <label className="text-sm text-gray-600">
+            <label className="text-sm text-gray-900">
               * Name
             </label>
 
@@ -223,81 +223,81 @@ export default function SignupPage() {
           </div>
 
           {/* Email */}
-          <div>
-            <label className="text-sm text-gray-600">
-              * Email Address
-            </label>
+<div>
+  <label className="text-sm text-gray-900">
+    * Email Address
+  </label>
 
-            <div className="flex items-center border-b-2 border-cyan-300">
-              <Mail className="h-5 w-5 text-cyan-600" />
+  <div className="flex items-center border-b-2 border-cyan-300">
+    <Mail className="h-5 w-5 text-cyan-600" />
 
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-                className="w-full px-3 py-3 outline-none bg-transparent text-black"
-              />
-            </div>
-          </div>
+    <input
+  type="email"
+  autoComplete="off"
+  value={email}
+  onChange={(e) => setEmail(e.target.value)}
+  placeholder="Enter your email"
+  className="w-full bg-transparent px-3 py-3 text-black outline-none"
+/>
+  </div>
+</div>
 
           {/* Phone */}
-          <div>
-            <label className="text-sm text-gray-600">
-              * Phone
-            </label>
+<div>
+  <label className="text-sm text-gray-900">
+    * Phone
+  </label>
 
-            <div className="border-b-2 border-cyan-300">
-              <input
-                type="tel"
-                inputMode="numeric"
-                maxLength={11}
-                className="w-full rounded-2xl border border-slate-200 bg-white p-4 text-slate-900 shadow-sm focus:border-emerald-600 focus:outline-none"
-                placeholder="01XXXXXXXXX"
-                value={phone}
-                onChange={(e) => {
-                  const value = e.target.value.replace(/\D/g, "");
+  <div className="flex items-center border-b-2 border-cyan-300">
+    <input
+      type="tel"
+      inputMode="numeric"
+      maxLength={11}
+      className="w-full bg-transparent px-3 py-3 text-black outline-none"
+      placeholder="01XXXXXXXXX"
+      value={phone}
+      onChange={(e) => {
+        const value = e.target.value.replace(/\D/g, "");
 
-                  if (value.length <= 11) {
-                    setPhone(value);
-                  }
-                }}
-              />
-            </div>
-          </div>
+        if (value.length <= 11) {
+          setPhone(value);
+        }
+      }}
+    />
+  </div>
+</div>
 
           {/* Password */}
-          <div>
-            <label className="text-sm text-gray-600">
-              * Password
-            </label>
+<div>
+  <label className="text-sm text-gray-900">
+    * Password
+  </label>
 
-            <div className="flex items-center border-b-2 border-cyan-300">
-              <Lock className="h-5 w-5 text-cyan-600" />
+  <div className="flex items-center border-b-2 border-cyan-300">
+    <Lock className="h-5 w-5 text-cyan-600" />
 
-              <input
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter password"
-                className="w-full px-3 py-3 outline-none bg-transparent text-black"
-              />
+    <input
+  type={showPassword ? "text" : "password"}
+  autoComplete="new-password"
+  value={password}
+  onChange={(e) => setPassword(e.target.value)}
+  placeholder="Enter password"
+  className="w-full bg-transparent px-3 py-3 text-black outline-none"
+/>
 
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                aria-label={
-                  showPassword ? "Hide password" : "Show password"
-                }
-              >
-                {showPassword ? (
-                  <EyeOff className="h-5 w-5 text-blue-600" />
-                ) : (
-                  <Eye className="h-5 w-5 text-blue-600" />
-                )}
-              </button>
-            </div>
-          </div>
+    <button
+      type="button"
+      onClick={() => setShowPassword(!showPassword)}
+      aria-label={showPassword ? "Hide password" : "Show password"}
+    >
+      {showPassword ? (
+        <EyeOff className="h-5 w-5 text-blue-600" />
+      ) : (
+        <Eye className="h-5 w-5 text-blue-600" />
+      )}
+    </button>
+  </div>
+</div>
 
           {/* Confirm Password */}
           <div>
@@ -307,13 +307,13 @@ export default function SignupPage() {
 
             <div className="flex items-center border-b-2 border-cyan-300">
               <input
-                type={showConfirmPassword ? "text" : "password"}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm password"
-                className="w-full py-3 outline-none bg-transparent text-black"
-              />
-
+  type={showConfirmPassword ? "text" : "password"}
+  autoComplete="new-password"
+  value={confirmPassword}
+  onChange={(e) => setConfirmPassword(e.target.value)}
+  placeholder="Confirm password"
+  className="w-full bg-transparent py-3 text-black outline-none"
+/>
               <button
                 type="button"
                 onClick={() =>
@@ -384,7 +384,18 @@ export default function SignupPage() {
       </div>
 
       <style jsx>{`
-        .sky-background {
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+    box-shadow: 0 0 0 1000px transparent inset !important;
+    -webkit-text-fill-color: #000 !important;
+    background-color: transparent !important;
+    transition: background-color 9999s ease-in-out 0s;
+  }
+
+  .sky-background {
           background:
             linear-gradient(
               180deg,
