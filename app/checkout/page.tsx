@@ -512,11 +512,7 @@ function CheckoutContent() {
                         )}
 
                       </div>
-
-                      <p className="mt-1 text-sm text-slate-500">
-                        Price × Quantity
-                      </p>
-
+                      
                     </div>
 
                     {/* QUANTITY */}
