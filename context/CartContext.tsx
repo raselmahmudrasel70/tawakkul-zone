@@ -8,10 +8,11 @@ import {
   ReactNode,
 } from "react";
 
-export type CartItem = {
+type CartItem = {
   id: number;
   name: string;
   price: number;
+  discountedPrice?: number;
   images: string;
   quantity: number;
 };
