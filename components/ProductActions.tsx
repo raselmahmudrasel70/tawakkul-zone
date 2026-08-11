@@ -11,6 +11,7 @@ interface Product {
   price: number;
   discount: number;
   images: string;
+  stock?: number;
 }
 
 export default function ProductActions({
@@ -51,17 +52,23 @@ export default function ProductActions({
   return (
     <div className="mx-auto mt-8 w-[calc(100%-40px)] max-w-[680px]">
 
-      {/* Add to Cart + Wishlist */}
+      {/* ADD TO CART + WISHLIST */}
       <div className="grid w-full grid-cols-[1fr_56px] items-center gap-4">
 
-        {/* Cart */}
+        {/* ADD TO CART */}
         <button
           type="button"
           onClick={() => {
             if (isInCart) {
               removeFromCart(product.id);
             } else {
-              addToCart(product);
+              addToCart({
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                discountedPrice,
+                images: product.images,
+              });
             }
           }}
           className={`h-11 w-full border px-4 text-base font-bold transition ${
@@ -75,7 +82,7 @@ export default function ProductActions({
             : "ADD TO CART"}
         </button>
 
-        {/* Wishlist */}
+        {/* WISHLIST */}
         <button
           type="button"
           onClick={() => {
@@ -106,20 +113,40 @@ export default function ProductActions({
             strokeWidth={1.5}
           />
         </button>
-
       </div>
 
-      {/* Buy Now */}
+      {/* BUY IT NOW */}
       <button
         type="button"
+        disabled={!product.stock}
         onClick={() => {
-          router.push(
-            `/checkout?productId=${product.id}`
+          const buyNowProduct = {
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            discountedPrice,
+            images: product.images,
+            quantity: 1,
+            stock: product.stock ?? 0,
+          };
+
+          /*
+           * IMPORTANT:
+           * শুধু এই product-টাই Buy Now-এর জন্য save হবে।
+           * Cart-এর কোনো product এখানে নেওয়া হচ্ছে না।
+           */
+          sessionStorage.setItem(
+            "buyNowProduct",
+            JSON.stringify(buyNowProduct)
           );
+
+          router.push("/checkout?buyNow=true");
         }}
-        className="mt-4 h-11 w-full border border-gray-300 bg-white px-4 text-base font-medium text-black transition hover:bg-black hover:text-white"
+        className="mt-4 h-11 w-full border border-gray-300 bg-white px-4 text-base font-medium text-black transition hover:bg-black hover:text-white disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
       >
-        BUY IT NOW
+        {product.stock
+          ? "BUY IT NOW"
+          : "OUT OF STOCK"}
       </button>
 
     </div>
