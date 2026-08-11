@@ -9,11 +9,11 @@ import {
 
 export default function Footer() {
   return (
-    <footer className="mt-20 bg-green-950 text-white">
-      <div className="mx-auto max-w-7xl px-4 py-8 md:px-4 md:py-6">
+    <footer className="mt-20 bg-slate-400 text-white">
+      <div className="mx-auto h-52 max-w-7xl px-3 py-8 md:px-5 md:py-4">
 
   {/* First Row */}
-  <div className="grid grid-cols-2 gap-6">
+  <div className="grid grid-cols-2 gap-7">
     {/* Brand */}
     <div>
       <h2 className="text-xl font-bold md:text-2xl">
@@ -108,7 +108,7 @@ export default function Footer() {
       </div>
     </div>
   </div>
- <div className="border-t border-cyan-800 py-2 text-center text-sm text-green-300">
+ <div className="border-t bg-slate-400 border-cyan-800 py-2 text-center text-sm text-green-300">
         © 2026 Tawakkul Zone. All Rights Reserved.
       </div>
 </div>

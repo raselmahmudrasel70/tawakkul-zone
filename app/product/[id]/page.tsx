@@ -101,11 +101,11 @@ export default async function ProductPage({
             {product.name}
           </h1>
 
-          <p className="mt-2 text-gray-400">
+          <p className="mt-2 text-black">
             Brand: {product.brand}
           </p>
 
-          <p className="text-gray-400">
+          <p className="text-black">
             Category: {product.category}
           </p>
           
@@ -139,7 +139,7 @@ export default async function ProductPage({
             )}
           </div>
 
-          <p className="mt-8 whitespace-pre-line text-gray-300">
+          <p className="mt-8 whitespace-pre-line text-black">
             {product.description}
           </p>
 
