@@ -7,111 +7,181 @@ import { useCart } from "@/context/CartContext";
 import SummaryCard from "@/components/SummaryCard";
 
 export default function WishlistPage() {
-  const { wishlist, removeFromWishlist } = useWishlist();
+  const {
+    wishlist,
+    removeFromWishlist,
+  } = useWishlist();
+
   const { addToCart } = useCart();
 
-  const wishlistTotal = wishlist.reduce(
-  (sum, item) =>
-    sum +
-    (item.discountedPrice ?? item.price),
-  0
-);
+  // =========================================
+  // WISHLIST TOTAL
+  // Discounted price থাকলে সেটাই total-এ যাবে
+  // =========================================
+  const total = wishlist.reduce((sum, item) => {
+    const currentPrice =
+      item.discountedPrice ?? item.price;
+
+    return sum + currentPrice;
+  }, 0);
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-10">
+
+      {/* =====================================
+          TITLE
+      ===================================== */}
       <h1 className="mb-8 text-4xl font-bold text-green-800">
         ❤️ My Wishlist
       </h1>
 
+      {/* =====================================
+          EMPTY WISHLIST
+      ===================================== */}
       {wishlist.length === 0 ? (
-        <div className="rounded-2xl bg-gray-300 p-10 text-center">
-          <h2 className="text-6xl">💔</h2>
+        <div className="rounded-2xl bg-gray-100 p-10 text-center shadow-sm">
 
-          <h3 className="mt-4 text-2xl font-semibold text-black">
-            Your Wishlist is Empty❗
+          <h2 className="text-6xl">
+            💔
+          </h2>
+
+          <h3 className="mt-4 text-2xl font-semibold text-gray-800">
+            Your Wishlist is Empty
           </h3>
 
-          <p className="mt-3 text-cyan-300">
+          <p className="mt-3 text-gray-600">
             আপনার পছন্দের পণ্যগুলো ❤️ চাপলে এখানে সংরক্ষিত হবে।
           </p>
 
           <Link
             href="/"
-            className="mt-6 inline-block rounded-xl bg-pink-700 px-8 py-3 font-semibold text-white hover:bg-green-800"
+            className="mt-6 inline-block rounded-xl bg-pink-700 px-8 py-3 font-semibold text-white transition hover:bg-pink-800"
           >
             🛍 Continue Shopping
           </Link>
+
         </div>
       ) : (
-        <div className="grid gap-8 lg:grid-cols-3">
-          <div className="space-y-5 lg:col-span-2">
-            {wishlist.map((item) => (
-              <ProductRow
-                key={item.id}
-                images={item.images}
-                name={item.name}
-                price={item.price}
-              >
-                <button
-                  onClick={() => addToCart(item)}
-                  className="rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white hover:bg-green-800"
-                >
-                  🛒 Add to Cart
-                </button>
 
-                <button
-                  onClick={() => removeFromWishlist(item.id)}
-                  className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
+        /* ===================================
+           WISHLIST CONTENT
+        =================================== */
+        <div className="grid items-start gap-8 lg:grid-cols-3">
+
+          {/* =================================
+              LEFT SIDE
+          ================================= */}
+          <div className="space-y-5 lg:col-span-2">
+
+            {wishlist.map((item) => {
+
+              // Discounted price থাকলে সেটা current price
+              const currentPrice =
+                item.discountedPrice ?? item.price;
+
+              // Discount আছে কিনা
+              const hasDiscount =
+                item.discountedPrice !== undefined &&
+                item.discountedPrice < item.price;
+
+              return (
+                <ProductRow
+                  key={item.id}
+                  images={item.images}
+                  name={item.name}
+                  price={currentPrice}
+                  originalPrice={
+                    hasDiscount
+                      ? item.price
+                      : undefined
+                  }
                 >
-                  Remove
-                </button>
-              </ProductRow>
-            ))}
+
+                  {/* =================================
+                      ADD TO CART
+                  ================================= */}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      addToCart({
+                        id: item.id,
+                        name: item.name,
+                        price: item.price,
+                        discountedPrice:
+                          item.discountedPrice,
+                        images: item.images,
+                        category: item.category,
+                      })
+                    }
+                    className="rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-800"
+                  >
+                    🛒 Add to Cart
+                  </button>
+
+                  {/* =================================
+                      REMOVE
+                  ================================= */}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      removeFromWishlist(item.id)
+                    }
+                    className="rounded-lg bg-red-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700"
+                  >
+                    Remove
+                  </button>
+
+                </ProductRow>
+              );
+            })}
+
           </div>
 
-          <div className="self-start">
-  <div className="self-start">
-  <SummaryCard title="Wishlist Summary">
+          {/* =================================
+              RIGHT SIDE
+              WISHLIST SUMMARY
+          ================================= */}
+          <div className="lg:col-span-1">
 
-    <div className="flex flex-col">
+            <SummaryCard title="Wishlist Summary">
 
-      {/* ITEMS */}
-      <div className="mb-5 flex justify-between">
-        <span>
-          Items
-        </span>
+              {/* ITEMS */}
+              <div className="mb-8 flex justify-between text-lg text-gray-900">
+                <span>
+                  Items
+                </span>
 
-        <span className="font-semibold">
-          {wishlist.length}
-        </span>
-      </div>
+                <span className="font-semibold">
+                  {wishlist.length}
+                </span>
+              </div>
 
-      {/* TOTAL */}
-      <div className="mb-6 flex justify-between text-xl font-bold text-gray-900">
-        <span>
-          Total
-        </span>
+              {/* TOTAL */}
+              <div className="mb-8 flex justify-between text-2xl font-bold text-gray-900">
+                <span>
+                  Total
+                </span>
 
-        <span>
-          ৳ {wishlistTotal}
-        </span>
-      </div>
+                <span>
+                  ৳ {total}
+                </span>
+              </div>
 
-      {/* CONTINUE SHOPPING */}
-      <Link
-        href="/"
-        className="mt-4 block w-full rounded-xl bg-pink-700 py-3 text-center font-semibold text-white transition hover:bg-green-800"
-      >
-        🛍 Continue Shopping
-      </Link>
+              {/* CONTINUE SHOPPING */}
+              <Link
+                href="/"
+                className="block w-full rounded-xl bg-pink-700 py-4 text-center text-lg font-bold text-white transition hover:bg-pink-800"
+              >
+                🛍 Continue Shopping
+              </Link>
 
-    </div>
+            </SummaryCard>
 
-  </SummaryCard>
-</div>
-</div>
+          </div>
+
         </div>
       )}
+
     </main>
   );
 }
