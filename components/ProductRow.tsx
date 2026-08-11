@@ -21,7 +21,7 @@ export default function ProductRow({
     originalPrice !== undefined && originalPrice > price;
 
   return (
-    <div className="flex items-center gap-5 rounded-2xl border bg-black p-4 shadow">
+    <div className="flex items-center gap-5 rounded-2xl border bg-transparent p-4 shadow">
       {/* Product Image */}
       <div className="relative h-28 w-28 flex-shrink-0 overflow-hidden rounded-xl">
         <Image
@@ -35,7 +35,7 @@ export default function ProductRow({
 
       {/* Product Info */}
       <div className="flex-1">
-        <h2 className="text-xl font-bold text-orange-300">
+        <h2 className="text-xl font-bold text-black">
           {name}
         </h2>
 
@@ -46,7 +46,7 @@ export default function ProductRow({
           </span>
 
           {hasDiscount && (
-            <span className="text-sm font-medium text-gray-400 line-through">
+            <span className="text-sm font-medium text-black line-through">
               ৳ {originalPrice}
             </span>
           )}

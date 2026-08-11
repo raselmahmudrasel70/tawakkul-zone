@@ -8,7 +8,7 @@ export default function SummaryCard({
   children,
 }: SummaryCardProps) {
   return (
-    <div className="rounded-2xl bg-gray-500 p-6 shadow-lg">
+    <div className="rounded-2xl bg-gray-100 p-6 shadow-lg">
       <h2 className="mb-5 text-2xl font-bold">
         {title}
       </h2>

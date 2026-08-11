@@ -35,12 +35,12 @@ export default function CartPage() {
       </h1>
 
       {cart.length === 0 ? (
-        <div className="rounded-2xl bg-gray-600 p-10 text-center">
-          <h2 className="text-2xl font-semibold text-white">
-            Your cart is empty 😒
+        <div className="rounded-2xl bg-gray-300 p-10 text-center">
+          <h2 className="text-2xl font-semibold text-black">
+            Your cart is empty❗
           </h2>
 
-          <p className="mt-2 text-cyan-400">
+          <p className="mt-2 text-red-500">
             Add some products to continue shopping.
           </p>
         </div>

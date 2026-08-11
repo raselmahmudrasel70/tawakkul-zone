@@ -10,6 +10,13 @@ export default function WishlistPage() {
   const { wishlist, removeFromWishlist } = useWishlist();
   const { addToCart } = useCart();
 
+  const wishlistTotal = wishlist.reduce(
+  (sum, item) =>
+    sum +
+    (item.discountedPrice ?? item.price),
+  0
+);
+
   return (
     <main className="mx-auto max-w-6xl px-6 py-10">
       <h1 className="mb-8 text-4xl font-bold text-green-800">
@@ -17,11 +24,11 @@ export default function WishlistPage() {
       </h1>
 
       {wishlist.length === 0 ? (
-        <div className="rounded-2xl bg-gray-600 p-10 text-center">
+        <div className="rounded-2xl bg-gray-300 p-10 text-center">
           <h2 className="text-6xl">💔</h2>
 
-          <h3 className="mt-4 text-2xl font-semibold text-white">
-            Your Wishlist is Empty
+          <h3 className="mt-4 text-2xl font-semibold text-black">
+            Your Wishlist is Empty❗
           </h3>
 
           <p className="mt-3 text-cyan-300">
@@ -62,19 +69,47 @@ export default function WishlistPage() {
             ))}
           </div>
 
-          <SummaryCard title="Wishlist Summary">
-            <div className="mb-5 flex justify-between">
-              <span>Items</span>
-              <span>{wishlist.length}</span>
-            </div>
+          <div className="self-start">
+  <div className="self-start">
+  <SummaryCard title="Wishlist Summary">
 
-            <Link
-              href="/"
-              className="block w-full rounded-xl bg-pink-700 py-3 text-center font-semibold text-white transition hover:bg-green-800"
-            >
-              🛍 Continue Shopping
-            </Link>
-          </SummaryCard>
+    <div className="flex flex-col">
+
+      {/* ITEMS */}
+      <div className="mb-5 flex justify-between">
+        <span>
+          Items
+        </span>
+
+        <span className="font-semibold">
+          {wishlist.length}
+        </span>
+      </div>
+
+      {/* TOTAL */}
+      <div className="mb-6 flex justify-between text-xl font-bold text-gray-900">
+        <span>
+          Total
+        </span>
+
+        <span>
+          ৳ {wishlistTotal}
+        </span>
+      </div>
+
+      {/* CONTINUE SHOPPING */}
+      <Link
+        href="/"
+        className="mt-4 block w-full rounded-xl bg-pink-700 py-3 text-center font-semibold text-white transition hover:bg-green-800"
+      >
+        🛍 Continue Shopping
+      </Link>
+
+    </div>
+
+  </SummaryCard>
+</div>
+</div>
         </div>
       )}
     </main>
