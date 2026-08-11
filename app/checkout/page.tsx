@@ -585,17 +585,7 @@ function CheckoutContent() {
 
           </div>
 
-          {isBuyNow && (
-            <p className="mt-4 text-sm font-medium text-blue-700">
-              ℹ️ আপনি Buy It Now করেছেন। শুধু এই product-টিই checkout হবে।
-            </p>
-          )}
-
-          {!isBuyNow && (
-            <p className="mt-4 text-sm font-medium text-green-700">
-              🛒 Cart-এর সব product এই order-এর সাথে যাবে।
-            </p>
-          )}
+          
 
         </div>
 
