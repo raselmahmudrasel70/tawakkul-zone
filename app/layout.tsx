@@ -2,7 +2,7 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header";
+import HideOnScrollHeader from "@/components/HideOnScrollHeader";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 
@@ -93,11 +93,11 @@ export default function RootLayout({
 
         <CartProvider>
           <WishlistProvider>
-            <Header />
+            <HideOnScrollHeader />
 
-            <main className="flex-1">
-              {children}
-            </main>
+            <main className="flex-1 pt-20">
+  {children}
+</main>
           </WishlistProvider>
         </CartProvider>
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!} />

@@ -193,7 +193,6 @@ function CheckoutContent() {
 
   /* =====================================
      BUY NOW -
-     
      Minimum = 1
   ===================================== */
 
@@ -304,39 +303,58 @@ function CheckoutContent() {
         })
       );
 
-    const insertResult =
-      await supabase
-        .from("orders")
-        .insert({
-          user_id: user.id,
-          customer_name: name,
-          phone,
-          address,
-          products:
-            orderProducts,
-          subtotal,
-          delivery_fee:
-            deliveryFee,
-          total,
-          payment_method:
-            paymentMethod,
-          transaction_id:
-            transactionId,
-          status: "Pending",
-        });
+    /* =====================================
+       CREATE ORDER
+    ===================================== */
 
-    if (insertResult.error) {
+    const {
+      data: newOrder,
+      error: orderError,
+    } = await supabase
+      .from("orders")
+      .insert({
+        user_id: user.id,
+        customer_name: name,
+        phone,
+        address,
+        products:
+          orderProducts,
+        subtotal,
+        delivery_fee:
+          deliveryFee,
+        total,
+        payment_method:
+          paymentMethod,
+        transaction_id:
+          transactionId,
+        status: "Pending",
+      })
+      .select("id")
+      .single();
+
+    /* =====================================
+       ORDER ERROR
+    ===================================== */
+
+    if (
+      orderError ||
+      !newOrder
+    ) {
       Swal.fire({
         icon: "error",
         title:
           "Order Failed",
         text:
-          insertResult.error
-            .message,
+          orderError?.message ||
+          "Order তৈরি করা যায়নি।",
       });
 
       return;
     }
+
+    /* =====================================
+       SUCCESS
+    ===================================== */
 
     await Swal.fire({
       icon: "success",
@@ -348,6 +366,10 @@ function CheckoutContent() {
         "#15803d",
     });
 
+    /* =====================================
+       CLEAR BUY NOW / CART
+    ===================================== */
+
     if (isBuyNow) {
       sessionStorage.removeItem(
         "buyNowProduct"
@@ -356,15 +378,27 @@ function CheckoutContent() {
       clearCart();
     }
 
+    /* =====================================
+       CLEAR FORM
+    ===================================== */
+
     setName("");
     setPhone("");
     setAddress("");
+
     setPaymentMethod(
       "Cash On Delivery"
     );
+
     setTransactionId("");
 
-    router.push("/dashboard");
+    /* =====================================
+       GO TO INVOICE
+    ===================================== */
+
+    router.push(
+      `/invoice/${newOrder.id}`
+    );
   }
 
   /* =====================================
@@ -512,7 +546,7 @@ function CheckoutContent() {
                         )}
 
                       </div>
-                      
+
                     </div>
 
                     {/* QUANTITY */}
@@ -580,8 +614,6 @@ function CheckoutContent() {
             )}
 
           </div>
-
-          
 
         </div>
 
