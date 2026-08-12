@@ -24,7 +24,6 @@ export default async function InvoicePage({
   params,
 }: PageProps) {
   const { id } = await params;
-
   const orderId = Number(id);
 
   if (!Number.isFinite(orderId)) {
@@ -89,28 +88,23 @@ export default async function InvoicePage({
       )
     : "N/A";
 
-  /*
-   * =========================
-   * PRICE CALCULATIONS
-   * =========================
-   */
+  /* =========================
+     PRICE CALCULATIONS
+  ========================= */
 
   const originalTotal = products.reduce(
     (sum, item) => {
-      const originalPrice =
-        Number(
-          item.originalPrice ??
-            item.price ??
-            0
-        );
-
-      const quantity =
-        Number(item.quantity ?? 1);
-
-      return (
-        sum +
-        originalPrice * quantity
+      const originalPrice = Number(
+        item.originalPrice ??
+          item.price ??
+          0
       );
+
+      const quantity = Number(
+        item.quantity ?? 1
+      );
+
+      return sum + originalPrice * quantity;
     },
     0
   );
@@ -137,23 +131,38 @@ export default async function InvoicePage({
           font-family: Arial, Helvetica, sans-serif;
         }
 
+        /* =========================
+           MAIN
+        ========================= */
+
         .invoice-wrapper {
           width: 100%;
           min-height: 100vh;
-          padding: 12px;
+          padding: 20px 10px;
           background: #f3f4f6;
         }
 
+        /* =========================
+           COMPACT INVOICE
+        ========================= */
+
         .invoice-paper {
           position: relative;
-          width: 100%;
-          max-width: 820px;
+
+          width: 470px;
+          max-width: 100%;
+
           margin: 0 auto;
+
+          zoom: 1.05;
+
           background: #ffffff;
           border: 1px solid #d1d5db;
           border-radius: 0;
           overflow: hidden;
-          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+
+          box-shadow:
+            0 4px 14px rgba(0, 0, 0, 0.08);
         }
 
         .invoice-paper::before {
@@ -162,37 +171,37 @@ export default async function InvoicePage({
           left: 0;
           top: 0;
           bottom: 0;
-          width: 8px;
+          width: 5px;
           background: #8ed05c;
         }
 
         .invoice-content {
-          padding: 28px 28px 30px 38px;
+          padding: 17px 17px 19px 23px;
         }
 
         /* =========================
-           INVOICE HEADER
+           HEADER
         ========================= */
 
         .invoice-header {
           display: flex;
           justify-content: space-between;
           align-items: flex-start;
-          gap: 20px;
-          padding-bottom: 16px;
+          gap: 10px;
+          padding-bottom: 11px;
           border-bottom: 1px solid #222;
         }
 
         .brand-name {
-          margin: 0 0 5px;
-          font-size: 22px;
+          margin: 0 0 4px;
+          font-size: 18px;
           font-weight: 900;
           color: #087f3e;
         }
 
         .invoice-title {
           margin: 0;
-          font-size: 34px;
+          font-size: 27px;
           line-height: 1;
           font-weight: 900;
           color: #111;
@@ -200,44 +209,47 @@ export default async function InvoicePage({
         }
 
         .invoice-number {
-          margin-top: 8px;
+          margin-top: 4px;
           color: #555;
-          font-size: 10px;
-          line-height: 1.6;
+          font-size: 8px;
+          line-height: 1.45;
         }
 
         /* =========================
-           CUSTOMER / ORDER INFO
+           CUSTOMER / COMPANY
         ========================= */
 
         .info-section {
           display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 25px;
-          padding: 20px 0 22px;
+          grid-template-columns:
+            minmax(0, 1fr)
+            minmax(0, 1fr);
+          gap: 12px;
+          padding: 12px 0 14px;
         }
 
         .info-title {
-          margin: 0 0 8px;
-          font-size: 11px;
+          margin: 0 0 4px;
+          font-size: 8px;
           font-weight: 700;
           color: #555;
           text-transform: uppercase;
-          letter-spacing: 0.5px;
+          letter-spacing: 0.35px;
         }
 
         .customer-name {
-          margin: 0 0 7px;
-          font-size: 15px;
+          margin: 0 0 4px;
+          font-size: 11.5px;
           font-weight: 900;
           color: #111;
         }
 
         .info-line {
-          margin: 3px 0;
+          margin: 2px 0;
           color: #555;
-          font-size: 10px;
-          line-height: 1.4;
+          font-size: 7.5px;
+          line-height: 1.3;
+          overflow-wrap: anywhere;
         }
 
         .info-line strong {
@@ -246,6 +258,7 @@ export default async function InvoicePage({
 
         .order-info {
           text-align: right;
+          min-width: 0;
         }
 
         .order-info .info-line {
@@ -260,39 +273,47 @@ export default async function InvoicePage({
           width: 100%;
           border-collapse: collapse;
           border: 1px solid #d1d5db;
-          border-radius: 0;
+          table-layout: fixed;
         }
 
         .product-table th {
-          padding: 9px 8px;
+          padding: 6px 5px;
           background: #48a941;
           color: white;
-          font-size: 10px;
+          font-size: 7.5px;
           font-weight: 800;
           text-align: left;
         }
 
         .product-table td {
-          padding: 10px 8px;
+          padding: 6px 5px;
           border-bottom: 1px solid #d1d5db;
           color: #222;
-          font-size: 10px;
+          font-size: 7.5px;
           vertical-align: top;
+          overflow-wrap: anywhere;
+        }
+
+        .product-table th:first-child,
+        .product-table td:first-child {
+          width: auto;
         }
 
         .product-table th:nth-child(2),
         .product-table td:nth-child(2) {
+          width: 60px;
           text-align: right;
         }
 
         .product-table th:nth-child(3),
         .product-table td:nth-child(3) {
-          width: 45px;
+          width: 34px;
           text-align: center;
         }
 
         .product-table th:nth-child(4),
         .product-table td:nth-child(4) {
+          width: 68px;
           text-align: right;
         }
 
@@ -302,16 +323,16 @@ export default async function InvoicePage({
 
         .old-price {
           display: inline-block;
-          margin-top: 3px;
+          margin-top: 2px;
           color: #777;
-          font-size: 8px;
+          font-size: 6px;
           text-decoration: line-through;
         }
 
         .discounted-price {
-          margin-left: 5px;
+          margin-left: 3px;
           color: #087f3e;
-          font-size: 8px;
+          font-size: 6px;
           font-weight: 700;
         }
 
@@ -321,50 +342,53 @@ export default async function InvoicePage({
 
         .bottom-section {
           display: grid;
-          grid-template-columns: 1fr 250px;
-          gap: 25px;
-          margin-top: 22px;
+          grid-template-columns:
+            minmax(0, 1fr)
+            155px;
+          gap: 10px;
+          margin-top: 13px;
         }
 
         .payment-box {
           border: 1px solid #bdbdbd;
           border-radius: 0;
-          padding: 13px;
+          padding: 8px;
         }
 
         .payment-title {
-          margin: 0 0 7px;
-          font-size: 11px;
+          margin: 0 0 4px;
+          font-size: 7.5px;
           font-weight: 900;
           color: #444;
         }
 
         .payment-line {
-          margin: 3px 0;
+          margin: 2px 0;
           color: #555;
-          font-size: 9px;
+          font-size: 6.8px;
+          overflow-wrap: anywhere;
         }
 
         .terms {
-          margin-top: 9px;
+          margin-top: 6px;
           color: #777;
-          font-size: 8px;
-          line-height: 1.4;
+          font-size: 6px;
+          line-height: 1.35;
         }
 
         .totals-box {
           background: #eeeeee;
           border-radius: 0;
-          padding: 15px 18px;
+          padding: 8px 9px;
         }
 
         .total-row {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          gap: 10px;
-          padding: 6px 0;
-          font-size: 11px;
+          gap: 5px;
+          padding: 3px 0;
+          font-size: 7px;
           color: #555;
         }
 
@@ -383,15 +407,15 @@ export default async function InvoicePage({
         }
 
         .total-divider {
-          margin: 8px 0;
+          margin: 4px 0;
           border-top: 1px solid #9ca3af;
         }
 
         .grand-total {
-          margin-top: 5px;
-          padding-top: 9px;
+          margin-top: 3px;
+          padding-top: 5px;
           border-top: 1px solid #555;
-          font-size: 15px;
+          font-size: 11px;
           font-weight: 900;
           color: #111;
         }
@@ -405,21 +429,21 @@ export default async function InvoicePage({
         ========================= */
 
         .acknowledgement {
-          margin-top: 25px;
+          margin-top: 13px;
         }
 
         .acknowledgement-title {
-          margin: 0 0 8px;
-          font-size: 12px;
+          margin: 0 0 4px;
+          font-size: 8.5px;
           font-weight: 900;
           color: #444;
         }
 
         .acknowledgement p {
-          margin: 0 0 6px;
+          margin: 0 0 3px;
           color: #666;
-          font-size: 9px;
-          line-height: 1.5;
+          font-size: 6.8px;
+          line-height: 1.35;
         }
 
         /* =========================
@@ -429,23 +453,23 @@ export default async function InvoicePage({
         .signature-section {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 35px;
-          margin-top: 32px;
+          gap: 16px;
+          margin-top: 17px;
         }
 
         .signature {
           text-align: center;
+          min-width: 0;
         }
 
         .signature-line {
-          min-height: 55px;
+          min-height: 35px;
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: flex-end;
-          padding-bottom: 5px;
+          padding-bottom: 3px;
           border-bottom: 1px solid #222;
-          border-radius: 0;
         }
 
         .customer-signature {
@@ -454,21 +478,24 @@ export default async function InvoicePage({
             "Brush Script MT",
             "Segoe Script",
             cursive;
-          font-size: 25px;
+          font-size: 17px;
           font-weight: 400;
           color: #111;
           line-height: 1;
           white-space: nowrap;
+          max-width: 100%;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
         .company-signature {
           display: block;
-          margin-top: 5px;
+          margin-top: 3px;
           font-family:
             Arial,
             Helvetica,
             sans-serif;
-          font-size: 13px;
+          font-size: 9px;
           font-weight: 700;
           color: #111;
           line-height: 1;
@@ -476,23 +503,23 @@ export default async function InvoicePage({
         }
 
         .signature-label {
-          margin: 5px 0 0;
-          font-size: 9px;
+          margin: 3px 0 0;
+          font-size: 6.5px;
           color: #222;
           font-weight: 500;
         }
 
         .signature-date {
           margin: 2px 0 0;
-          font-size: 8px;
+          font-size: 6px;
           color: #555;
         }
 
         .thank-you {
-          margin-top: 20px;
+          margin-top: 9px;
           text-align: center;
           color: #555;
-          font-size: 9px;
+          font-size: 6.8px;
           font-weight: 600;
         }
 
@@ -504,20 +531,19 @@ export default async function InvoicePage({
           display: flex;
           justify-content: center;
           align-items: center;
-          gap: 8px;
-          margin: 12px auto 20px;
-          width: 100%;
-          max-width: 820px;
+          gap: 5px;
+          margin: 10px auto 15px;
+          width: min(100%, 470px);
         }
 
         .invoice-action {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          min-width: 130px;
-          padding: 10px 14px;
+          min-width: 90px;
+          padding: 7px 9px;
           text-decoration: none;
-          font-size: 12px;
+          font-size: 8px;
           font-weight: 800;
           border: none;
           border-radius: 0;
@@ -540,17 +566,46 @@ export default async function InvoicePage({
         }
 
         /* =========================
+           TABLET
+        ========================= */
+
+        @media (max-width: 800px) {
+          .invoice-wrapper {
+            padding: 12px 7px;
+          }
+
+          .invoice-paper {
+            width: 470px;
+            max-width: 100%;
+            zoom: 1.03;
+          }
+
+          .invoice-content {
+            padding: 16px 15px 18px 21px;
+          }
+        }
+
+        /* =========================
            MOBILE
         ========================= */
 
         @media (max-width: 600px) {
+          html,
+          body {
+            background: #ffffff;
+          }
+
           .invoice-wrapper {
+            width: 100%;
+            min-height: auto;
             padding: 0;
+            background: #ffffff;
           }
 
           .invoice-paper {
             width: 100%;
             max-width: none;
+            zoom: 1;
             border-left: none;
             border-right: none;
             box-shadow: none;
@@ -561,181 +616,453 @@ export default async function InvoicePage({
           }
 
           .invoice-content {
-            padding: 18px 12px 20px 18px;
+            padding: 16px 10px 18px 16px;
           }
 
           .invoice-header {
-            gap: 8px;
-            padding-bottom: 10px;
+            gap: 6px;
+            padding-bottom: 8px;
           }
 
           .brand-name {
-            font-size: 16px;
+            font-size: 14px;
+            margin-bottom: 3px;
           }
 
           .invoice-title {
-            font-size: 25px;
+            font-size: 21px;
           }
 
           .invoice-number {
-            font-size: 7px;
+            font-size: 6px;
+            line-height: 1.35;
           }
 
           .info-section {
-            gap: 10px;
-            padding: 12px 0 14px;
+            gap: 7px;
+            padding: 10px 0 11px;
           }
 
           .info-title {
-            font-size: 7px;
+            margin-bottom: 3px;
+            font-size: 6px;
           }
 
           .customer-name {
-            font-size: 10px;
+            margin-bottom: 3px;
+            font-size: 9px;
           }
 
           .info-line {
-            font-size: 7px;
+            margin: 1.5px 0;
+            font-size: 6px;
+            line-height: 1.25;
           }
 
           .product-table th {
-            padding: 6px 4px;
-            font-size: 7px;
+            padding: 5px 3px;
+            font-size: 6px;
           }
 
           .product-table td {
-            padding: 6px 4px;
-            font-size: 7px;
+            padding: 5px 3px;
+            font-size: 6px;
+          }
+
+          .product-table th:nth-child(2),
+          .product-table td:nth-child(2) {
+            width: 50px;
+          }
+
+          .product-table th:nth-child(3),
+          .product-table td:nth-child(3) {
+            width: 27px;
+          }
+
+          .product-table th:nth-child(4),
+          .product-table td:nth-child(4) {
+            width: 58px;
           }
 
           .old-price,
           .discounted-price {
-            font-size: 6px;
+            font-size: 5px;
           }
 
           .bottom-section {
-            grid-template-columns: 1fr 150px;
-            gap: 8px;
-            margin-top: 12px;
+            grid-template-columns:
+              minmax(0, 1fr)
+              120px;
+            gap: 6px;
+            margin-top: 10px;
           }
 
           .payment-box {
-            padding: 7px;
+            padding: 5px;
           }
 
           .payment-title {
-            font-size: 7px;
+            margin-bottom: 3px;
+            font-size: 6px;
           }
 
           .payment-line {
-            font-size: 6px;
+            font-size: 5.2px;
           }
 
           .terms {
-            font-size: 5.8px;
+            margin-top: 5px;
+            font-size: 4.8px;
+            line-height: 1.25;
           }
 
           .totals-box {
-            padding: 8px;
+            padding: 6px;
           }
 
           .total-row {
-            font-size: 7.5px;
-            padding: 3px 0;
-          }
-
-          .grand-total {
-            font-size: 11px;
-          }
-
-          .acknowledgement {
-            margin-top: 13px;
-          }
-
-          .acknowledgement-title {
-            font-size: 8px;
-          }
-
-          .acknowledgement p {
-            font-size: 6.5px;
-            line-height: 1.3;
-          }
-
-          .signature-section {
-            gap: 12px;
-            margin-top: 18px;
-          }
-
-          .signature-line {
-            min-height: 40px;
-          }
-
-          .customer-signature {
-            font-size: 17px;
-          }
-
-          .company-signature {
-            font-size: 8px;
-          }
-
-          .signature-label {
-            font-size: 6.5px;
-            margin-top: 3px;
-          }
-
-          .signature-date {
+            gap: 3px;
+            padding: 2px 0;
             font-size: 6px;
           }
 
-          .thank-you {
+          .total-divider {
+            margin: 3px 0;
+          }
+
+          .grand-total {
+            margin-top: 2px;
+            padding-top: 4px;
+            font-size: 9px;
+          }
+
+          .acknowledgement {
             margin-top: 10px;
+          }
+
+          .acknowledgement-title {
+            margin-bottom: 3px;
+            font-size: 7px;
+          }
+
+          .acknowledgement p {
+            margin-bottom: 2px;
+            font-size: 5.5px;
+            line-height: 1.25;
+          }
+
+          .signature-section {
+            gap: 8px;
+            margin-top: 14px;
+          }
+
+          .signature-line {
+            min-height: 32px;
+            padding-bottom: 2px;
+          }
+
+          .customer-signature {
+            font-size: 14px;
+          }
+
+          .company-signature {
+            margin-top: 2px;
             font-size: 6.5px;
+          }
+
+          .signature-label {
+            margin-top: 2px;
+            font-size: 5.2px;
+          }
+
+          .signature-date {
+            margin-top: 1px;
+            font-size: 5px;
+          }
+
+          .thank-you {
+            margin-top: 7px;
+            font-size: 5.5px;
           }
 
           .invoice-actions {
             width: 100%;
-            padding: 0 6px;
-            gap: 4px;
-            margin: 7px auto 10px;
+            padding: 0 4px;
+            gap: 3px;
+            margin: 5px auto 8px;
           }
 
           .invoice-action {
             min-width: 0;
             flex: 1;
-            padding: 8px 4px;
-            font-size: 8px;
+            padding: 6px 3px;
+            font-size: 6.5px;
           }
         }
 
         /* =========================
-           PRINT
+           VERY SMALL PHONES
+        ========================= */
+
+        @media (max-width: 380px) {
+          .invoice-content {
+            padding-left: 14px;
+            padding-right: 7px;
+          }
+
+          .invoice-title {
+            font-size: 20px;
+          }
+
+          .brand-name {
+            font-size: 13px;
+          }
+
+          .bottom-section {
+            grid-template-columns:
+              minmax(0, 1fr)
+              112px;
+          }
+
+          .product-table th:nth-child(2),
+          .product-table td:nth-child(2) {
+            width: 47px;
+          }
+
+          .product-table th:nth-child(3),
+          .product-table td:nth-child(3) {
+            width: 25px;
+          }
+
+          .product-table th:nth-child(4),
+          .product-table td:nth-child(4) {
+            width: 55px;
+          }
+        }
+
+        /* =========================
+           A5 PRINT
         ========================= */
 
         @media print {
           @page {
-            size: A4;
-            margin: 0;
+            size: A5 portrait;
+            margin: 7mm;
           }
 
           html,
           body {
             margin: 0 !important;
             padding: 0 !important;
-            background: white !important;
+            background: #ffffff !important;
           }
 
           .invoice-wrapper {
+            width: 100% !important;
+            min-height: auto !important;
             padding: 0 !important;
-            background: white !important;
+            margin: 0 !important;
+            background: #ffffff !important;
           }
 
+          /*
+           * A5:
+           * 148mm × 210mm
+           *
+           * Invoice compact থাকবে এবং
+           * page-এর মাঝখানে থাকবে।
+           */
           .invoice-paper {
-            width: 100% !important;
-            max-width: none !important;
-            min-height: 100vh !important;
-            border: none !important;
+            width: 470px !important;
+            max-width: 470px !important;
+
+            zoom: 1 !important;
+
+            margin: 0 auto !important;
+
+            border: 1px solid #d1d5db !important;
             border-radius: 0 !important;
+
             box-shadow: none !important;
+
+            page-break-inside: avoid;
+          }
+
+          .invoice-paper::before {
+            width: 4px !important;
+          }
+
+          .invoice-content {
+            padding: 14px 14px 16px 20px !important;
+          }
+
+          .invoice-header {
+            gap: 8px !important;
+            padding-bottom: 8px !important;
+          }
+
+          .brand-name {
+            font-size: 16px !important;
+            margin-bottom: 3px !important;
+          }
+
+          .invoice-title {
+            font-size: 24px !important;
+          }
+
+          .invoice-number {
+            margin-top: 3px !important;
+            font-size: 6.8px !important;
+            line-height: 1.35 !important;
+          }
+
+          .info-section {
+            gap: 10px !important;
+            padding: 9px 0 10px !important;
+          }
+
+          .info-title {
+            margin-bottom: 3px !important;
+            font-size: 7px !important;
+          }
+
+          .customer-name {
+            margin-bottom: 3px !important;
+            font-size: 10px !important;
+          }
+
+          .info-line {
+            margin: 1.5px 0 !important;
+            font-size: 6.5px !important;
+            line-height: 1.25 !important;
+          }
+
+          .product-table th {
+            padding: 5px 4px !important;
+            font-size: 6.8px !important;
+          }
+
+          .product-table td {
+            padding: 5px 4px !important;
+            font-size: 6.8px !important;
+          }
+
+          .product-table th:nth-child(2),
+          .product-table td:nth-child(2) {
+            width: 58px !important;
+          }
+
+          .product-table th:nth-child(3),
+          .product-table td:nth-child(3) {
+            width: 32px !important;
+          }
+
+          .product-table th:nth-child(4),
+          .product-table td:nth-child(4) {
+            width: 64px !important;
+          }
+
+          .old-price,
+          .discounted-price {
+            font-size: 5.5px !important;
+          }
+
+          .bottom-section {
+            grid-template-columns:
+              minmax(0, 1fr)
+              145px !important;
+
+            gap: 8px !important;
+
+            margin-top: 10px !important;
+          }
+
+          .payment-box {
+            padding: 7px !important;
+          }
+
+          .payment-title {
+            margin-bottom: 3px !important;
+            font-size: 7px !important;
+          }
+
+          .payment-line {
+            margin: 1.5px 0 !important;
+            font-size: 6px !important;
+          }
+
+          .terms {
+            margin-top: 5px !important;
+            font-size: 5.3px !important;
+            line-height: 1.25 !important;
+          }
+
+          .totals-box {
+            padding: 7px 8px !important;
+          }
+
+          .total-row {
+            padding: 2.5px 0 !important;
+            font-size: 6.5px !important;
+          }
+
+          .total-divider {
+            margin: 3px 0 !important;
+          }
+
+          .grand-total {
+            margin-top: 2px !important;
+            padding-top: 4px !important;
+            font-size: 10px !important;
+          }
+
+          .acknowledgement {
+            margin-top: 10px !important;
+          }
+
+          .acknowledgement-title {
+            margin-bottom: 3px !important;
+            font-size: 7.5px !important;
+          }
+
+          .acknowledgement p {
+            margin-bottom: 2px !important;
+            font-size: 6px !important;
+            line-height: 1.25 !important;
+          }
+
+          .signature-section {
+            gap: 14px !important;
+            margin-top: 13px !important;
+          }
+
+          .signature-line {
+            min-height: 30px !important;
+            padding-bottom: 2px !important;
+          }
+
+          .customer-signature {
+            font-size: 15px !important;
+          }
+
+          .company-signature {
+            margin-top: 2px !important;
+            font-size: 8px !important;
+          }
+
+          .signature-label {
+            margin-top: 2px !important;
+            font-size: 5.8px !important;
+          }
+
+          .signature-date {
+            margin-top: 1px !important;
+            font-size: 5.5px !important;
+          }
+
+          .thank-you {
+            margin-top: 7px !important;
+            font-size: 6px !important;
           }
 
           .invoice-actions {
@@ -759,6 +1086,7 @@ export default async function InvoicePage({
             <header className="invoice-header">
 
               <div>
+
                 <h1 className="brand-name">
                   Tawakkul Zone
                 </h1>
@@ -778,22 +1106,22 @@ export default async function InvoicePage({
                   </div>
 
                 </div>
+
               </div>
 
               <div>
+
                 <h2 className="invoice-title">
                   INVOICE
                 </h2>
+
               </div>
 
             </header>
 
-
             {/* CUSTOMER / COMPANY */}
 
             <section className="info-section">
-
-              {/* CUSTOMER */}
 
               <div>
 
@@ -820,9 +1148,6 @@ export default async function InvoicePage({
                 </p>
 
               </div>
-
-
-              {/* COMPANY */}
 
               <div className="order-info">
 
@@ -858,7 +1183,6 @@ export default async function InvoicePage({
 
             </section>
 
-
             {/* PRODUCTS */}
 
             <section>
@@ -888,7 +1212,6 @@ export default async function InvoicePage({
                   </tr>
 
                 </thead>
-
 
                 <tbody>
 
@@ -949,16 +1272,13 @@ export default async function InvoicePage({
 
                           </td>
 
-
                           <td>
                             ৳ {finalPrice}
                           </td>
 
-
                           <td>
                             {quantity}
                           </td>
-
 
                           <td>
                             ৳ {itemSubtotal}
@@ -974,7 +1294,6 @@ export default async function InvoicePage({
               </table>
 
             </section>
-
 
             {/* PAYMENT + TOTAL */}
 
@@ -1003,7 +1322,6 @@ export default async function InvoicePage({
 
                 </div>
 
-
                 <p className="terms">
                   *Please keep this invoice
                   for your records. Payment
@@ -1015,12 +1333,9 @@ export default async function InvoicePage({
 
               </div>
 
-
-              {/* PRICE SUMMARY */}
+              {/* TOTALS */}
 
               <div className="totals-box">
-
-                {/* Original Price */}
 
                 <div className="total-row">
 
@@ -1034,9 +1349,6 @@ export default async function InvoicePage({
 
                 </div>
 
-
-                {/* Discount */}
-
                 <div className="total-row discount-row">
 
                   <span>
@@ -1048,9 +1360,6 @@ export default async function InvoicePage({
                   </span>
 
                 </div>
-
-
-                {/* Discounted Price */}
 
                 <div className="total-row">
 
@@ -1064,13 +1373,7 @@ export default async function InvoicePage({
 
                 </div>
 
-
-                {/* Divider */}
-
                 <div className="total-divider" />
-
-
-                {/* Subtotal */}
 
                 <div className="total-row">
 
@@ -1084,9 +1387,6 @@ export default async function InvoicePage({
 
                 </div>
 
-
-                {/* Delivery Fee */}
-
                 <div className="total-row">
 
                   <span>
@@ -1099,13 +1399,7 @@ export default async function InvoicePage({
 
                 </div>
 
-
-                {/* Divider */}
-
                 <div className="total-divider" />
-
-
-                {/* TOTAL */}
 
                 <div className="total-row grand-total">
 
@@ -1122,7 +1416,6 @@ export default async function InvoicePage({
               </div>
 
             </section>
-
 
             {/* ACKNOWLEDGEMENT */}
 
@@ -1147,12 +1440,9 @@ export default async function InvoicePage({
 
             </section>
 
-
-            {/* SIGNATURE SECTION */}
+            {/* SIGNATURE */}
 
             <section className="signature-section">
-
-              {/* CUSTOMER */}
 
               <div className="signature">
 
@@ -1173,9 +1463,6 @@ export default async function InvoicePage({
                 </p>
 
               </div>
-
-
-              {/* TAWAKKUL ZONE */}
 
               <div className="signature">
 
@@ -1199,7 +1486,6 @@ export default async function InvoicePage({
 
             </section>
 
-
             {/* THANK YOU */}
 
             <div className="thank-you">
@@ -1211,10 +1497,7 @@ export default async function InvoicePage({
 
         </div>
 
-
-        {/* =========================
-            BUTTONS
-        ========================= */}
+        {/* BUTTONS */}
 
         <div className="invoice-actions">
 
