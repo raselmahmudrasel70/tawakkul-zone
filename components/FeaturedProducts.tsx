@@ -108,14 +108,14 @@ export default function FeaturedProducts({
               return (
                 <div
                   key={product.id}
-                  className="rounded-2xl bg-gray-300 p-3 shadow-lg transition duration-300 hover:-translate-y-2 hover:shadow-2xl md:p-6"
+                  className="rounded-xl bg-gray-300 p-2.5 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-xl sm:p-3 md:p-5"
                 >
 
                   {/* =======================
                       IMAGE
                   ======================= */}
 
-                  <div className="relative mb-3 h-40 overflow-hidden rounded-xl md:h-56">
+                  <div className="relative mb-2 h-32 overflow-hidden rounded-lg sm:h-36 md:h-52">
 
                     <Link
                       href={`/product/${product.id}`}
@@ -207,22 +207,22 @@ export default function FeaturedProducts({
                   <Link
                     href={`/product/${product.id}`}
                   >
-                    <h3 className="mt-4 text-lg font-semibold text-gray-700 hover:text-green-700">
-                      {product.name}
-                    </h3>
+                    <h3 className="mt-2 line-clamp-2 text-xs font-semibold leading-tight text-gray-700 hover:text-green-700 sm:text-sm md:text-base">
+  {product.name}
+</h3>
                   </Link>
 
                   {/* =======================
                       STOCK
                   ======================= */}
 
-                  <div className="mt-1">
+                  <div className="mt-0.5">
                     {product.stock ? (
-                      <span className="text-sm text-green-600">
+                      <span className="text-xs text-green-600">
                         ✔ In Stock
                       </span>
                     ) : (
-                      <span className="text-sm text-red-600">
+                      <span className="text-xs text-red-600">
                         ✖ Out of Stock
                       </span>
                     )}
@@ -232,7 +232,7 @@ export default function FeaturedProducts({
                       PRICE
                   ======================= */}
 
-                  <div className="mt-3">
+                  <div className="mt-2">
 
                     {product.discount > 0 ? (
                       <>
@@ -293,7 +293,7 @@ export default function FeaturedProducts({
         product.category,
     });
   }}
-  className="mt-5 w-full rounded-xl bg-green-700 py-2 font-semibold text-white transition hover:bg-green-800"
+  className="mt-3 w-full rounded-lg bg-green-700 py-2 text-xs font-semibold text-white transition hover:bg-green-800 sm:text-sm"
 >
   Add to Cart
 </button>
