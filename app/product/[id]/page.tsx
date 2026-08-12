@@ -83,7 +83,7 @@ export default async function ProductPage({
     <main className="min-h-screen bg-white">
       <div className="mx-auto w-full max-w-[1500px] px-4 py-5 sm:px-6 lg:px-8">
 
-        <div className="grid grid-cols-1 items-start gap-5 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-7">
+        <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-[42fr_58fr]">
 
           {/* =========================================
               LEFT - IMAGE
