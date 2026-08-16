@@ -27,6 +27,33 @@ export default function AddProductPage() {
   const finalPrice =
     originalPrice - (originalPrice * discountPercent) / 100;
 
+    function generateSlug(text: string) {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-");
+}
+
+
+function generateSKU(text: string) {
+  const words = text
+    .toUpperCase()
+    .split(" ")
+    .filter(Boolean);
+
+  let code = words.map((word) => word[0]).join("");
+
+  if (code.length < 3) {
+    code = text.substring(0, 3).toUpperCase();
+  }
+
+  const random = Date.now().toString().slice(-6);
+
+  return `TZ-${code}-${random}`;
+}
+
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -92,11 +119,17 @@ export default function AddProductPage() {
               </label>
 
               <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full rounded-xl border p-3 outline-none text-black focus:border-green-700"
-              />
+  type="text"
+  value={name}
+  onChange={(e) => {
+    const value = e.target.value;
+
+    setName(value);
+    setSlug(generateSlug(value));
+    setSku(generateSKU(value));
+  }}
+  className="w-full rounded-xl border p-3 outline-none text-black focus:border-green-700"
+/>
             </div>
             <div>
               <label className="mb-2 block font-semibold text-yellow-700">
@@ -104,12 +137,11 @@ export default function AddProductPage() {
               </label>
 
               <input
-                type="text"
-                value={slug}
-                onChange={(e) => setSlug(e.target.value)}
-                placeholder="premium-three-piece"
-                className="w-full rounded-xl border p-3 outline-none focus:border-green-700"
-              />
+  type="text"
+  value={sku}
+  readOnly
+  className="w-full rounded-xl border p-3 text-black"
+/>
             </div>
             <div>
               <label className="mb-2 block font-semibold text-yellow-700">

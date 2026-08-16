@@ -1,3 +1,5 @@
+
+
 import { NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { createClient } from "@supabase/supabase-js";
@@ -170,25 +172,54 @@ export async function POST(request: Request) {
       );
     }
 
-    /*
-     * Image
-     *
-     * Storage upload can be added later.
-     */
-    const images: string | null = null;
+  // Image Upload to Supabase Storage
+let images: string | null = null;
 
-    if (
-      image instanceof File &&
-      image.size > 0
-    ) {
-      console.log(
-        "Image received:",
-        image.name,
-        image.type,
-        image.size
-      );
-    }
+if (image instanceof File && image.size > 0) {
 
+  const cleanName = image.name
+    .replace(/\s+/g, "-")
+    .replace(/[^a-zA-Z0-9.-]/g, "");
+
+  const fileName = `${Date.now()}-${cleanName}`;
+
+  const buffer = Buffer.from(
+    await image.arrayBuffer()
+  );
+
+  const { data: uploadData, error: uploadError } =
+    await supabase.storage
+      .from("products")
+      .upload(fileName, buffer, {
+        contentType: image.type,
+        cacheControl: "3600",
+        upsert: false,
+      });
+
+
+  if (uploadError) {
+    console.log("STORAGE ERROR:", uploadError);
+
+    return NextResponse.json(
+      {
+        error: "Image upload failed",
+        details: uploadError.message,
+      },
+      { status: 500 }
+    );
+  }
+
+
+  const { data: publicData } =
+    supabase.storage
+      .from("products")
+      .getPublicUrl(uploadData.path);
+
+
+  images = publicData.publicUrl;
+
+  console.log("SAVED IMAGE URL:", images);
+}
     // Insert product
     const { data, error } = await supabase
       .from("products")

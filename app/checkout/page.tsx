@@ -313,22 +313,18 @@ function CheckoutContent() {
     } = await supabase
       .from("orders")
       .insert({
-        user_id: user.id,
-        customer_name: name,
-        phone,
-        address,
-        products:
-          orderProducts,
-        subtotal,
-        delivery_fee:
-          deliveryFee,
-        total,
-        payment_method:
-          paymentMethod,
-        transaction_id:
-          transactionId,
-        status: "Pending",
-      })
+  user_id: user.id,
+  customer_name: name,
+  phone,
+  address,
+  products: orderProducts,
+  subtotal,
+  delivery_fee: deliveryFee,
+  total,
+  payment_method: paymentMethod,
+  transaction_id: transactionId,
+  status: "Pending",
+})
       .select("id")
       .single();
 

@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import PrintInvoiceButton from "@/components/PrintInvoiceButton";
+import { redirect } from "next/navigation";
+import { createServerSupabaseClient } from "@/lib/supabase-server";
 
 export const dynamic = "force-dynamic";
 
@@ -20,9 +22,7 @@ type OrderProduct = {
   discount?: number;
 };
 
-export default async function InvoicePage({
-  params,
-}: PageProps) {
+export default async function InvoicePage({ params }: PageProps) {
   const { id } = await params;
   const orderId = Number(id);
 
@@ -30,1041 +30,876 @@ export default async function InvoicePage({
     notFound();
   }
 
-  const { data: order, error } = await supabaseAdmin
-    .from("orders")
-    .select("*")
-    .eq("id", orderId)
-    .single();
+const supabase = await createServerSupabaseClient();
 
-  if (error || !order) {
-    notFound();
-  }
+const {
+  data: { user },
+} = await supabase.auth.getUser();
 
+if (!user) {
+  redirect("/login");
+}
+
+// Get profile role
+const { data: profile } = await supabase
+  .from("profiles")
+  .select("role")
+  .eq("id", user.id)
+  .single();
+
+
+const isMerchant = profile?.role === "merchant";
+
+
+// Get order
+const { data: order, error } = await supabaseAdmin
+  .from("orders")
+  .select("*")
+  .eq("id", orderId)
+  .single();
+
+
+if (error || !order) {
+  notFound();
+}
+
+
+// Get customer email
+const { data: authUser, error: authError } =
+  await supabaseAdmin.auth.admin.getUserById(
+    order.user_id
+  );
+
+console.log("AUTH USER:", authUser);
+console.log("AUTH ERROR:", authError);
+
+const customerEmail =
+  authUser?.user?.email ?? "N/A";
+
+  console.log("FINAL CUSTOMER EMAIL:", customerEmail);
+
+// Security check
+if (!isMerchant && order.user_id !== user.id) {
+  notFound();
+}
   const products: OrderProduct[] = Array.isArray(order.products)
     ? order.products
     : [];
 
   const subtotal = Number(order.subtotal ?? 0);
   const deliveryFee = Number(order.delivery_fee ?? 0);
+  const total = Number(order.total ?? subtotal + deliveryFee);
 
-  const total = Number(
-    order.total ?? subtotal + deliveryFee
-  );
-
-  const customerName =
-    order.customer_name ?? "Customer";
-
-  const phone =
-    order.phone ?? "N/A";
-
-  const address =
-    order.address ?? "N/A";
-
-  const paymentMethod =
-    order.payment_method ?? "N/A";
-
-  const status =
-    order.status ?? "Pending";
-
-  const transactionId =
-    order.transaction_id ?? "N/A";
-
-  const customerEmail =
-    order.email ??
-    order.customer_email ??
-    "N/A";
+  const customerName = order.customer_name ?? "Customer";
+  const phone = order.phone ?? "N/A";
+  const address = order.address ?? "N/A";
+  const paymentMethod = order.payment_method ?? "N/A";
+  const status = order.status ?? "Pending";
+  const transactionId = order.transaction_id ?? "N/A";
+  
 
   const createdAt = order.created_at
-    ? new Date(order.created_at).toLocaleString(
-        "en-US",
-        {
-          month: "2-digit",
-          day: "2-digit",
-          year: "numeric",
-          hour: "numeric",
-          minute: "2-digit",
-          hour12: true,
-        }
-      )
+    ? new Date(order.created_at).toLocaleString("en-US", {
+        month: "2-digit",
+        day: "2-digit",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      })
     : "N/A";
 
-  /* =========================
-     PRICE CALCULATIONS
-  ========================= */
+  // Price calculations
+  const originalTotal = products.reduce((sum, item) => {
+    const originalPrice = Number(item.originalPrice ?? item.price ?? 0);
+    const quantity = Number(item.quantity ?? 1);
+    return sum + originalPrice * quantity;
+  }, 0);
 
-  const originalTotal = products.reduce(
-    (sum, item) => {
-      const originalPrice = Number(
-        item.originalPrice ??
-          item.price ??
-          0
-      );
-
-      const quantity = Number(
-        item.quantity ?? 1
-      );
-
-      return sum + originalPrice * quantity;
-    },
-    0
-  );
-
-  const discountAmount = Math.max(
-    0,
-    originalTotal - subtotal
-  );
-
+  const discountAmount = Math.max(0, originalTotal - subtotal);
   const discountedTotal = subtotal;
 
   return (
     <>
       <style>{`
+        /* =========================
+           RESET & BASE – YELLOW MINIMAL THEME
+        ========================= */
         * {
           box-sizing: border-box;
         }
-
         html,
         body {
           margin: 0;
           padding: 0;
-          background: #f3f4f6;
-          font-family: Arial, Helvetica, sans-serif;
+          background: #FFFFFF; /* soft yellow-beige */
+          font-family: 'Helvetica Neue', Arial, sans-serif;
         }
 
         /* =========================
-           MAIN
+           MAIN WRAPPER
         ========================= */
-
         .invoice-wrapper {
           width: 100%;
           min-height: 100vh;
-          padding: 20px 10px;
-          background: #f3f4f6;
+          padding: 30px 12px;
+          background: #FFFFFF;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
         }
 
         /* =========================
-           COMPACT INVOICE
+           INVOICE PAPER – light cream
         ========================= */
-
         .invoice-paper {
           position: relative;
-
-          width: 470px;
+          width: 500px;
           max-width: 100%;
-
           margin: 0 auto;
-
-          zoom: 1.05;
-
-          background: #ffffff;
-          border: 1px solid #d1d5db;
+          background: #FFFFFF;
+          border: 1px solid #d4c9b8;
           border-radius: 0;
           overflow: hidden;
-
-          box-shadow:
-            0 4px 14px rgba(0, 0, 0, 0.08);
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
         }
-
+        /* Accent bar – golden yellow */
         .invoice-paper::before {
           content: "";
           position: absolute;
           left: 0;
           top: 0;
           bottom: 0;
-          width: 5px;
-          background: #8ed05c;
+          width: 6px;
+          background: #FFFFFF;
         }
-
         .invoice-content {
-          padding: 17px 17px 19px 23px;
+          padding: 18px 20px 20px 28px;
         }
 
         /* =========================
            HEADER
         ========================= */
-
         .invoice-header {
           display: flex;
           justify-content: space-between;
           align-items: flex-start;
           gap: 10px;
-          padding-bottom: 11px;
-          border-bottom: 1px solid #222;
+          padding-bottom: 10px;
+          border-bottom: 2px solid #b5a984;
         }
-
+        .brand-wrap {
+          display: flex;
+          flex-direction: column;
+        }
         .brand-name {
-          margin: 0 0 4px;
-          font-size: 18px;
-          font-weight: 900;
-          color: #087f3e;
-        }
-
-        .invoice-title {
           margin: 0;
-          font-size: 27px;
-          line-height: 1;
+          font-size: 20px;
           font-weight: 900;
-          color: #111;
+          color: #2fa27c; /* dark gold */
+          letter-spacing: -0.3px;
+        }
+        .tagline {
+          margin: 2px 0 0;
+          font-size: 7px;
+          font-weight: 600;
+          color: #a58a6a;
+          text-transform: uppercase;
+          letter-spacing: 0.8px;
+        }
+        .invoice-title-wrap {
           text-align: right;
         }
-
-        .invoice-number {
-          margin-top: 4px;
-          color: #555;
-          font-size: 8px;
-          line-height: 1.45;
+        .invoice-title {
+          margin: 0;
+          font-size: 30px;
+          font-weight: 900;
+          color: #15120f;
+          line-height: 1;
+          letter-spacing: -0.5px;
         }
 
         /* =========================
-           CUSTOMER / COMPANY
+           INFO ROW
         ========================= */
-
-        .info-section {
+        .info-row {
           display: grid;
-          grid-template-columns:
-            minmax(0, 1fr)
-            minmax(0, 1fr);
-          gap: 12px;
-          padding: 12px 0 14px;
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+          gap: 14px;
+          padding: 12px 0 10px;
         }
-
-        .info-title {
-          margin: 0 0 4px;
-          font-size: 8px;
-          font-weight: 700;
-          color: #555;
-          text-transform: uppercase;
-          letter-spacing: 0.35px;
-        }
-
-        .customer-name {
-          margin: 0 0 4px;
-          font-size: 11.5px;
-          font-weight: 900;
-          color: #111;
-        }
-
-        .info-line {
-          margin: 2px 0;
-          color: #555;
+        .info-label {
+          margin: 0 0 3px;
           font-size: 7.5px;
-          line-height: 1.3;
+          font-weight: 700;
+          color: #8b7a60;
+          text-transform: uppercase;
+          letter-spacing: 0.4px;
+        }
+        .customer-name {
+          margin: 0 0 3px;
+          font-size: 12px;
+          font-weight: 900;
+          color: #2d1f0e;
+        }
+        .info-line {
+          margin: 1.5px 0;
+          color: #5a4d3a;
+          font-size: 7.5px;
+          line-height: 1.35;
           overflow-wrap: anywhere;
         }
-
         .info-line strong {
-          color: #222;
+          color: #2d1f0e;
         }
-
-        .order-info {
+        .info-right {
           text-align: right;
-          min-width: 0;
         }
-
-        .order-info .info-line {
+        .info-right .info-line {
           text-align: right;
+        }
+        .info-right .info-label {
+          text-align: right;
+        }
+        .invoice-meta {
+          margin-top: 6px;
+        }
+        .invoice-meta .info-line {
+          font-weight: 600;
+          color: #2d1f0e;
+        }
+        .invoice-meta .info-line span {
+          font-weight: 400;
+          color: #5a4d3a;
         }
 
         /* =========================
            PRODUCT TABLE
         ========================= */
-
+        .table-wrap {
+          margin-top: 4px;
+        }
         .product-table {
           width: 100%;
           border-collapse: collapse;
-          border: 1px solid #d1d5db;
+          border: 1px solid #d4c9b8;
           table-layout: fixed;
         }
-
         .product-table th {
-          padding: 6px 5px;
-          background: #48a941;
-          color: white;
+          padding: 6px 6px;
+          background: #f5d81c;
+          color: #fff;
           font-size: 7.5px;
           font-weight: 800;
           text-align: left;
+          text-transform: uppercase;
+          letter-spacing: 0.3px;
         }
-
         .product-table td {
-          padding: 6px 5px;
-          border-bottom: 1px solid #d1d5db;
-          color: #222;
+          padding: 6px 6px;
+          border-bottom: 1px solid #e8dfd0;
+          color: #2d1f0e;
           font-size: 7.5px;
           vertical-align: top;
           overflow-wrap: anywhere;
         }
-
+        .product-table tr:last-child td {
+          border-bottom: none;
+        }
         .product-table th:first-child,
         .product-table td:first-child {
-          width: auto;
-        }
-
-        .product-table th:nth-child(2),
-        .product-table td:nth-child(2) {
-          width: 60px;
-          text-align: right;
-        }
-
-        .product-table th:nth-child(3),
-        .product-table td:nth-child(3) {
-          width: 34px;
+          width: 28px;
           text-align: center;
         }
-
-        .product-table th:nth-child(4),
-        .product-table td:nth-child(4) {
-          width: 68px;
+        .product-table th:nth-child(2),
+        .product-table td:nth-child(2) {
+          width: auto;
+        }
+        .product-table th:nth-child(3),
+        .product-table td:nth-child(3) {
+          width: 52px;
           text-align: right;
         }
-
+        .product-table th:nth-child(4),
+        .product-table td:nth-child(4) {
+          width: 32px;
+          text-align: center;
+        }
+        .product-table th:nth-child(5),
+        .product-table td:nth-child(5) {
+          width: 62px;
+          text-align: right;
+        }
         .product-name {
           font-weight: 700;
         }
-
-        .old-price {
+        .price-strike {
           display: inline-block;
-          margin-top: 2px;
-          color: #777;
+          margin-top: 1px;
+          color: #999;
           font-size: 6px;
           text-decoration: line-through;
+          margin-right: 4px;
         }
-
-        .discounted-price {
-          margin-left: 3px;
-          color: #087f3e;
+        .price-discount {
+          color: #8b2626;
           font-size: 6px;
           font-weight: 700;
         }
 
         /* =========================
-           PAYMENT + TOTAL
+           THANK YOU + TOTALS
         ========================= */
-
         .bottom-section {
           display: grid;
-          grid-template-columns:
-            minmax(0, 1fr)
-            155px;
-          gap: 10px;
-          margin-top: 13px;
+          grid-template-columns: minmax(0, 1fr) 160px;
+          gap: 14px;
+          margin-top: 14px;
         }
+        .thank-you-text {
+          margin: 0 0 6px;
+          font-size: 8px;
+          font-weight: 700;
+          color: #727d2e;
+          font-style: italic;
+          letter-spacing: 0.2px;
+        }
+        .terms-box {
+          border-top: 1px solid #d4c9b8;
+          padding-top: 6px;
+          margin-top: 6px;
+        }
+        .terms-label {
+          margin: 0 0 2px;
+          font-size: 7px;
+          font-weight: 800;
+          color: #5a4d3a;
+          text-transform: uppercase;
+          letter-spacing: 0.3px;
+        }
+        .terms-text {
+          margin: 0;
+          color: #7a6a54;
+          font-size: 5.8px;
+          line-height: 1.4;
+        }
+          .payment-title {
+  margin: 0 0 6px;
+  font-size: 9px;
+  font-weight: 800;
+  color: #040302;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
 
         .payment-box {
-          border: 1px solid #bdbdbd;
-          border-radius: 0;
-          padding: 8px;
+  padding: 8px;
+  border: 1px solid #d4c9b8;
+}
+        .payment-label {
+          margin: 0 0 3px;
+          font-size: 8px;
+          font-weight: 800;
+          color: #5a4d3a;
+          text-transform: uppercase;
+          letter-spacing: 0.3px;
         }
-
-        .payment-title {
-          margin: 0 0 4px;
-          font-size: 7.5px;
-          font-weight: 900;
-          color: #444;
-        }
-
         .payment-line {
-          margin: 2px 0;
-          color: #555;
-          font-size: 6.8px;
+          margin: 3.5px 0;
+          color: #010100;
+          font-size: 8px;
           overflow-wrap: anywhere;
         }
-
-        .terms {
-          margin-top: 6px;
-          color: #777;
-          font-size: 6px;
-          line-height: 1.35;
+        .payment-line strong {
+          color: #2d1f0e;
         }
 
+        /* ---- Totals box ---- */
         .totals-box {
-          background: #eeeeee;
-          border-radius: 0;
-          padding: 8px 9px;
+          background: #f8f3e9;
+          border: 1px solid #d4c9b8;
+          padding: 8px 10px;
         }
-
         .total-row {
           display: flex;
           justify-content: space-between;
           align-items: center;
           gap: 5px;
-          padding: 3px 0;
+          padding: 2.5px 0;
           font-size: 7px;
-          color: #555;
+          color: #a08763;
         }
-
-        .discount-row {
-          color: #555;
+        .total-row.discount-row {
+          color: #941818;
         }
-
-        .discount-amount {
-          color: #dc2626;
+        .total-row.discount-row .total-amount {
+          color: #b22222;
           font-weight: 600;
         }
-
-        .discounted-total {
-          color: #087f3e;
+        .total-row.discounted-row .total-amount {
+          color: #b8a830;
           font-weight: 700;
         }
-
         .total-divider {
-          margin: 4px 0;
-          border-top: 1px solid #9ca3af;
+          margin: 3px 0;
+          border-top: 1px solid #d4c9b8;
         }
-
+        .total-divider.thick {
+          border-top: 2px solid #c9a84c;
+        }
         .grand-total {
-          margin-top: 3px;
-          padding-top: 5px;
-          border-top: 1px solid #555;
+          margin-top: 2px;
+          padding-top: 4px;
+          border-top: 2px solid #c9a84c;
           font-size: 11px;
           font-weight: 900;
-          color: #111;
+          color: #2d1f0e;
         }
-
-        .grand-total span:last-child {
-          color: #087f3e;
-        }
-
-        /* =========================
-           ACKNOWLEDGEMENT
-        ========================= */
-
-        .acknowledgement {
-          margin-top: 13px;
-        }
-
-        .acknowledgement-title {
-          margin: 0 0 4px;
-          font-size: 8.5px;
-          font-weight: 900;
-          color: #444;
-        }
-
-        .acknowledgement p {
-          margin: 0 0 3px;
-          color: #666;
-          font-size: 6.8px;
-          line-height: 1.35;
+        .grand-total .total-amount {
+          color: #9a4413;
         }
 
         /* =========================
            SIGNATURE
         ========================= */
-
         .signature-section {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 16px;
-          margin-top: 17px;
+          gap: 20px;
+          margin-top: 16px;
+          padding-top: 12px;
+          border-top: 1px solid #d4c9b8;
         }
-
         .signature {
           text-align: center;
           min-width: 0;
         }
-
         .signature-line {
-          min-height: 35px;
+          min-height: 34px;
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: flex-end;
           padding-bottom: 3px;
-          border-bottom: 1px solid #222;
+          border-bottom: 1px solid #2d1f0e;
         }
-
-        .customer-signature {
-          font-family:
-            "Brittany Signature",
-            "Brush Script MT",
-            "Segoe Script",
-            cursive;
-          font-size: 17px;
+        .signature-name {
+          font-family: "Brittany Signature", "Brush Script MT", "Segoe Script", cursive;
+          font-size: 18px;
           font-weight: 400;
-          color: #111;
+          color: #2d1f0e;
           line-height: 1;
           white-space: nowrap;
           max-width: 100%;
           overflow: hidden;
           text-overflow: ellipsis;
         }
-
-        .company-signature {
+        .signature-company {
           display: block;
-          margin-top: 3px;
-          font-family:
-            Arial,
-            Helvetica,
-            sans-serif;
+          margin-top: 2px;
+          font-family: 'Helvetica Neue', Arial, sans-serif;
           font-size: 9px;
           font-weight: 700;
-          color: #111;
+          color: #2d1f0e;
           line-height: 1;
           white-space: nowrap;
         }
-
         .signature-label {
           margin: 3px 0 0;
           font-size: 6.5px;
-          color: #222;
-          font-weight: 500;
+          color: #5a4d3a;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.3px;
         }
-
         .signature-date {
           margin: 2px 0 0;
-          font-size: 6px;
-          color: #555;
+          font-size: 5.8px;
+          color: #8b7a60;
         }
 
-        .thank-you {
-          margin-top: 9px;
-          text-align: center;
-          color: #555;
+        /* =========================
+           FOOTER – Phone | Address | Website
+        ========================= */
+        .invoice-footer {
+          margin-top: 16px;
+          padding-top: 10px;
+          border-top: 1px solid #d4c9b8;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 6px;
           font-size: 6.8px;
-          font-weight: 600;
+          color: #5a4d3a;
+          font-weight: 500;
+        }
+        .footer-item {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+        }
+        .footer-item span {
+          font-weight: 700;
+          color: #2d1f0e;
         }
 
         /* =========================
            BUTTONS
         ========================= */
-
         .invoice-actions {
           display: flex;
           justify-content: center;
           align-items: center;
-          gap: 5px;
-          margin: 10px auto 15px;
-          width: min(100%, 470px);
+          gap: 6px;
+          margin: 14px auto 10px;
+          width: min(100%, 500px);
+          flex-wrap: wrap;
         }
-
         .invoice-action {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          min-width: 90px;
-          padding: 7px 9px;
+          min-width: 80px;
+          padding: 8px 12px;
           text-decoration: none;
           font-size: 8px;
           font-weight: 800;
           border: none;
           border-radius: 0;
           cursor: pointer;
+          transition: opacity 0.2s;
         }
-
+        .invoice-action:hover {
+          opacity: 0.8;
+        }
         .print-button {
-          background: #2563eb;
-          color: white;
+          background: #c9a84c;
+          color: #fff;
         }
-
         .home-button {
-          background: #000;
-          color: white;
+          background: #2d1f0e;
+          color: #fff;
         }
-
         .dashboard-button {
-          background: #087f3e;
-          color: white;
+          background: #7d5d2e;
+          color: #fff;
         }
 
         /* =========================
-           TABLET
+           RESPONSIVE (unchanged)
         ========================= */
-
         @media (max-width: 800px) {
           .invoice-wrapper {
-            padding: 12px 7px;
+            padding: 16px 8px;
           }
-
           .invoice-paper {
-            width: 470px;
+            width: 480px;
             max-width: 100%;
-            zoom: 1.03;
           }
-
           .invoice-content {
-            padding: 16px 15px 18px 21px;
+            padding: 16px 16px 18px 24px;
           }
         }
-
-        /* =========================
-           MOBILE
-        ========================= */
-
         @media (max-width: 600px) {
           html,
           body {
             background: #ffffff;
           }
-
           .invoice-wrapper {
-            width: 100%;
-            min-height: auto;
             padding: 0;
             background: #ffffff;
+            min-height: auto;
           }
-
           .invoice-paper {
             width: 100%;
             max-width: none;
-            zoom: 1;
             border-left: none;
             border-right: none;
             box-shadow: none;
+            border: none;
           }
-
           .invoice-paper::before {
             width: 4px;
           }
-
           .invoice-content {
-            padding: 16px 10px 18px 16px;
+            padding: 14px 10px 16px 18px;
           }
-
           .invoice-header {
             gap: 6px;
             padding-bottom: 8px;
           }
-
           .brand-name {
-            font-size: 14px;
-            margin-bottom: 3px;
+            font-size: 16px;
           }
-
+          .tagline {
+            font-size: 6px;
+          }
           .invoice-title {
-            font-size: 21px;
+            font-size: 22px;
           }
-
-          .invoice-number {
-            font-size: 6px;
-            line-height: 1.35;
+          .info-row {
+            gap: 8px;
+            padding: 10px 0 8px;
           }
-
-          .info-section {
-            gap: 7px;
-            padding: 10px 0 11px;
-          }
-
-          .info-title {
-            margin-bottom: 3px;
+          .info-label {
             font-size: 6px;
           }
-
           .customer-name {
-            margin-bottom: 3px;
-            font-size: 9px;
+            font-size: 10px;
           }
-
           .info-line {
-            margin: 1.5px 0;
-            font-size: 6px;
-            line-height: 1.25;
+            font-size: 6.2px;
           }
-
           .product-table th {
-            padding: 5px 3px;
+            padding: 4px 4px;
             font-size: 6px;
           }
-
           .product-table td {
-            padding: 5px 3px;
+            padding: 4px 4px;
             font-size: 6px;
           }
-
-          .product-table th:nth-child(2),
-          .product-table td:nth-child(2) {
-            width: 50px;
+          .product-table th:first-child,
+          .product-table td:first-child {
+            width: 22px;
           }
-
           .product-table th:nth-child(3),
           .product-table td:nth-child(3) {
-            width: 27px;
+            width: 44px;
           }
-
           .product-table th:nth-child(4),
           .product-table td:nth-child(4) {
-            width: 58px;
+            width: 26px;
           }
-
-          .old-price,
-          .discounted-price {
+          .product-table th:nth-child(5),
+          .product-table td:nth-child(5) {
+            width: 52px;
+          }
+          .price-strike,
+          .price-discount {
             font-size: 5px;
           }
-
           .bottom-section {
-            grid-template-columns:
-              minmax(0, 1fr)
-              120px;
-            gap: 6px;
+            grid-template-columns: 1fr;
+            gap: 10px;
             margin-top: 10px;
           }
-
-          .payment-box {
-            padding: 5px;
-          }
-
-          .payment-title {
-            margin-bottom: 3px;
-            font-size: 6px;
-          }
-
-          .payment-line {
-            font-size: 5.2px;
-          }
-
-          .terms {
-            margin-top: 5px;
-            font-size: 4.8px;
-            line-height: 1.25;
-          }
-
           .totals-box {
-            padding: 6px;
+            padding: 6px 8px;
           }
-
           .total-row {
-            gap: 3px;
-            padding: 2px 0;
             font-size: 6px;
+            padding: 2px 0;
           }
-
-          .total-divider {
-            margin: 3px 0;
-          }
-
           .grand-total {
-            margin-top: 2px;
-            padding-top: 4px;
             font-size: 9px;
           }
-
-          .acknowledgement {
-            margin-top: 10px;
-          }
-
-          .acknowledgement-title {
-            margin-bottom: 3px;
+          .thank-you-text {
             font-size: 7px;
           }
-
-          .acknowledgement p {
-            margin-bottom: 2px;
-            font-size: 5.5px;
-            line-height: 1.25;
-          }
-
-          .signature-section {
-            gap: 8px;
-            margin-top: 14px;
-          }
-
-          .signature-line {
-            min-height: 32px;
-            padding-bottom: 2px;
-          }
-
-          .customer-signature {
-            font-size: 14px;
-          }
-
-          .company-signature {
-            margin-top: 2px;
-            font-size: 6.5px;
-          }
-
-          .signature-label {
-            margin-top: 2px;
+          .terms-text {
             font-size: 5.2px;
           }
-
-          .signature-date {
-            margin-top: 1px;
-            font-size: 5px;
+          .payment-line {
+            font-size: 5.8px;
           }
-
-          .thank-you {
-            margin-top: 7px;
+          .signature-section {
+            gap: 10px;
+            margin-top: 12px;
+            padding-top: 10px;
+          }
+          .signature-line {
+            min-height: 28px;
+            padding-bottom: 2px;
+          }
+          .signature-name {
+            font-size: 14px;
+          }
+          .signature-company {
+            font-size: 7px;
+          }
+          .signature-label {
             font-size: 5.5px;
           }
-
+          .signature-date {
+            font-size: 5px;
+          }
+          .invoice-footer {
+            font-size: 5.8px;
+            flex-direction: column;
+            align-items: flex-start;
+          }
           .invoice-actions {
             width: 100%;
             padding: 0 4px;
-            gap: 3px;
-            margin: 5px auto 8px;
+            gap: 4px;
+            margin: 6px auto 8px;
           }
-
           .invoice-action {
             min-width: 0;
             flex: 1;
-            padding: 6px 3px;
-            font-size: 6.5px;
+            padding: 6px 4px;
+            font-size: 6px;
           }
         }
-
-        /* =========================
-           VERY SMALL PHONES
-        ========================= */
-
         @media (max-width: 380px) {
           .invoice-content {
             padding-left: 14px;
-            padding-right: 7px;
+            padding-right: 6px;
           }
-
+          .brand-name {
+            font-size: 14px;
+          }
           .invoice-title {
             font-size: 20px;
           }
-
-          .brand-name {
-            font-size: 13px;
+          .product-table th:first-child,
+          .product-table td:first-child {
+            width: 18px;
           }
-
-          .bottom-section {
-            grid-template-columns:
-              minmax(0, 1fr)
-              112px;
-          }
-
-          .product-table th:nth-child(2),
-          .product-table td:nth-child(2) {
-            width: 47px;
-          }
-
           .product-table th:nth-child(3),
           .product-table td:nth-child(3) {
-            width: 25px;
+            width: 38px;
           }
-
           .product-table th:nth-child(4),
           .product-table td:nth-child(4) {
-            width: 55px;
+            width: 22px;
+          }
+          .product-table th:nth-child(5),
+          .product-table td:nth-child(5) {
+            width: 44px;
           }
         }
 
         /* =========================
-           A5 PRINT
+           PRINT – A5 with yellow theme
         ========================= */
-
         @media print {
           @page {
             size: A5 portrait;
-            margin: 7mm;
+            margin: 6mm;
           }
-
           html,
           body {
             margin: 0 !important;
             padding: 0 !important;
-            background: #ffffff !important;
+            background: #FFFFFF !important;
           }
-
           .invoice-wrapper {
             width: 100% !important;
             min-height: auto !important;
             padding: 0 !important;
             margin: 0 !important;
-            background: #ffffff !important;
+            background: #fefcf6 !important;
           }
-
-          /*
-           * A5:
-           * 148mm × 210mm
-           *
-           * Invoice compact থাকবে এবং
-           * page-এর মাঝখানে থাকবে।
-           */
           .invoice-paper {
-            width: 470px !important;
-            max-width: 470px !important;
-
-            zoom: 1 !important;
-
+            width: 100% !important;
+            max-width: 100% !important;
             margin: 0 auto !important;
-
-            border: 1px solid #d1d5db !important;
-            border-radius: 0 !important;
-
+            border: 1px solid #d4c9b8 !important;
             box-shadow: none !important;
-
             page-break-inside: avoid;
           }
-
           .invoice-paper::before {
             width: 4px !important;
           }
-
           .invoice-content {
-            padding: 14px 14px 16px 20px !important;
+            padding: 12px 14px 14px 22px !important;
           }
-
           .invoice-header {
-            gap: 8px !important;
             padding-bottom: 8px !important;
           }
-
           .brand-name {
-            font-size: 16px !important;
-            margin-bottom: 3px !important;
+            font-size: 17px !important;
           }
-
+          .tagline {
+            font-size: 5.5px !important;
+          }
           .invoice-title {
-            font-size: 24px !important;
+            font-size: 26px !important;
           }
-
-          .invoice-number {
-            margin-top: 3px !important;
-            font-size: 6.8px !important;
-            line-height: 1.35 !important;
+          .info-row {
+            padding: 10px 0 8px !important;
           }
-
-          .info-section {
-            gap: 10px !important;
-            padding: 9px 0 10px !important;
-          }
-
-          .info-title {
-            margin-bottom: 3px !important;
-            font-size: 7px !important;
-          }
-
-          .customer-name {
-            margin-bottom: 3px !important;
-            font-size: 10px !important;
-          }
-
-          .info-line {
-            margin: 1.5px 0 !important;
+          .info-label {
             font-size: 6.5px !important;
-            line-height: 1.25 !important;
           }
-
+          .customer-name {
+            font-size: 10.5px !important;
+          }
+          .info-line {
+            font-size: 6.5px !important;
+          }
           .product-table th {
-            padding: 5px 4px !important;
-            font-size: 6.8px !important;
+            padding: 5px 5px !important;
+            font-size: 6.5px !important;
           }
-
           .product-table td {
-            padding: 5px 4px !important;
-            font-size: 6.8px !important;
+            padding: 5px 5px !important;
+            font-size: 6.5px !important;
           }
-
-          .product-table th:nth-child(2),
-          .product-table td:nth-child(2) {
-            width: 58px !important;
+          .product-table th:first-child,
+          .product-table td:first-child {
+            width: 26px !important;
           }
-
           .product-table th:nth-child(3),
           .product-table td:nth-child(3) {
-            width: 32px !important;
+            width: 50px !important;
           }
-
           .product-table th:nth-child(4),
           .product-table td:nth-child(4) {
-            width: 64px !important;
+            width: 30px !important;
           }
-
-          .old-price,
-          .discounted-price {
-            font-size: 5.5px !important;
+          .product-table th:nth-child(5),
+          .product-table td:nth-child(5) {
+            width: 58px !important;
           }
-
           .bottom-section {
-            grid-template-columns:
-              minmax(0, 1fr)
-              145px !important;
-
-            gap: 8px !important;
-
-            margin-top: 10px !important;
+            grid-template-columns: minmax(0, 1fr) 150px !important;
+            gap: 12px !important;
+            margin-top: 12px !important;
           }
-
-          .payment-box {
-            padding: 7px !important;
-          }
-
-          .payment-title {
-            margin-bottom: 3px !important;
-            font-size: 7px !important;
-          }
-
-          .payment-line {
-            margin: 1.5px 0 !important;
-            font-size: 6px !important;
-          }
-
-          .terms {
-            margin-top: 5px !important;
-            font-size: 5.3px !important;
-            line-height: 1.25 !important;
-          }
-
           .totals-box {
-            padding: 7px 8px !important;
+            padding: 6px 8px !important;
           }
-
           .total-row {
-            padding: 2.5px 0 !important;
             font-size: 6.5px !important;
+            padding: 2px 0 !important;
           }
-
-          .total-divider {
-            margin: 3px 0 !important;
-          }
-
           .grand-total {
-            margin-top: 2px !important;
-            padding-top: 4px !important;
             font-size: 10px !important;
           }
-
-          .acknowledgement {
-            margin-top: 10px !important;
+          .thank-you-text {
+            font-size: 7px !important;
           }
-
-          .acknowledgement-title {
-            margin-bottom: 3px !important;
-            font-size: 7.5px !important;
+          .terms-text {
+            font-size: 5.2px !important;
           }
-
-          .acknowledgement p {
-            margin-bottom: 2px !important;
+          .payment-line {
             font-size: 6px !important;
-            line-height: 1.25 !important;
           }
-
           .signature-section {
-            gap: 14px !important;
-            margin-top: 13px !important;
+            margin-top: 14px !important;
+            padding-top: 10px !important;
           }
-
           .signature-line {
             min-height: 30px !important;
-            padding-bottom: 2px !important;
           }
-
-          .customer-signature {
-            font-size: 15px !important;
+          .signature-name {
+            font-size: 16px !important;
           }
-
-          .company-signature {
-            margin-top: 2px !important;
+          .signature-company {
             font-size: 8px !important;
           }
-
           .signature-label {
-            margin-top: 2px !important;
             font-size: 5.8px !important;
           }
-
           .signature-date {
-            margin-top: 1px !important;
-            font-size: 5.5px !important;
+            font-size: 5.2px !important;
           }
-
-          .thank-you {
-            margin-top: 7px !important;
+          .invoice-footer {
             font-size: 6px !important;
           }
-
           .invoice-actions {
             display: none !important;
           }
@@ -1072,236 +907,114 @@ export default async function InvoicePage({
       `}</style>
 
       <main className="invoice-wrapper">
-
-        {/* =========================
-            INVOICE
-        ========================= */}
-
         <div className="invoice-paper">
-
           <div className="invoice-content">
-
             {/* HEADER */}
-
             <header className="invoice-header">
-
-              <div>
-
-                <h1 className="brand-name">
-                  Tawakkul Zone
-                </h1>
-
-                <div className="invoice-number">
-
-                  <div>
-                    NO. — #{order.id}
-                  </div>
-
-                  <div>
-                    ORDER NUMBER — #{order.id}
-                  </div>
-
-                  <div>
-                    DATE — {createdAt}
-                  </div>
-
-                </div>
-
+              <div className="brand-wrap">
+                <h1 className="brand-name">Tawakkul Zone</h1>
+                <p className="tagline">Online Shopping Platform</p>
               </div>
-
-              <div>
-
-                <h2 className="invoice-title">
-                  INVOICE
-                </h2>
-
+              <div className="invoice-title-wrap">
+                <h2 className="invoice-title">INVOICE</h2>
               </div>
-
             </header>
 
-            {/* CUSTOMER / COMPANY */}
-
-            <section className="info-section">
-
-              <div>
-
-                <h3 className="info-title">
-                  Invoice To
-                </h3>
-
-                <h4 className="customer-name">
+            {/* INFO ROW */}
+            <section className="info-row">
+              <div className="info-left">
+                <p className="info-label">Invoice to</p>
+                <p className="customer-name">
                   {customerName}
-                </h4>
-
-                <p className="info-line">
-                  {address}
                 </p>
-
                 <p className="info-line">
-                  <strong>Phone:</strong>{" "}
-                  {phone}
+                  <strong>Address:</strong> {address}
                 </p>
-
                 <p className="info-line">
-                  <strong>Email:</strong>{" "}
-                  {customerEmail}
+                  <strong>Phone:</strong> {phone}
                 </p>
-
+                <p className="info-line">
+                  <strong>Email:</strong> {customerEmail}
+                </p>
               </div>
-
-              <div className="order-info">
-
-                <h3 className="info-title">
-                  Company
-                </h3>
-
-                <h4 className="customer-name">
-                  Tawakkul Zone
-                </h4>
-
-                <p className="info-line">
-                  Online Shopping Platform
-                </p>
-
-                <p className="info-line">
-                  Bangladesh
-                </p>
-
-                <p className="info-line">
-                  Payment: {paymentMethod}
-                </p>
-
-                <p className="info-line">
-                  Status: {status}
-                </p>
-
-                <p className="info-line">
-                  Transaction ID: {transactionId}
-                </p>
-
+              <div className="info-right">
+                <p className="info-label">Invoice Details</p>
+                <div className="invoice-meta">
+                  <p className="info-line">
+                    Invoice # <span>{order.id}</span>
+                  </p>
+                  <p className="info-line">
+                    Date <span>{createdAt}</span>
+                  </p>
+                  <p className="info-line">
+                    Payment <span>{paymentMethod}</span>
+                  </p>
+                  <p className="info-line">
+                    Status <span>{status}</span>
+                  </p>
+                  <p className="info-line">
+                    Txn ID <span>{transactionId}</span>
+                  </p>
+                </div>
               </div>
-
             </section>
 
-            {/* PRODUCTS */}
-
-            <section>
-
+            {/* PRODUCT TABLE */}
+            <section className="table-wrap">
               <table className="product-table">
-
                 <thead>
-
                   <tr>
-
-                    <th>
-                      Description
-                    </th>
-
-                    <th>
-                      Price
-                    </th>
-
-                    <th>
-                      QTY
-                    </th>
-
-                    <th>
-                      Subtotal
-                    </th>
-
+                    <th>SL.</th>
+                    <th>Item Description</th>
+                    <th>Price</th>
+                    <th>Qty</th>
+                    <th>Total</th>
                   </tr>
-
                 </thead>
-
                 <tbody>
+                  {products.map((item, index) => {
+                    const originalPrice = Number(
+                      item.originalPrice ?? item.price ?? 0
+                    );
+                    const finalPrice =
+                      item.discountedPrice !== undefined
+                        ? Number(item.discountedPrice)
+                        : Number(item.price ?? 0);
+                    const quantity = Number(item.quantity ?? 1);
+                    const itemSubtotal = finalPrice * quantity;
+                    const hasDiscount = finalPrice < originalPrice;
 
-                  {products.map(
-                    (item, index) => {
-
-                      const originalPrice =
-                        Number(
-                          item.originalPrice ??
-                            item.price ??
-                            0
-                        );
-
-                      const finalPrice =
-                        item.discountedPrice !==
-                        undefined
-                          ? Number(
-                              item.discountedPrice
-                            )
-                          : Number(
-                              item.price ?? 0
-                            );
-
-                      const quantity =
-                        Number(
-                          item.quantity ?? 1
-                        );
-
-                      const itemSubtotal =
-                        finalPrice * quantity;
-
-                      const hasDiscount =
-                        finalPrice <
-                        originalPrice;
-
-                      return (
-                        <tr key={index}>
-
-                          <td>
-
-                            <div className="product-name">
-                              {item.name}
+                    return (
+                      <tr key={index}>
+                        <td>{index + 1}</td>
+                        <td>
+                          <div className="product-name">{item.name}</div>
+                          {hasDiscount && (
+                            <div>
+                              <span className="price-strike">
+                                ৳ {originalPrice}
+                              </span>
+                              <span className="price-discount">
+                                ৳ {finalPrice}
+                              </span>
                             </div>
-
-                            {hasDiscount && (
-                              <div>
-
-                                <span className="old-price">
-                                  ৳ {originalPrice}
-                                </span>
-
-                                <span className="discounted-price">
-                                  ৳ {finalPrice}
-                                </span>
-
-                              </div>
-                            )}
-
-                          </td>
-
-                          <td>
-                            ৳ {finalPrice}
-                          </td>
-
-                          <td>
-                            {quantity}
-                          </td>
-
-                          <td>
-                            ৳ {itemSubtotal}
-                          </td>
-
-                        </tr>
-                      );
-                    }
-                  )}
-
+                          )}
+                        </td>
+                        <td>৳ {finalPrice}</td>
+                        <td>{quantity}</td>
+                        <td>৳ {itemSubtotal}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
-
               </table>
-
             </section>
 
-            {/* PAYMENT + TOTAL */}
-
+            {/* BOTTOM: THANK YOU + TOTALS */}
             <section className="bottom-section">
-
-              <div>
-
-                <div className="payment-box">
+              <div className="bottom-left">
+                
+                 <div className="payment-box">
 
                   <h3 className="payment-title">
                     PAYMENT METHOD
@@ -1321,204 +1034,92 @@ export default async function InvoicePage({
                   </p>
 
                 </div>
+              
 
-                <p className="terms">
-                  *Please keep this invoice
+
+
+                <div className="terms-box">
+                  <p className="terms-label">Terms & Conditions</p>
+                  <p className="terms-text">
+                    *Please keep this invoice
                   for your records. Payment
                   and delivery details shown
                   above are based on the order
                   information provided at
                   checkout.
-                </p>
-
-              </div>
-
-              {/* TOTALS */}
-
+                  </p>
+                  
+                </div>
+</div>
               <div className="totals-box">
-
                 <div className="total-row">
-
-                  <span>
-                    Original Price
-                  </span>
-
-                  <span>
-                    ৳ {originalTotal}
-                  </span>
-
+                  <span>Sub Total</span>
+                  <span className="total-amount">৳ {subtotal}</span>
                 </div>
-
                 <div className="total-row discount-row">
-
-                  <span>
-                    Discount
-                  </span>
-
-                  <span className="discount-amount">
-                    - ৳ {discountAmount}
-                  </span>
-
+                  <span>Discount</span>
+                  <span className="total-amount">-৳ {discountAmount}</span>
                 </div>
-
+                <div className="total-row discounted-row">
+                  <span>Discounted Price</span>
+                  <span className="total-amount">৳ {discountedTotal}</span>
+                </div>
+                <div className="total-divider"></div>
                 <div className="total-row">
-
-                  <span>
-                    Discounted Price
-                  </span>
-
-                  <span className="discounted-total">
-                    ৳ {discountedTotal}
-                  </span>
-
+                  <span>Delivery Fee</span>
+                  <span className="total-amount">৳ {deliveryFee}</span>
                 </div>
-
-                <div className="total-divider" />
-
-                <div className="total-row">
-
-                  <span>
-                    Subtotal
-                  </span>
-
-                  <span>
-                    ৳ {subtotal}
-                  </span>
-
-                </div>
-
-                <div className="total-row">
-
-                  <span>
-                    Delivery Fee
-                  </span>
-
-                  <span>
-                    ৳ {deliveryFee}
-                  </span>
-
-                </div>
-
-                <div className="total-divider" />
-
+                <div className="total-divider thick"></div>
                 <div className="total-row grand-total">
-
-                  <span>
-                    TOTAL
-                  </span>
-
-                  <span>
-                    ৳ {total}
-                  </span>
-
+                  <span>TOTAL</span>
+                  <span className="total-amount">৳ {total}</span>
                 </div>
-
               </div>
-
-            </section>
-
-            {/* ACKNOWLEDGEMENT */}
-
-            <section className="acknowledgement">
-
-              <h3 className="acknowledgement-title">
-                ACKNOWLEDGEMENT OF RECEIPT
-              </h3>
-
-              <p>
-                This invoice confirms that
-                your order has been
-                successfully received by
-                Tawakkul Zone.
-              </p>
-
-              <p>
-                Please retain this invoice
-                as proof of your order and
-                payment information.
-              </p>
-
             </section>
 
             {/* SIGNATURE */}
-
             <section className="signature-section">
-
               <div className="signature">
-
                 <div className="signature-line">
-
-                  <span className="customer-signature">
-                    {customerName}
-                  </span>
-
+                  <span className="signature-name">{customerName}</span>
                 </div>
-
-                <p className="signature-label">
-                  Customer Signature
-                </p>
-
-                <p className="signature-date">
-                  {createdAt}
-                </p>
-
+                <p className="signature-label">Customer Signature</p>
+                <p className="signature-date">{createdAt}</p>
               </div>
-
               <div className="signature">
-
                 <div className="signature-line">
-
-                  <p className="signature-label">
-                    Authorized Person
-                  </p>
-
+                  <span className="signature-company">Tawakkul Zone</span>
                 </div>
-
-                <span className="company-signature">
-                  Tawakkul Zone
-                </span>
-
-                <p className="signature-date">
-                  {createdAt}
-                </p>
-
+                <p className="signature-label">Authorised Sign</p>
+                <p className="signature-date">{createdAt}</p>
               </div>
-
             </section>
 
-            {/* THANK YOU */}
-
-            <div className="thank-you">
-              Thank you for shopping with
-              Tawakkul Zone ❤️
+            {/* FOOTER – Phone | Address | Website */}
+            <div className="invoice-footer">
+              <span className="footer-item">
+                <span>Phone:</span> +8801637133488
+              </span>
+              <span className="footer-item">
+                <span>Address:</span> All, Bangladesh
+              </span>
+              <span className="footer-item">
+                <span>Website:</span> www.tawakkulzone.shop
+              </span>
             </div>
-
           </div>
-
         </div>
 
         {/* BUTTONS */}
-
         <div className="invoice-actions">
-
           <PrintInvoiceButton />
-
-          <Link
-            href="/"
-            className="invoice-action home-button"
-          >
+          <Link href="/" className="invoice-action home-button">
             🏠 Home
           </Link>
-
-          <Link
-            href="/dashboard"
-            className="invoice-action dashboard-button"
-          >
+          <Link href="/dashboard" className="invoice-action dashboard-button">
             📊 Dashboard
           </Link>
-
         </div>
-
       </main>
     </>
   );
