@@ -86,7 +86,18 @@ if (!isMerchant && order.user_id !== user.id) {
     ? order.products
     : [];
 
-  const subtotal = Number(order.subtotal ?? 0);
+  const subtotal = products.reduce(
+  (sum, item) =>
+    sum + (item.originalPrice ?? item.price) * item.quantity,
+  0
+);
+
+const discountedPrice = products.reduce(
+  (sum, item) =>
+    sum + item.price * item.quantity,
+  0
+);
+
   const deliveryFee = Number(order.delivery_fee ?? 0);
   const total = Number(order.total ?? subtotal + deliveryFee);
 
@@ -110,15 +121,28 @@ if (!isMerchant && order.user_id !== user.id) {
     : "N/A";
 
   // Price calculations
-  const originalTotal = products.reduce((sum, item) => {
-    const originalPrice = Number(item.originalPrice ?? item.price ?? 0);
-    const quantity = Number(item.quantity ?? 1);
-    return sum + originalPrice * quantity;
-  }, 0);
+ const originalTotal = products.reduce((sum, item) => {
+  const originalPrice = Number(item.originalPrice ?? item.price ?? 0);
+  const quantity = Number(item.quantity ?? 1);
 
-  const discountAmount = Math.max(0, originalTotal - subtotal);
-  const discountedTotal = subtotal;
+  return sum + originalPrice * quantity;
+}, 0);
 
+
+const discountedTotal = products.reduce((sum, item) => {
+  const price = Number(
+    item.discountedPrice ?? item.price ?? 0
+  );
+
+  const quantity = Number(item.quantity ?? 1);
+
+  return sum + price * quantity;
+}, 0);
+
+const discountAmount = Math.max(
+  0,
+  originalTotal - discountedTotal
+);
   return (
     <>
       <style>{`
