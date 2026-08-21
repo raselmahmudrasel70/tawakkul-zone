@@ -1,5 +1,8 @@
-﻿const AUTH_SECRET =
-  process.env.ADMIN_AUTH_SECRET || "tawakkul-zone-admin-secret";
+﻿const AUTH_SECRET = process.env.ADMIN_AUTH_SECRET;
+
+if (!AUTH_SECRET) {
+  throw new Error("ADMIN_AUTH_SECRET is not configured");
+}
 
 export const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "";
 
