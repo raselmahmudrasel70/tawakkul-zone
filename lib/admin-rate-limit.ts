@@ -71,8 +71,7 @@ export async function recordFailedLogin(ip: string, email: string) {
       )
       .select();
 
-    console.log("UPSERT RESULT:", data);
-    console.log("UPSERT ERROR:", error);
+    
 
     return {
       attempts,
@@ -95,9 +94,6 @@ export async function recordFailedLogin(ip: string, email: string) {
       }
     )
     .select();
-
-  console.log("UPSERT RESULT:", data);
-  console.log("UPSERT ERROR:", error);
 
   return {
     attempts,
