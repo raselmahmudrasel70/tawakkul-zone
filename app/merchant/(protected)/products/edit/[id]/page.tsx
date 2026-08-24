@@ -10,6 +10,7 @@ type Product = {
   category: string;
   discount: number;
   images: string | null;
+  stock: boolean;
 };
 
 export default function EditProductPage() {
@@ -25,6 +26,8 @@ export default function EditProductPage() {
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("");
   const [discount, setDiscount] = useState("");
+  const [stock, setStock] = useState(true);
+
   const [image, setImage] = useState<File | null>(null);
   const [currentImageUrl, setCurrentImageUrl] = useState("");
 
@@ -49,6 +52,7 @@ export default function EditProductPage() {
         setPrice(String(data.price ?? ""));
         setCategory(data.category ?? "");
         setDiscount(String(data.discount ?? 0));
+        setStock(Boolean(data.stock));
         setCurrentImageUrl(data.images ?? "");
       } catch (error) {
         console.error("Load product error:", error);
@@ -84,6 +88,9 @@ export default function EditProductPage() {
       formData.append("price", price);
       formData.append("category", category);
       formData.append("discount", discount);
+
+      // Stock value পাঠানো হচ্ছে
+      formData.append("stock", String(stock));
 
       if (image) {
         formData.append("image", image);
@@ -133,43 +140,103 @@ export default function EditProductPage() {
   return (
     <main className="min-h-screen bg-black p-8 text-white">
       <div className="mx-auto max-w-3xl">
+
         <h1 className="mb-6 text-3xl font-bold">
           ✏️ Edit Product
         </h1>
 
         <div className="space-y-4 rounded-xl bg-white p-6 text-slate-900 shadow">
-          <input
-            className="w-full rounded border p-3"
-            placeholder="Product Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
 
-          <input
-            type="number"
-            className="w-full rounded border p-3"
-            placeholder="Price"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-          />
+          {/* Product Name */}
+          <div>
+            <label className="mb-2 block font-semibold">
+              Product Name
+            </label>
 
-          <input
-            className="w-full rounded border p-3"
-            placeholder="Category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          />
+            <input
+              className="w-full rounded border p-3"
+              placeholder="Product Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
 
-          <input
-            type="number"
-            min="0"
-            max="100"
-            className="w-full rounded border p-3"
-            placeholder="Discount"
-            value={discount}
-            onChange={(e) => setDiscount(e.target.value)}
-          />
+          {/* Price */}
+          <div>
+            <label className="mb-2 block font-semibold">
+              Price
+            </label>
 
+            <input
+              type="number"
+              className="w-full rounded border p-3"
+              placeholder="Price"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+            />
+          </div>
+
+          {/* Category */}
+          <div>
+            <label className="mb-2 block font-semibold">
+              Category
+            </label>
+
+            <input
+              className="w-full rounded border p-3"
+              placeholder="Category"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+            />
+          </div>
+
+          {/* Discount */}
+          <div>
+            <label className="mb-2 block font-semibold">
+              Discount (%)
+            </label>
+
+            <input
+              type="number"
+              min="0"
+              max="100"
+              className="w-full rounded border p-3"
+              placeholder="Discount"
+              value={discount}
+              onChange={(e) => setDiscount(e.target.value)}
+            />
+          </div>
+
+          {/* Stock */}
+          <div className="rounded-lg border bg-slate-50 p-4">
+            <div className="flex items-center justify-between">
+
+              <div>
+                <p className="font-semibold">
+                  Stock Status
+                </p>
+
+                <p className="text-sm text-gray-500">
+                  Product বর্তমানে stock-এ আছে কি না
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setStock((current) => !current)}
+                className={`rounded-full px-5 py-2 font-semibold text-white transition ${
+                  stock
+                    ? "bg-green-600 hover:bg-green-700"
+                    : "bg-red-600 hover:bg-red-700"
+                }`}
+              >
+                {stock ? "✓ In Stock" : "✕ Out of Stock"}
+              </button>
+
+            </div>
+          </div>
+
+          {/* Product Image */}
           <div>
             <label className="mb-2 block font-semibold">
               Product Image
@@ -201,10 +268,14 @@ export default function EditProductPage() {
             )}
           </div>
 
-          <div className="flex gap-3">
+          {/* Buttons */}
+          <div className="flex gap-3 pt-2">
+
             <button
               type="button"
-              onClick={() => router.push("/merchant/products")}
+              onClick={() =>
+                router.push("/merchant/products")
+              }
               className="flex-1 rounded bg-gray-600 p-3 font-semibold text-white hover:bg-gray-700"
             >
               Cancel
@@ -216,9 +287,13 @@ export default function EditProductPage() {
               disabled={saving}
               className="flex-1 rounded bg-green-700 p-3 font-semibold text-white hover:bg-green-800 disabled:opacity-50"
             >
-              {saving ? "Updating..." : "Update Product"}
+              {saving
+                ? "Updating..."
+                : "Update Product"}
             </button>
+
           </div>
+
         </div>
       </div>
     </main>

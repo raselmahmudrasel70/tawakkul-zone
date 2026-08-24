@@ -114,7 +114,7 @@ export async function GET(
 /* =========================================================
    PATCH - Update one merchant-owned product
    ========================================================= */
-
+   
 export async function PATCH(
   request: Request,
   { params }: RouteContext
@@ -136,7 +136,7 @@ export async function PATCH(
       );
     }
 
-    // Make sure the product belongs to this merchant.
+    // Check product ownership
     const { data: existingProduct, error: findError } =
       await supabaseAdmin
         .from("products")
@@ -173,6 +173,14 @@ export async function PATCH(
       formData.get("discount") ?? 0
     );
 
+    // Stock
+    const stockValue = String(
+      formData.get("stock") ?? "true"
+    );
+
+    const stock =
+      stockValue === "true";
+
     if (!name) {
       return NextResponse.json(
         { error: "Product name is required." },
@@ -197,29 +205,24 @@ export async function PATCH(
       );
     }
 
-    /*
-     * Image upload is intentionally not changed here.
-     *
-     * Your current product API does not have a confirmed
-     * Supabase Storage bucket configuration, so we keep
-     * the existing image.
-     */
-
     const updateData = {
       name,
       category,
       price,
       discount,
+      stock,
     };
 
-    const { data: updatedProduct, error: updateError } =
-      await supabaseAdmin
-        .from("products")
-        .update(updateData)
-        .eq("id", productId)
-        .eq("created_by", user.id)
-        .select()
-        .single();
+    const {
+      data: updatedProduct,
+      error: updateError,
+    } = await supabaseAdmin
+      .from("products")
+      .update(updateData)
+      .eq("id", productId)
+      .eq("created_by", user.id)
+      .select()
+      .single();
 
     if (updateError) {
       console.error(
@@ -249,12 +252,13 @@ export async function PATCH(
     );
 
     return NextResponse.json(
-      { error: "Failed to update product." },
+      {
+        error: "Failed to update product.",
+      },
       { status: 500 }
     );
   }
 }
-
 /* =========================================================
    DELETE - Existing working merchant delete
    ========================================================= */
