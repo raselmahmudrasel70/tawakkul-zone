@@ -240,7 +240,7 @@ export default function FeaturedProducts({
 
                           {/* ORIGINAL PRICE */}
 
-                          <span className="text-sm font-semibold text-red-500 line-through">
+                          <span className="text-sm font-semibold text-black line-through">
                             ৳ {product.price}
                           </span>
 
@@ -254,7 +254,7 @@ export default function FeaturedProducts({
 
                         {/* DISCOUNTED PRICE */}
 
-                        <p className="mt-1 text-2xl font-extrabold text-green-700">
+                        <p className="mt-1 text-2xl font-extrabold text-black">
                           ৳{" "}
                           {discountedPrice}
                         </p>

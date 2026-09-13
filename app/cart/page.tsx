@@ -181,7 +181,7 @@ export default function CartPage() {
                 onClick={() =>
                   router.push("/checkout")
                 }
-                className="block w-full rounded-xl bg-pink-700 py-4 text-center text-lg font-bold text-white transition hover:bg-pink-800"
+                className="block w-full rounded-xl bg-black py-4 text-center text-lg font-bold text-white transition"
               >
                 Proceed to Checkout
               </button>
