@@ -54,11 +54,12 @@ export default async function ProductsPage() {
               <div className="flex items-center gap-5">
                 <div className="relative h-24 w-24 overflow-hidden rounded-xl border bg-gray-100">
                   <Image
-                    src={product.images || "/products/product1.jpg"}
-                    alt={product.name}
-                    fill
-                    className="object-cover"
-                  />
+  src={product.images || "/products/product1.jpg"}
+  alt={product.name}
+  fill
+  sizes="64px"
+  className="object-cover"
+/>
                 </div>
 
                 <div>

@@ -29,11 +29,12 @@ export default function ProductDetails({ product }: Props) {
         {/* Product Image */}
         <div className="relative h-[600px] overflow-hidden rounded-3xl border border-zinc-700 shadow-2xl">
           <Image
-            src={product.images || "/products/product1.jpg"}
-            alt={product.name}
-            fill
-            className="object-cover"
-          />
+  src={product.images || "/products/product1.jpg"}
+  alt={product.name}
+  fill
+  sizes="64px"
+  className="object-cover"
+/>
         </div>
 
         {/* Product Info */}

@@ -41,7 +41,7 @@ useEffect(() => {
   if (!search.trim()) return null;
 
   return (
-    <div className="absolute left-0 top-full mt-3 w-full rounded-2xl bg-white shadow-2xl">
+    <div className="absolute left-0 top-full z-[9999] mt-3 w-full rounded-2xl bg-white shadow-2xl">
 
       {filteredProducts.length === 0 ? (
         <div className="p-6 text-center text-red-500">

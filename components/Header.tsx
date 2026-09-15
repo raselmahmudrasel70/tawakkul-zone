@@ -68,7 +68,7 @@ export default function Header() {
   }, [showMenu]);
 
   return (
-    <header className="relative z-30 bg-slate-400 text-white shadow-lg">
+    <header className="relative z-[100] bg-slate-400 text-white shadow-lg">
 
       {/* ================= DESKTOP ================= */}
       <div className="hidden lg:block">
