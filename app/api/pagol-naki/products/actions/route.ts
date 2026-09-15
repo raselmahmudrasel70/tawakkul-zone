@@ -3,6 +3,7 @@
 import { NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import sharp from "sharp";
 
 export async function POST(request: Request) {
   try {
@@ -177,20 +178,29 @@ if (image instanceof File && image.size > 0) {
     .replace(/\s+/g, "-")
     .replace(/[^a-zA-Z0-9.-]/g, "");
 
-  const fileName = `${Date.now()}-${cleanName}`;
 
-  const buffer = Buffer.from(
-    await image.arrayBuffer()
-  );
+  const buffer = await sharp(
+  Buffer.from(await image.arrayBuffer())
+)
+  .resize(1200, 1200, {
+    fit: "inside",
+    withoutEnlargement: true,
+  })
+  .webp({
+    quality: 82,
+  })
+  .toBuffer();
 
-  const { data: uploadData, error: uploadError } =
-    await supabase.storage
-      .from("products")
-      .upload(fileName, buffer, {
-        contentType: image.type,
-        cacheControl: "3600",
-        upsert: false,
-      });
+const webpFileName = `${Date.now()}-${cleanName.replace(/\.[^/.]+$/, "")}.webp`;
+
+const { data: uploadData, error: uploadError } =
+  await supabase.storage
+    .from("products")
+    .upload(webpFileName, buffer, {
+      contentType: "image/webp",
+      cacheControl: "3600",
+      upsert: false,
+    });
 
 
   if (uploadError) {
