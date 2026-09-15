@@ -155,8 +155,8 @@ function generateSKU(text: string) {
               >
                 <option>Three Piece</option>
                 <option>Skin Care</option>
+                <option>Gadgets</option>
                 <option>Socks</option>
-                <option>Hijab</option>
                 <option>Fabric</option>
                 <option>Kids</option>
               </select>

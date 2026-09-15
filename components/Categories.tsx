@@ -11,8 +11,8 @@ export default function Categories({
     "All Products",
     "Three Piece",
     "Skin Care",
+    "Gadgets",
     "Socks",
-    "Hijab",
     "Fabric",
     "Kids",
   ];
